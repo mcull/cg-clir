@@ -22,8 +22,7 @@ async function searchArtworks(
     .select(
       `
       id,
-      title,
-      image_url,
+      *,
       artist:artists(id, first_name, last_name)
       `,
       { count: "exact" }
