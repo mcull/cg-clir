@@ -78,12 +78,21 @@ function saveProgress(progress: Progress) {
 }
 
 // ─── Image processing ─────────────────────────────────────────────────────
-async function downloadImage(url: string): Promise<Buffer> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status} fetching ${url}`);
+async function downloadImage(url: string, retries = 3): Promise<Buffer> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} fetching ${url}`);
+      }
+      return Buffer.from(await response.arrayBuffer());
+    } catch (err) {
+      if (attempt === retries) throw err;
+      // Wait before retrying (exponential backoff)
+      await new Promise((r) => setTimeout(r, 1000 * attempt));
+    }
   }
-  return Buffer.from(await response.arrayBuffer());
+  throw new Error("unreachable");
 }
 
 async function processAndUploadVariants(
@@ -127,19 +136,34 @@ async function processAndUploadVariants(
 async function main() {
   console.log("Fetching artworks with images from Supabase...");
 
-  const { data: artworks, error } = await supabase
-    .from("artworks")
-    .select("id, inventory_number, image_original, image_url")
-    .not("image_original", "is", null)
-    .not("inventory_number", "is", null)
-    .order("inventory_number");
+  // Paginate to get all artworks (Supabase REST defaults to 1000)
+  type ArtworkRow = { id: string; inventory_number: string | null; image_original: string | null; image_url: string | null };
+  let allArtworks: ArtworkRow[] = [];
+  let offset = 0;
+  const PAGE_SIZE = 1000;
 
-  if (error) {
-    console.error("Error fetching artworks:", error);
-    process.exit(1);
+  while (true) {
+    const { data, error } = await supabase
+      .from("artworks")
+      .select("id, inventory_number, image_original, image_url")
+      .not("image_original", "is", null)
+      .not("inventory_number", "is", null)
+      .order("inventory_number")
+      .range(offset, offset + PAGE_SIZE - 1);
+
+    if (error) {
+      console.error("Error fetching artworks:", error);
+      process.exit(1);
+    }
+    if (!data || data.length === 0) break;
+    allArtworks = allArtworks.concat(data);
+    if (data.length < PAGE_SIZE) break;
+    offset += PAGE_SIZE;
   }
 
-  if (!artworks || artworks.length === 0) {
+  const artworks = allArtworks;
+
+  if (artworks.length === 0) {
     console.log("No artworks with images found. Run import-csv.ts first.");
     process.exit(0);
   }

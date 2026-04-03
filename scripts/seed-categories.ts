@@ -70,9 +70,29 @@ const CATEGORY_DEFINITIONS = [
 async function main() {
   console.log("Fetching all artworks...");
 
-  const { data: artworks, error } = await supabase
-    .from("artworks")
-    .select("id, medium, tags, depth");
+  // Supabase REST API defaults to 1000 rows — paginate to get all
+  let allArtworks: { id: string; medium: string | null; tags: string[] | null; depth: number | null }[] = [];
+  let offset = 0;
+  const PAGE_SIZE = 1000;
+
+  while (true) {
+    const { data, error: fetchErr } = await supabase
+      .from("artworks")
+      .select("id, medium, tags, depth")
+      .range(offset, offset + PAGE_SIZE - 1);
+
+    if (fetchErr) {
+      console.error("Error fetching artworks:", fetchErr);
+      process.exit(1);
+    }
+    if (!data || data.length === 0) break;
+    allArtworks = allArtworks.concat(data);
+    if (data.length < PAGE_SIZE) break;
+    offset += PAGE_SIZE;
+  }
+
+  const artworks = allArtworks;
+  const error = null;
 
   if (error || !artworks) {
     console.error("Error fetching artworks:", error);

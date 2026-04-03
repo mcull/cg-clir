@@ -22,11 +22,11 @@ const MIGRATION_FILE = path.join(
 
 async function main() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const dbPassword = process.env.SUPABASE_DB_PASSWORD;
 
-  if (!url || !key) {
+  if (!url || !dbPassword) {
     console.error(
-      "Error: Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY"
+      "Error: Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_DB_PASSWORD in .env.local"
     );
     process.exit(1);
   }
@@ -34,8 +34,9 @@ async function main() {
   // Extract project ref from URL: https://<ref>.supabase.co
   const projectRef = new URL(url).hostname.split(".")[0];
 
-  // Supabase Postgres connection via the pooler
-  const connectionString = `postgresql://postgres.${projectRef}:${key}@aws-0-us-west-1.pooler.supabase.com:6543/postgres`;
+  // Try direct connection first, fall back to pooler
+  // Direct: db.<ref>.supabase.co:5432
+  const connectionString = `postgresql://postgres:${encodeURIComponent(dbPassword)}@db.${projectRef}.supabase.co:5432/postgres`;
 
   console.log("Reading migration file...");
   const sql = fs.readFileSync(MIGRATION_FILE, "utf-8");
