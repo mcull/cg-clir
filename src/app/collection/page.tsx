@@ -40,6 +40,7 @@ async function getArtworks(
       id,
       title,
       image_url,
+      image_original,
       artist:artists(id, first_name, last_name),
       categories:artwork_categories(category:categories(id, name, slug))
       `,

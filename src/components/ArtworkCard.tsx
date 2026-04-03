@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Artwork } from "@/lib/types";
-import { getAltText, formatArtistName } from "@/lib/utils";
+import { getAltText, formatArtistName, resolveImageUrl } from "@/lib/utils";
 
 interface ArtworkCardProps {
   artwork: Artwork & { artist?: { first_name: string; last_name: string } };
@@ -9,6 +9,7 @@ interface ArtworkCardProps {
 
 export default function ArtworkCard({ artwork }: ArtworkCardProps) {
   const altText = getAltText(artwork);
+  const imageUrl = resolveImageUrl(artwork);
   const artistName = artwork.artist
     ? formatArtistName(artwork.artist.first_name, artwork.artist.last_name)
     : "Unknown Artist";
@@ -17,9 +18,9 @@ export default function ArtworkCard({ artwork }: ArtworkCardProps) {
     <Link href={`/artwork/${artwork.id}`}>
       <article className="group cursor-pointer">
         <div className="aspect-square relative bg-gray-100 overflow-hidden rounded-sm mb-3">
-          {artwork.image_url ? (
+          {imageUrl ? (
             <Image
-              src={artwork.image_url}
+              src={imageUrl}
               alt={altText}
               fill
               className="object-cover group-hover:opacity-90 transition-opacity"

@@ -58,6 +58,30 @@ export function parseTags(tagString: string | undefined): string[] {
 }
 
 /**
+ * Resolve an artwork's display image URL.
+ * Handles: absolute URLs (pass through), relative R2 paths (need public URL),
+ * and fallback to image_original if needed.
+ */
+export function resolveImageUrl(artwork: {
+  image_url: string | null;
+  image_original?: string | null;
+}): string | null {
+  const url = artwork.image_url;
+  if (url && (url.startsWith("http://") || url.startsWith("https://"))) {
+    return url;
+  }
+  // image_url is a relative R2 path — fall back to original Art Cloud URL
+  if (artwork.image_original) {
+    return artwork.image_original;
+  }
+  // Last resort: construct absolute R2 URL if public URL is configured
+  if (url && process.env.NEXT_PUBLIC_R2_PUBLIC_URL) {
+    return `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${url}`;
+  }
+  return null;
+}
+
+/**
  * Get the effective alt text for an artwork (admin-edited takes priority).
  */
 export function getAltText(artwork: {

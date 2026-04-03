@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Artwork } from "@/lib/types";
-import { getAltText, formatArtistName, formatDimensions } from "@/lib/utils";
+import { getAltText, formatArtistName, formatDimensions, resolveImageUrl } from "@/lib/utils";
 import DownloadButton from "@/components/DownloadButton";
 import ArtworkGrid from "@/components/ArtworkGrid";
 import ArtworkCard from "@/components/ArtworkCard";
@@ -93,10 +93,10 @@ export async function generateMetadata({ params }: ArtworkPageProps) {
     openGraph: {
       title: artwork.title,
       description: altText,
-      images: artwork.image_url
+      images: resolveImageUrl(artwork)
         ? [
             {
-              url: artwork.image_url,
+              url: resolveImageUrl(artwork)!,
               width: 1200,
               height: 1200,
               alt: altText,
@@ -120,6 +120,7 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
     (await getArtistArtworks(artwork.artist_id, artwork.id));
 
   const altText = getAltText(artwork);
+  const imageUrl = resolveImageUrl(artwork);
   const artistName = artwork.artist
     ? formatArtistName(artwork.artist.first_name, artwork.artist.last_name)
     : "Unknown Artist";
@@ -158,9 +159,9 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
         {/* Image */}
         <div className="lg:col-span-2">
           <div className="bg-gray-100 aspect-square relative mb-4">
-            {artwork.image_url ? (
+            {imageUrl ? (
               <Image
-                src={artwork.image_url}
+                src={imageUrl}
                 alt={altText}
                 fill
                 className="object-cover"
