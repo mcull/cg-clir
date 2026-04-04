@@ -1,0 +1,249 @@
+website_slug,clir_slug,clir_name,has_bio,bio_length,match_type,updated_db
+"judith-scott","judith-scott","Judith Scott",true,3104,"exact_slug",true
+"aurie-ramirez","aurie-ramirez","Aurie Ramirez",true,2382,"exact_slug",true
+"cedric-johnson","","",true,1543,"no_match",false
+"gail-lewis","gail-lewis","Gail Lewis",true,1167,"exact_slug",true
+"donald-mitchell","donald-mitchell","Donald Mitchell",true,1415,"exact_slug",true
+"jay-daley","jay-daley","Jay Daley",true,782,"exact_slug",true
+"jessica-rodriguez","","",true,318,"no_match",false
+"franna-lusson","franna-lusson","Franna Lusson",true,3748,"exact_slug",true
+"susan-janow","","",true,1652,"no_match",false
+"dan-miller","dan-miller","Dan Miller",true,1884,"exact_slug",true
+"john-hiltunen","john-hiltunen","John Hiltunen",true,2624,"exact_slug",true
+"john-mullins","john-mullins","John Mullins",true,508,"exact_slug",true
+"lulu-sotelo","","",true,1792,"no_match",false
+"tony-pedemonte","","",true,1868,"no_match",false
+"ron-veasey","ron-veasey","Ron Veasey",true,2987,"exact_slug",true
+"daniel-gardiner","","",false,0,"no_match",false
+"dinah-shapiro","","",true,3731,"no_match",false
+"ying-ge-zhou","ying-ge-zhou","Ying Ge Zhou",true,1918,"exact_slug",true
+"peter-salsman","","",true,1470,"no_match",false
+"alice-wong","","",true,1649,"no_match",false
+"latefa-noorzai","latefa-noorzai","Latefa Noorzai",true,1680,"exact_slug",true
+"rosa-giron","","",true,624,"no_match",false
+"paul-fields","","",true,973,"no_match",false
+"marion-bolton","marion-bolton","Marion Bolton",true,1114,"exact_slug",true
+"natascha-haehlen","","",true,1572,"no_match",false
+"maureen-clay","maureen-clay","Maureen Clay",true,1251,"exact_slug",true
+"william-tyler","william-tyler","William Tyler",true,2110,"exact_slug",true
+"zina-hall","","",true,2491,"no_match",false
+"ray-vickers","","",true,2130,"no_match",false
+"john-martin","john-martin","John Martin",true,2133,"exact_slug",true
+"jack-lahaderne","","",true,242,"no_match",false
+"barry-regan","","",true,1666,"no_match",false
+"casey-byrnes","casey-byrnes","Casey Byrnes",true,4555,"exact_slug",true
+"david-albertsen","david-albertsen","David Albertsen",false,0,"exact_slug",false
+"terri-bowden","terri-bowden","Terri Bowden",true,3407,"exact_slug",true
+"gerone-spruill","gerone-spruill","Gerone Spruill",true,149,"exact_slug",true
+"kim-clark","","",true,264,"no_match",false
+"jorge-gomez","","",true,1262,"no_match",false
+"dan-hamilton","dan-hamilton","Dan Hamilton",true,1692,"exact_slug",true
+"sherry-stanley","","",true,292,"no_match",false
+"dlisa-fort","","",true,540,"no_match",false
+"dwight-mackintosh","dwight-mackintosh","Dwight Mackintosh",true,3855,"exact_slug",true
+"allan-lofberg","","",true,1372,"no_match",false
+"jason-jackson","","",true,48,"no_match",false
+"luis-aguilera","luis-aguilera","Luis Aguilera",true,643,"exact_slug",true
+"carlos-fernandez","","",true,1450,"no_match",false
+"larry-randolph","larry-randolph","Larry Randolph",true,1863,"exact_slug",true
+"george-wilson","george-wilson","George Wilson",true,1404,"exact_slug",true
+"joseph-alef","","",true,1423,"no_match",false
+"valerie-tribble","valerie-tribble","Valerie Tribble",true,114,"exact_slug",true
+"barbara-guhl","","",true,280,"no_match",false
+"barbara-mealey","","",true,469,"no_match",false
+"monica-valentine","","",true,1570,"no_match",false
+"rickie-algarva","","",true,2337,"no_match",false
+"ruth-stafford","","",true,717,"no_match",false
+"ricardo-gaitan","","",true,1078,"no_match",false
+"christine-szeto","","",true,1780,"no_match",false
+"carrie-oyama","","",true,2384,"no_match",false
+"paulino-martin","","",true,1281,"no_match",false
+"lauren-dare","lauren-dare","Lauren Dare",true,741,"exact_slug",true
+"edwin-zalenski","","",true,1524,"no_match",false
+"theresa-lambert","","",true,1182,"no_match",false
+"angela-villalobos","","",true,855,"no_match",false
+"shayla-weber","","",false,0,"no_match",false
+"william-scott","william-scott","William Scott",true,4291,"exact_slug",true
+"brian-nakahara","","",true,1008,"no_match",false
+"sherrie-aradanas","","",true,1487,"no_match",false
+"heather-edgar","","",true,867,"no_match",false
+"nicole-storm","nicole-storm","Nicole Storm",true,3662,"exact_slug",true
+"mayra-gonzalez","","",true,1368,"no_match",false
+"chris-corr-barberis","","",true,374,"no_match",false
+"james-davis","","",true,982,"no_match",false
+"lynn-pisco","","",true,356,"no_match",false
+"stephanie-hill","","",true,819,"no_match",false
+"carlos-perez","","",true,1637,"no_match",false
+"madison-bandy","","",false,0,"no_match",false
+"david-parsons","","",false,0,"no_match",false
+"juan-aguilera","juan-aguilera","Juan Aguilera",true,1632,"exact_slug",true
+"meyshe-shapiro-nygren","","",true,1294,"no_match",false
+"kristian-cheek","kristian-cheek","Kristian Cheek",true,249,"exact_slug",true
+"rosena-finister","rosena-finister","Rosena Finister",true,1412,"exact_slug",true
+"sher-ron-freeman","","",true,584,"no_match",false
+"sallie-williams","","",true,518,"no_match",false
+"julie-swartout","","",true,131,"no_match",false
+"stephanie-nguyen","","",true,623,"no_match",false
+"jordan-king","jordan-king","Jordan King",true,1214,"exact_slug",true
+"gina-damerell","","",true,980,"no_match",false
+"raydell-early","","",true,760,"no_match",false
+"gregory-stoper","","",false,0,"no_match",false
+"betty-hinman","","",true,62,"no_match",false
+"alice-ung","","",true,961,"no_match",false
+"katrina-taylor","","",true,462,"no_match",false
+"angela-archuleta","","",false,0,"no_match",false
+"andrea-leber","andrea-leber","Andrea Leber",true,1522,"exact_slug",true
+"jo-beal","","",true,919,"no_match",false
+"shirley-chiu","","",true,257,"no_match",false
+"jane-kassner","jane-kassner","Jane Kassner",true,516,"exact_slug",true
+"lawrence-choy","","",true,504,"no_match",false
+"bruce-howell","","",true,1483,"no_match",false
+"tanisha-warren","","",true,657,"no_match",false
+"kathy-zhong","","",true,114,"no_match",false
+"diana-lo","","",true,445,"no_match",false
+"susan-glikbarg","","",true,570,"no_match",false
+"nancy-weigen","nancy-weigen","Nancy Weigen",false,0,"exact_slug",false
+"emily-dunster-farey","","",true,228,"no_match",false
+"isaiah-jackson","isaiah-jackson","Isaiah Jackson",true,731,"exact_slug",true
+"jamie-ghilardi","","",true,418,"no_match",false
+"debra-crider","","",false,0,"no_match",false
+"lena-saavedra","","",false,0,"no_match",false
+"avery-babon","","",true,290,"no_match",false
+"lena-salk","lena-salk","Lena Salk",false,0,"exact_slug",false
+"ana-alegre","","",false,0,"no_match",false
+"amid-ehsani","","",true,260,"no_match",false
+"robbie-erion","","",true,1052,"no_match",false
+"walter-baldwin","","",true,292,"no_match",false
+"shui-wah-poon","","",true,59,"no_match",false
+"nathaniel-jackson","","",true,416,"no_match",false
+"lisa-craib","","",true,339,"no_match",false
+"james-freid","","",true,2977,"no_match",false
+"henry-trockle","","",true,523,"no_match",false
+"janis-danker","","",true,48,"no_match",false
+"eli-cooper","","",true,622,"no_match",false
+"elizabeth-rangel","","",true,523,"no_match",false
+"carol-fullen","","",true,157,"no_match",false
+"donna-kurtz","","",true,229,"no_match",false
+"ryan-williams","","",false,0,"no_match",false
+"carmen-quinones","","",false,0,"no_match",false
+"lisa-lipton","","",true,139,"no_match",false
+"jack-starbuck","","",true,561,"no_match",false
+"aj-herzfeld","","",true,444,"no_match",false
+"jade-saren","","",true,1366,"no_match",false
+"julian-ou","","",true,863,"no_match",false
+"reginald-burton","","",true,397,"no_match",false
+"trinity-joseph","","",false,0,"no_match",false
+"karen-ridge","","",true,484,"no_match",false
+"emily-witkin","","",true,476,"no_match",false
+"emmanuel-gonzalez","","",true,444,"no_match",false
+"kathleen-miller","","",true,469,"no_match",false
+"jordan-evans","","",true,688,"no_match",false
+"melissa-poe","","",true,598,"no_match",false
+"gregg-nakanishi","","",true,539,"no_match",false
+"tristram-day-schott","","",true,374,"no_match",false
+"joe-spears-iii","","",true,371,"no_match",false
+"akasha-cananizado","","",true,937,"no_match",false
+"emma-holbrook","","",true,538,"no_match",false
+"malia-ramsey","","",true,928,"no_match",false
+"steven-pho","","",true,337,"no_match",false
+"hyo-ju-mims","","",true,568,"no_match",false
+"adumasa-ayinde","","",false,0,"no_match",false
+"isaac-bar-zeev","","",false,0,"no_match",false
+"brenda-estrada","","",false,0,"no_match",false
+"oliver-santana","","",false,0,"no_match",false
+"isabel-gallegos","","",true,61,"no_match",false
+"oscar-bomse","","",false,0,"no_match",false
+"erik-kodono","","",false,0,"no_match",false
+"peter-ahn","","",false,0,"no_match",false
+"zachary-barber","","",false,0,"no_match",false
+"maya-rogers","","",false,0,"no_match",false
+"alex-schaffer","","",true,446,"no_match",false
+"angel-love","","",true,352,"no_match",false
+"ernest-spears","","",false,0,"no_match",false
+"eva-garrett","","",false,0,"no_match",false
+"cathy-sampson","","",false,0,"no_match",false
+"anthony-baio","","",false,0,"no_match",false
+"james-ferrell","","",false,0,"no_match",false
+"maria-lopez","","",false,0,"no_match",false
+"charles-nagle","charles-nagle","Charles Nagle",false,0,"exact_slug",false
+"paul-gee","paul-gee","Paul Gee",false,0,"exact_slug",false
+"pharroh-mosely-katakanga","","",false,0,"no_match",false
+"victoria-sisneros","","",false,0,"no_match",false
+"zar-shepard","","",true,822,"no_match",false
+"peter-landau","","",true,162,"no_match",false
+"jean-paul-vallence","","",true,182,"no_match",false
+"robert-lauricella","robert-lauricella","Robert Lauricella",false,0,"exact_slug",false
+"andre-keenan","","",false,0,"no_match",false
+"jarren-samuel","","",false,0,"no_match",false
+"pharroh-mosley-katakanga","","",false,0,"no_match",false
+"charles-brown","","",false,0,"no_match",false
+"yolanda-vallance","","",true,239,"no_match",false
+"benjamin-lew","","",false,0,"no_match",false
+"calista-novenario","","",false,0,"no_match",false
+"daniel-vallance","","",false,0,"no_match",false
+"katherine-miller","","",true,147,"no_match",false
+"elizabeth-rangel-i","","",true,153,"no_match",false
+"darrel-davis","","",true,420,"no_match",false
+"emily-hessenauer","","",true,352,"no_match",false
+"kerry-damianakes","kerry-damianakes","Kerry Damianakes",true,717,"exact_slug",true
+"moises-martinez","","",false,0,"no_match",false
+"jorge-vargas","","",false,0,"no_match",false
+"amaya-lee","","",false,0,"no_match",false
+"hope-hendricks","","",false,0,"no_match",false
+"dania-leyva","","",false,0,"no_match",false
+"jorge-rodriguez-vargas","","",false,0,"no_match",false
+"rey-rivero","","",false,0,"no_match",false
+"camille-mcfarlane","","",false,0,"no_match",false
+"comic-woodall","","",false,0,"no_match",false
+"ben-lieberman-i","","",false,0,"no_match",false
+"jason-monzon","","",false,0,"no_match",false
+"jose-pena-i","","",false,0,"no_match",false
+"andy-banchero","","",false,0,"no_match",false
+"jerren-rylee-samuel","","",false,0,"no_match",false
+"","ana-vasquez","Ana Vasquez",false,0,"clir_only",false
+"","ben-liebermann","Ben Liebermann",false,0,"clir_only",false
+"","camille-holvoet","Camille Holvoet",false,0,"clir_only",false
+"","camille-holvoet-2","Camille Holvoet?",false,0,"clir_only",false
+"","carl-hendrickson","Carl Hendrickson",false,0,"clir_only",false
+"","co-op","Co-Op",false,0,"clir_only",false
+"","darlene","Darlene",false,0,"clir_only",false
+"","darlene-jafoya","Darlene Jafoya",false,0,"clir_only",false
+"","david-alvarez","David Alvarez",false,0,"clir_only",false
+"","donald-paterson","Donald Paterson",false,0,"clir_only",false
+"","earnest-spears","Earnest Spears",false,0,"clir_only",false
+"","eddie-lais","Eddie Lais",false,0,"clir_only",false
+"","edwin-wong","Edwin Wong",false,0,"clir_only",false
+"","eleanor-chackee","Eleanor Chackee",false,0,"clir_only",false
+"","eleanor-hackett","Eleanor Hackett",false,0,"clir_only",false
+"","feraidoon-nalan","Feraidoon Nalan",false,0,"clir_only",false
+"","geary-walker","Geary Walker",false,0,"clir_only",false
+"","george-kellogg","George Kellogg",false,0,"clir_only",false
+"","george-pames","George Pames",false,0,"clir_only",false
+"","gina-richardson","Gina Richardson",false,0,"clir_only",false
+"","gloria-gonzalez","Gloria Gonzalez",false,0,"clir_only",false
+"","jacqueline-frank","Jacqueline Frank",false,0,"clir_only",false
+"","jeanette-tessandori","Jeanette Tessandori",false,0,"clir_only",false
+"","kathleen-flannegau","Kathleen Flannegau",false,0,"clir_only",false
+"","ken-veasey","Ken Veasey",false,0,"clir_only",false
+"","laura-jo-pierce","Laura Jo Pierce",false,0,"clir_only",false
+"","lolita-triplette","Lolita Triplette",false,0,"clir_only",false
+"","louis-estape","Louis Estape",false,0,"clir_only",false
+"","maria-bustillos","Maria Bustillos",false,0,"clir_only",false
+"","maria-moreno","Maria Moreno",false,0,"clir_only",false
+"","mary-argen","Mary Argen",false,0,"clir_only",false
+"","merritt-wallace","Merritt Wallace",false,0,"clir_only",false
+"","mike-manfield","Mike Manfield",false,0,"clir_only",false
+"","murlin-antoine","Murlin Antoine",false,0,"clir_only",false
+"","nelson-tygart","Nelson Tygart",false,0,"clir_only",false
+"","paul-costa","Paul Costa",false,0,"clir_only",false
+"","ramon-avalos","Ramon Avalos",false,0,"clir_only",false
+"","regina-broussard","Regina Broussard",false,0,"clir_only",false
+"","rick-turner","Rick Turner",false,0,"clir_only",false
+"","robert-feise","Robert Feise",false,0,"clir_only",false
+"","stanley-carmen","Stanley Carmen",false,0,"clir_only",false
+"","thelma","Thelma",false,0,"clir_only",false
+"","vera-hollins","Vera Hollins",false,0,"clir_only",false
+"","vj-williamson","VJ Williamson",false,0,"clir_only",false
+"","william-savella","William Savella",false,0,"clir_only",false
+"","xzcxzcxzxcz","xzcxzcxzxcz'",false,0,"clir_only",false
+"","zelma-riley","Zelma Riley",false,0,"clir_only",false
