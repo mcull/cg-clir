@@ -292,6 +292,27 @@
   const progressFill = $('#progressFill');
   const toast = $('#toast');
 
+  // ─── State persistence ────────────────────────────────────────
+  const STATE_KEY = 'cg-clir-review-state';
+
+  function saveState() {
+    const a = filtered[currentIndex];
+    const state = {
+      artworkId: a ? a.id : null,
+      filter: filterSelect.value,
+      search: searchInput.value,
+      index: currentIndex,
+    };
+    try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch(e) {}
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STATE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  }
+
   // ─── Toast ───────────────────────────────────────────────────
   function showToast(msg) {
     toast.textContent = msg;
@@ -371,6 +392,7 @@
     currentIndex = 0;
     renderCurrent();
     updateStats();
+    saveState();
   }
 
   function updateStats() {
@@ -450,19 +472,21 @@
       if (currentIndex < filtered.length - 1) {
         currentIndex++;
       } else {
-        applyFilter(); // re-filter to remove approved if in unreviewed mode
+        applyFilter();
         return;
       }
     } else {
       showToast('Save failed — try again');
     }
     renderCurrent();
+    saveState();
   }
 
   function skip() {
     if (currentIndex < filtered.length - 1) {
       currentIndex++;
       renderCurrent();
+      saveState();
     }
   }
 
@@ -554,10 +578,10 @@
 
   // ─── Navigation ──────────────────────────────────────────────
   prevBtn.addEventListener('click', () => {
-    if (currentIndex > 0) { currentIndex--; renderCurrent(); }
+    if (currentIndex > 0) { currentIndex--; renderCurrent(); saveState(); }
   });
   nextBtn.addEventListener('click', () => {
-    if (currentIndex < filtered.length - 1) { currentIndex++; renderCurrent(); }
+    if (currentIndex < filtered.length - 1) { currentIndex++; renderCurrent(); saveState(); }
   });
 
   // Keyboard shortcuts
@@ -578,7 +602,23 @@
     try {
       allArtworks = await fetchAllArtworks();
       loadingMsg.style.display = 'none';
+
+      // Restore saved state
+      const saved = loadState();
+      if (saved) {
+        filterSelect.value = saved.filter || 'unreviewed';
+        searchInput.value = saved.search || '';
+      }
       applyFilter();
+
+      // Restore position by artwork ID
+      if (saved && saved.artworkId) {
+        const idx = filtered.findIndex(a => a.id === saved.artworkId);
+        if (idx >= 0) {
+          currentIndex = idx;
+          renderCurrent();
+        }
+      }
     } catch (err) {
       loadingMsg.textContent = 'Error loading data: ' + err.message;
     }
