@@ -10,9 +10,7 @@ import cgHeaderHtml from "./cg-header.html";
 
 export default function Header() {
   const pathname = usePathname();
-
   const isAdmin = pathname?.startsWith("/admin");
-  if (isAdmin) return null;
 
   // Wire up dropdown toggle behavior for the injected CG nav
   useEffect(() => {
@@ -61,9 +59,11 @@ export default function Header() {
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
+  if (isAdmin) return null;
+
   return (
     <header className="bg-white sticky top-0 z-40">
-      {/* Load CG header CSS */}
+      {/* eslint-disable-next-line @next/next/no-css-tags */}
       <link rel="stylesheet" href="/cg-header.css" />
 
       {/* Injected CG header */}

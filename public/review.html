@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CG CLIR — Description Review Tool</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .header .stats {
+      font-size: 14px;
+      color: #666;
+    }
+    .header .stats strong { color: #198639; }
+    .controls {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 12px 24px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .controls select, .controls input {
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .controls input[type="text"] { width: 250px; }
+    .controls button {
+      padding: 6px 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .controls button:hover { background: #f0f0f0; }
+    .controls button.active { background: #198639; color: #fff; border-color: #198639; }
+
+    .main { max-width: 900px; margin: 24px auto; padding: 0 24px; }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .card-image {
+      background: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-height: 500px;
+      overflow: hidden;
+    }
+    .card-image img {
+      max-width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+    }
+    .card-image .no-image {
+      padding: 60px;
+      color: #999;
+      font-size: 14px;
+    }
+    .card-body { padding: 24px; }
+    .card-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: #666;
+    }
+    .card-meta span { background: #f0f0f0; padding: 2px 8px; border-radius: 3px; }
+    .card-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .card-artist { font-size: 16px; color: #555; margin-bottom: 16px; }
+
+    .desc-section { margin-bottom: 16px; }
+    .desc-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+    .desc-text {
+      font-size: 15px;
+      line-height: 1.6;
+      padding: 12px;
+      background: #fafafa;
+      border: 1px solid #e8e8e8;
+      border-radius: 4px;
+      min-height: 60px;
+    }
+    textarea.desc-edit {
+      width: 100%;
+      font-size: 15px;
+      line-height: 1.6;
+      padding: 12px;
+      border: 2px solid #198639;
+      border-radius: 4px;
+      min-height: 80px;
+      font-family: inherit;
+      resize: vertical;
+    }
+    .char-count {
+      font-size: 11px;
+      color: #999;
+      text-align: right;
+      margin-top: 2px;
+    }
+    .char-count.over { color: #d32f2f; font-weight: 700; }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
+    }
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-approve { background: #198639; color: #fff; }
+    .btn-approve:hover { background: #146b2d; }
+    .btn-edit { background: #fff; border: 1px solid #ccc; }
+    .btn-edit:hover { background: #f5f5f5; }
+    .btn-save { background: #1976d2; color: #fff; }
+    .btn-save:hover { background: #1565c0; }
+    .btn-cancel { background: #fff; border: 1px solid #ccc; }
+    .btn-skip { background: #fff; border: 1px solid #ccc; }
+    .btn-skip:hover { background: #f5f5f5; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-reviewed { background: #e8f5e9; color: #2e7d32; }
+    .badge-pending { background: #fff3e0; color: #e65100; }
+
+    .progress-bar {
+      width: 200px;
+      height: 6px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-bar .fill {
+      height: 100%;
+      background: #198639;
+      transition: width 0.3s;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .nav-buttons button {
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+    }
+    .nav-buttons button:hover { background: #f0f0f0; }
+    .nav-buttons button:disabled { opacity: 0.3; cursor: default; }
+    .nav-buttons .pos { font-size: 14px; color: #666; min-width: 80px; text-align: center; }
+
+    .loading { text-align: center; padding: 60px; color: #888; }
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #333;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 100;
+    }
+    .toast.show { opacity: 1; }
+
+    @media (max-width: 640px) {
+      .header { flex-direction: column; gap: 8px; }
+      .controls { flex-direction: column; }
+      .controls input[type="text"] { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>CG CLIR Description Review</h1>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="stats">
+      <strong id="reviewedCount">—</strong> / <span id="totalCount">—</span> reviewed
+    </div>
+    <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="controls">
+  <select id="filterSelect">
+    <option value="unreviewed">Unreviewed only</option>
+    <option value="all">All with descriptions</option>
+    <option value="reviewed">Reviewed only</option>
+  </select>
+  <input type="text" id="searchInput" placeholder="Search by title or artist...">
+  <div class="nav-buttons">
+    <button id="prevBtn" title="Previous">&larr;</button>
+    <span class="pos" id="posLabel">— / —</span>
+    <button id="nextBtn" title="Next">&rarr;</button>
+  </div>
+</div>
+
+<div class="main" id="mainContent">
+  <div class="loading" id="loadingMsg">Loading artworks from Supabase...</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── Config ──────────────────────────────────────────────────
+  // These will be filled in when deploying; for local dev they read from the page URL's origin
+  const SUPABASE_URL = 'https://qvovplzzvfqkzbmvplbu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2b3ZwbHp6dmZxa3pibXZwbGJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NTY0MTYsImV4cCI6MjA4MDIzMjQxNn0.zBHrGDqVBbmFAaLuzRS0CRullTZrmpLp4z6GZLQWqzc';
+
+  const headers = {
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal',
+  };
+
+  // ─── State ───────────────────────────────────────────────────
+  let allArtworks = [];
+  let filtered = [];
+  let currentIndex = 0;
+  let editing = false;
+
+  // ─── DOM refs ────────────────────────────────────────────────
+  const $ = (sel) => document.querySelector(sel);
+  const filterSelect = $('#filterSelect');
+  const searchInput = $('#searchInput');
+  const prevBtn = $('#prevBtn');
+  const nextBtn = $('#nextBtn');
+  const posLabel = $('#posLabel');
+  const mainContent = $('#mainContent');
+  const loadingMsg = $('#loadingMsg');
+  const reviewedCount = $('#reviewedCount');
+  const totalCount = $('#totalCount');
+  const progressFill = $('#progressFill');
+  const toast = $('#toast');
+
+  // ─── Toast ───────────────────────────────────────────────────
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  // ─── Supabase helpers ────────────────────────────────────────
+  async function fetchAllArtworks() {
+    let all = [];
+    let offset = 0;
+    const limit = 1000;
+    while (true) {
+      const url = `${SUPABASE_URL}/rest/v1/artworks?select=id,title,medium,image_url,image_original,ai_description,alt_text,description_reviewed,inventory_number,artist:artists(first_name,last_name)&ai_description=not.is.null&order=title.asc&offset=${offset}&limit=${limit}`;
+      const res = await fetch(url, { headers });
+      if (!res.ok) {
+        // If description_reviewed column doesn't exist, retry without it
+        if (res.status === 400) {
+          return fetchAllArtworksFallback();
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      all = all.concat(data);
+      if (data.length < limit) break;
+      offset += limit;
+    }
+    return all;
+  }
+
+  async function fetchAllArtworksFallback() {
+    // Fallback if description_reviewed column doesn't exist yet
+    let all = [];
+    let offset = 0;
+    const limit = 1000;
+    while (true) {
+      const url = `${SUPABASE_URL}/rest/v1/artworks?select=id,title,medium,image_url,image_original,ai_description,alt_text,inventory_number,artist:artists(first_name,last_name)&ai_description=not.is.null&order=title.asc&offset=${offset}&limit=${limit}`;
+      const res = await fetch(url, { headers });
+      const data = await res.json();
+      // Add synthetic description_reviewed field
+      data.forEach(a => a.description_reviewed = false);
+      all = all.concat(data);
+      if (data.length < limit) break;
+      offset += limit;
+    }
+    return all;
+  }
+
+  async function updateArtwork(id, fields) {
+    const url = `${SUPABASE_URL}/rest/v1/artworks?id=eq.${id}`;
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify(fields),
+    });
+    return res.ok;
+  }
+
+  // ─── Filter & render ─────────────────────────────────────────
+  function applyFilter() {
+    const filter = filterSelect.value;
+    const search = searchInput.value.toLowerCase().trim();
+
+    filtered = allArtworks.filter(a => {
+      if (filter === 'unreviewed' && a.description_reviewed) return false;
+      if (filter === 'reviewed' && !a.description_reviewed) return false;
+
+      if (search) {
+        const artist = a.artist ? `${a.artist.first_name} ${a.artist.last_name}`.toLowerCase() : '';
+        const title = (a.title || '').toLowerCase();
+        if (!title.includes(search) && !artist.includes(search)) return false;
+      }
+
+      return true;
+    });
+
+    currentIndex = 0;
+    renderCurrent();
+    updateStats();
+  }
+
+  function updateStats() {
+    const reviewed = allArtworks.filter(a => a.description_reviewed).length;
+    const total = allArtworks.length;
+    reviewedCount.textContent = reviewed;
+    totalCount.textContent = total;
+    progressFill.style.width = total ? `${(reviewed / total * 100).toFixed(1)}%` : '0%';
+    posLabel.textContent = filtered.length ? `${currentIndex + 1} / ${filtered.length}` : '0 / 0';
+    prevBtn.disabled = currentIndex <= 0;
+    nextBtn.disabled = currentIndex >= filtered.length - 1;
+  }
+
+  function resolveImageUrl(artwork) {
+    const url = artwork.image_url;
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) return url;
+    if (artwork.image_original) return artwork.image_original;
+    return null;
+  }
+
+  function renderCurrent() {
+    if (filtered.length === 0) {
+      mainContent.innerHTML = '<div class="loading">No artworks match the current filter.</div>';
+      updateStats();
+      return;
+    }
+
+    const a = filtered[currentIndex];
+    const artist = a.artist ? `${a.artist.first_name} ${a.artist.last_name}`.trim() : 'Unknown Artist';
+    const imgUrl = resolveImageUrl(a);
+    const badge = a.description_reviewed
+      ? '<span class="badge badge-reviewed">Reviewed</span>'
+      : '<span class="badge badge-pending">Pending</span>';
+
+    mainContent.innerHTML = `
+      <div class="card">
+        <div class="card-image">
+          ${imgUrl ? `<img src="${imgUrl}" alt="${(a.alt_text || a.title || '').replace(/"/g, '&quot;')}" loading="lazy">` : '<div class="no-image">No image available</div>'}
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            ${badge}
+            ${a.inventory_number ? `<span>${a.inventory_number}</span>` : ''}
+            ${a.medium ? `<span>${a.medium}</span>` : ''}
+          </div>
+          <div class="card-title">${a.title || 'Untitled'}</div>
+          <div class="card-artist">${artist}</div>
+
+          <div class="desc-section">
+            <div class="desc-label">Alt Text (for screen readers, &lt;125 chars)</div>
+            <div class="desc-text" id="altTextDisplay">${a.alt_text || '<em style="color:#999">No alt text</em>'}</div>
+          </div>
+
+          <div class="desc-section">
+            <div class="desc-label">AI Description</div>
+            <div class="desc-text" id="descDisplay">${a.ai_description || '<em style="color:#999">No description</em>'}</div>
+          </div>
+
+          <div class="actions" id="actionButtons">
+            <button class="btn btn-approve" onclick="approve()">Approve &amp; Next</button>
+            <button class="btn btn-edit" onclick="startEdit()">Edit</button>
+            <button class="btn btn-skip" onclick="skip()">Skip</button>
+          </div>
+        </div>
+      </div>
+    `;
+    updateStats();
+  }
+
+  // ─── Actions ─────────────────────────────────────────────────
+  async function approve() {
+    const a = filtered[currentIndex];
+    const ok = await updateArtwork(a.id, { description_reviewed: true });
+    if (ok) {
+      a.description_reviewed = true;
+      showToast('Approved!');
+      if (currentIndex < filtered.length - 1) {
+        currentIndex++;
+      } else {
+        applyFilter(); // re-filter to remove approved if in unreviewed mode
+        return;
+      }
+    } else {
+      showToast('Save failed — try again');
+    }
+    renderCurrent();
+  }
+
+  function skip() {
+    if (currentIndex < filtered.length - 1) {
+      currentIndex++;
+      renderCurrent();
+    }
+  }
+
+  function startEdit() {
+    const a = filtered[currentIndex];
+    editing = true;
+
+    const altDisplay = document.getElementById('altTextDisplay');
+    const descDisplay = document.getElementById('descDisplay');
+    const actions = document.getElementById('actionButtons');
+
+    altDisplay.outerHTML = `
+      <textarea class="desc-edit" id="altTextEdit" maxlength="200">${a.alt_text || ''}</textarea>
+      <div class="char-count" id="altCharCount">${(a.alt_text || '').length} / 125</div>
+    `;
+    descDisplay.outerHTML = `
+      <textarea class="desc-edit" id="descEdit">${a.ai_description || ''}</textarea>
+    `;
+    actions.innerHTML = `
+      <button class="btn btn-save" onclick="saveEdit()">Save</button>
+      <button class="btn btn-save" onclick="saveAndApprove()" style="background:#198639">Save &amp; Approve</button>
+      <button class="btn btn-cancel" onclick="cancelEdit()">Cancel</button>
+    `;
+
+    // Character count for alt text
+    const altEdit = document.getElementById('altTextEdit');
+    const altCount = document.getElementById('altCharCount');
+    altEdit.addEventListener('input', () => {
+      const len = altEdit.value.length;
+      altCount.textContent = `${len} / 125`;
+      altCount.className = len > 125 ? 'char-count over' : 'char-count';
+    });
+  }
+
+  async function saveEdit() {
+    const a = filtered[currentIndex];
+    const altText = document.getElementById('altTextEdit').value.trim();
+    const desc = document.getElementById('descEdit').value.trim();
+
+    const ok = await updateArtwork(a.id, {
+      alt_text: altText,
+      ai_description: desc,
+    });
+
+    if (ok) {
+      a.alt_text = altText;
+      a.ai_description = desc;
+      editing = false;
+      showToast('Saved!');
+      renderCurrent();
+    } else {
+      showToast('Save failed — try again');
+    }
+  }
+
+  async function saveAndApprove() {
+    const a = filtered[currentIndex];
+    const altText = document.getElementById('altTextEdit').value.trim();
+    const desc = document.getElementById('descEdit').value.trim();
+
+    const ok = await updateArtwork(a.id, {
+      alt_text: altText,
+      ai_description: desc,
+      description_reviewed: true,
+    });
+
+    if (ok) {
+      a.alt_text = altText;
+      a.ai_description = desc;
+      a.description_reviewed = true;
+      editing = false;
+      showToast('Saved & Approved!');
+      if (currentIndex < filtered.length - 1) {
+        currentIndex++;
+      } else {
+        applyFilter();
+        return;
+      }
+      renderCurrent();
+    } else {
+      showToast('Save failed — try again');
+    }
+  }
+
+  function cancelEdit() {
+    editing = false;
+    renderCurrent();
+  }
+
+  // ─── Navigation ──────────────────────────────────────────────
+  prevBtn.addEventListener('click', () => {
+    if (currentIndex > 0) { currentIndex--; renderCurrent(); }
+  });
+  nextBtn.addEventListener('click', () => {
+    if (currentIndex < filtered.length - 1) { currentIndex++; renderCurrent(); }
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (editing) return; // don't hijack when editing
+    if (e.key === 'ArrowRight' || e.key === 'j') { nextBtn.click(); }
+    if (e.key === 'ArrowLeft' || e.key === 'k') { prevBtn.click(); }
+    if (e.key === 'a') { approve(); }
+    if (e.key === 'e') { startEdit(); }
+    if (e.key === 's') { skip(); }
+  });
+
+  filterSelect.addEventListener('change', applyFilter);
+  searchInput.addEventListener('input', applyFilter);
+
+  // ─── Init ────────────────────────────────────────────────────
+  (async () => {
+    try {
+      allArtworks = await fetchAllArtworks();
+      loadingMsg.style.display = 'none';
+      applyFilter();
+    } catch (err) {
+      loadingMsg.textContent = 'Error loading data: ' + err.message;
+    }
+  })();
+</script>
+
+</body>
+</html>
