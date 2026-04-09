@@ -1,249 +1,249 @@
-website_slug,clir_slug,clir_name,has_bio,bio_length,match_type,updated_db
-"judith-scott","judith-scott","Judith Scott",true,3104,"exact_slug",true
-"aurie-ramirez","aurie-ramirez","Aurie Ramirez",true,2382,"exact_slug",true
-"cedric-johnson","","",true,1543,"no_match",false
-"gail-lewis","gail-lewis","Gail Lewis",true,1167,"exact_slug",true
-"donald-mitchell","donald-mitchell","Donald Mitchell",true,1415,"exact_slug",true
-"jay-daley","jay-daley","Jay Daley",true,782,"exact_slug",true
-"jessica-rodriguez","","",true,318,"no_match",false
-"franna-lusson","franna-lusson","Franna Lusson",true,3748,"exact_slug",true
-"susan-janow","","",true,1652,"no_match",false
-"dan-miller","dan-miller","Dan Miller",true,1884,"exact_slug",true
-"john-hiltunen","john-hiltunen","John Hiltunen",true,2624,"exact_slug",true
-"john-mullins","john-mullins","John Mullins",true,508,"exact_slug",true
-"lulu-sotelo","","",true,1792,"no_match",false
-"tony-pedemonte","","",true,1868,"no_match",false
-"ron-veasey","ron-veasey","Ron Veasey",true,2987,"exact_slug",true
-"daniel-gardiner","","",false,0,"no_match",false
-"dinah-shapiro","","",true,3731,"no_match",false
-"ying-ge-zhou","ying-ge-zhou","Ying Ge Zhou",true,1918,"exact_slug",true
-"peter-salsman","","",true,1470,"no_match",false
-"alice-wong","","",true,1649,"no_match",false
-"latefa-noorzai","latefa-noorzai","Latefa Noorzai",true,1680,"exact_slug",true
-"rosa-giron","","",true,624,"no_match",false
-"paul-fields","","",true,973,"no_match",false
-"marion-bolton","marion-bolton","Marion Bolton",true,1114,"exact_slug",true
-"natascha-haehlen","","",true,1572,"no_match",false
-"maureen-clay","maureen-clay","Maureen Clay",true,1251,"exact_slug",true
-"william-tyler","william-tyler","William Tyler",true,2110,"exact_slug",true
-"zina-hall","","",true,2491,"no_match",false
-"ray-vickers","","",true,2130,"no_match",false
-"john-martin","john-martin","John Martin",true,2133,"exact_slug",true
-"jack-lahaderne","","",true,242,"no_match",false
-"barry-regan","","",true,1666,"no_match",false
-"casey-byrnes","casey-byrnes","Casey Byrnes",true,4555,"exact_slug",true
-"david-albertsen","david-albertsen","David Albertsen",false,0,"exact_slug",false
-"terri-bowden","terri-bowden","Terri Bowden",true,3407,"exact_slug",true
-"gerone-spruill","gerone-spruill","Gerone Spruill",true,149,"exact_slug",true
-"kim-clark","","",true,264,"no_match",false
-"jorge-gomez","","",true,1262,"no_match",false
-"dan-hamilton","dan-hamilton","Dan Hamilton",true,1692,"exact_slug",true
-"sherry-stanley","","",true,292,"no_match",false
-"dlisa-fort","","",true,540,"no_match",false
-"dwight-mackintosh","dwight-mackintosh","Dwight Mackintosh",true,3855,"exact_slug",true
-"allan-lofberg","","",true,1372,"no_match",false
-"jason-jackson","","",true,48,"no_match",false
-"luis-aguilera","luis-aguilera","Luis Aguilera",true,643,"exact_slug",true
-"carlos-fernandez","","",true,1450,"no_match",false
-"larry-randolph","larry-randolph","Larry Randolph",true,1863,"exact_slug",true
-"george-wilson","george-wilson","George Wilson",true,1404,"exact_slug",true
-"joseph-alef","","",true,1423,"no_match",false
-"valerie-tribble","valerie-tribble","Valerie Tribble",true,114,"exact_slug",true
-"barbara-guhl","","",true,280,"no_match",false
-"barbara-mealey","","",true,469,"no_match",false
-"monica-valentine","","",true,1570,"no_match",false
-"rickie-algarva","","",true,2337,"no_match",false
-"ruth-stafford","","",true,717,"no_match",false
-"ricardo-gaitan","","",true,1078,"no_match",false
-"christine-szeto","","",true,1780,"no_match",false
-"carrie-oyama","","",true,2384,"no_match",false
-"paulino-martin","","",true,1281,"no_match",false
-"lauren-dare","lauren-dare","Lauren Dare",true,741,"exact_slug",true
-"edwin-zalenski","","",true,1524,"no_match",false
-"theresa-lambert","","",true,1182,"no_match",false
-"angela-villalobos","","",true,855,"no_match",false
-"shayla-weber","","",false,0,"no_match",false
-"william-scott","william-scott","William Scott",true,4291,"exact_slug",true
-"brian-nakahara","","",true,1008,"no_match",false
-"sherrie-aradanas","","",true,1487,"no_match",false
-"heather-edgar","","",true,867,"no_match",false
-"nicole-storm","nicole-storm","Nicole Storm",true,3662,"exact_slug",true
-"mayra-gonzalez","","",true,1368,"no_match",false
-"chris-corr-barberis","","",true,374,"no_match",false
-"james-davis","","",true,982,"no_match",false
-"lynn-pisco","","",true,356,"no_match",false
-"stephanie-hill","","",true,819,"no_match",false
-"carlos-perez","","",true,1637,"no_match",false
-"madison-bandy","","",false,0,"no_match",false
-"david-parsons","","",false,0,"no_match",false
-"juan-aguilera","juan-aguilera","Juan Aguilera",true,1632,"exact_slug",true
-"meyshe-shapiro-nygren","","",true,1294,"no_match",false
-"kristian-cheek","kristian-cheek","Kristian Cheek",true,249,"exact_slug",true
-"rosena-finister","rosena-finister","Rosena Finister",true,1412,"exact_slug",true
-"sher-ron-freeman","","",true,584,"no_match",false
-"sallie-williams","","",true,518,"no_match",false
-"julie-swartout","","",true,131,"no_match",false
-"stephanie-nguyen","","",true,623,"no_match",false
-"jordan-king","jordan-king","Jordan King",true,1214,"exact_slug",true
-"gina-damerell","","",true,980,"no_match",false
-"raydell-early","","",true,760,"no_match",false
-"gregory-stoper","","",false,0,"no_match",false
-"betty-hinman","","",true,62,"no_match",false
-"alice-ung","","",true,961,"no_match",false
-"katrina-taylor","","",true,462,"no_match",false
-"angela-archuleta","","",false,0,"no_match",false
-"andrea-leber","andrea-leber","Andrea Leber",true,1522,"exact_slug",true
-"jo-beal","","",true,919,"no_match",false
-"shirley-chiu","","",true,257,"no_match",false
-"jane-kassner","jane-kassner","Jane Kassner",true,516,"exact_slug",true
-"lawrence-choy","","",true,504,"no_match",false
-"bruce-howell","","",true,1483,"no_match",false
-"tanisha-warren","","",true,657,"no_match",false
-"kathy-zhong","","",true,114,"no_match",false
-"diana-lo","","",true,445,"no_match",false
-"susan-glikbarg","","",true,570,"no_match",false
-"nancy-weigen","nancy-weigen","Nancy Weigen",false,0,"exact_slug",false
-"emily-dunster-farey","","",true,228,"no_match",false
-"isaiah-jackson","isaiah-jackson","Isaiah Jackson",true,731,"exact_slug",true
-"jamie-ghilardi","","",true,418,"no_match",false
-"debra-crider","","",false,0,"no_match",false
-"lena-saavedra","","",false,0,"no_match",false
-"avery-babon","","",true,290,"no_match",false
-"lena-salk","lena-salk","Lena Salk",false,0,"exact_slug",false
-"ana-alegre","","",false,0,"no_match",false
-"amid-ehsani","","",true,260,"no_match",false
-"robbie-erion","","",true,1052,"no_match",false
-"walter-baldwin","","",true,292,"no_match",false
-"shui-wah-poon","","",true,59,"no_match",false
-"nathaniel-jackson","","",true,416,"no_match",false
-"lisa-craib","","",true,339,"no_match",false
-"james-freid","","",true,2977,"no_match",false
-"henry-trockle","","",true,523,"no_match",false
-"janis-danker","","",true,48,"no_match",false
-"eli-cooper","","",true,622,"no_match",false
-"elizabeth-rangel","","",true,523,"no_match",false
-"carol-fullen","","",true,157,"no_match",false
-"donna-kurtz","","",true,229,"no_match",false
-"ryan-williams","","",false,0,"no_match",false
-"carmen-quinones","","",false,0,"no_match",false
-"lisa-lipton","","",true,139,"no_match",false
-"jack-starbuck","","",true,561,"no_match",false
-"aj-herzfeld","","",true,444,"no_match",false
-"jade-saren","","",true,1366,"no_match",false
-"julian-ou","","",true,863,"no_match",false
-"reginald-burton","","",true,397,"no_match",false
-"trinity-joseph","","",false,0,"no_match",false
-"karen-ridge","","",true,484,"no_match",false
-"emily-witkin","","",true,476,"no_match",false
-"emmanuel-gonzalez","","",true,444,"no_match",false
-"kathleen-miller","","",true,469,"no_match",false
-"jordan-evans","","",true,688,"no_match",false
-"melissa-poe","","",true,598,"no_match",false
-"gregg-nakanishi","","",true,539,"no_match",false
-"tristram-day-schott","","",true,374,"no_match",false
-"joe-spears-iii","","",true,371,"no_match",false
-"akasha-cananizado","","",true,937,"no_match",false
-"emma-holbrook","","",true,538,"no_match",false
-"malia-ramsey","","",true,928,"no_match",false
-"steven-pho","","",true,337,"no_match",false
-"hyo-ju-mims","","",true,568,"no_match",false
-"adumasa-ayinde","","",false,0,"no_match",false
-"isaac-bar-zeev","","",false,0,"no_match",false
-"brenda-estrada","","",false,0,"no_match",false
-"oliver-santana","","",false,0,"no_match",false
-"isabel-gallegos","","",true,61,"no_match",false
-"oscar-bomse","","",false,0,"no_match",false
-"erik-kodono","","",false,0,"no_match",false
-"peter-ahn","","",false,0,"no_match",false
-"zachary-barber","","",false,0,"no_match",false
-"maya-rogers","","",false,0,"no_match",false
-"alex-schaffer","","",true,446,"no_match",false
-"angel-love","","",true,352,"no_match",false
-"ernest-spears","","",false,0,"no_match",false
-"eva-garrett","","",false,0,"no_match",false
-"cathy-sampson","","",false,0,"no_match",false
-"anthony-baio","","",false,0,"no_match",false
-"james-ferrell","","",false,0,"no_match",false
-"maria-lopez","","",false,0,"no_match",false
-"charles-nagle","charles-nagle","Charles Nagle",false,0,"exact_slug",false
-"paul-gee","paul-gee","Paul Gee",false,0,"exact_slug",false
-"pharroh-mosely-katakanga","","",false,0,"no_match",false
-"victoria-sisneros","","",false,0,"no_match",false
-"zar-shepard","","",true,822,"no_match",false
-"peter-landau","","",true,162,"no_match",false
-"jean-paul-vallence","","",true,182,"no_match",false
-"robert-lauricella","robert-lauricella","Robert Lauricella",false,0,"exact_slug",false
-"andre-keenan","","",false,0,"no_match",false
-"jarren-samuel","","",false,0,"no_match",false
-"pharroh-mosley-katakanga","","",false,0,"no_match",false
-"charles-brown","","",false,0,"no_match",false
-"yolanda-vallance","","",true,239,"no_match",false
-"benjamin-lew","","",false,0,"no_match",false
-"calista-novenario","","",false,0,"no_match",false
-"daniel-vallance","","",false,0,"no_match",false
-"katherine-miller","","",true,147,"no_match",false
-"elizabeth-rangel-i","","",true,153,"no_match",false
-"darrel-davis","","",true,420,"no_match",false
-"emily-hessenauer","","",true,352,"no_match",false
-"kerry-damianakes","kerry-damianakes","Kerry Damianakes",true,717,"exact_slug",true
-"moises-martinez","","",false,0,"no_match",false
-"jorge-vargas","","",false,0,"no_match",false
-"amaya-lee","","",false,0,"no_match",false
-"hope-hendricks","","",false,0,"no_match",false
-"dania-leyva","","",false,0,"no_match",false
-"jorge-rodriguez-vargas","","",false,0,"no_match",false
-"rey-rivero","","",false,0,"no_match",false
-"camille-mcfarlane","","",false,0,"no_match",false
-"comic-woodall","","",false,0,"no_match",false
-"ben-lieberman-i","","",false,0,"no_match",false
-"jason-monzon","","",false,0,"no_match",false
-"jose-pena-i","","",false,0,"no_match",false
-"andy-banchero","","",false,0,"no_match",false
-"jerren-rylee-samuel","","",false,0,"no_match",false
-"","ana-vasquez","Ana Vasquez",false,0,"clir_only",false
-"","ben-liebermann","Ben Liebermann",false,0,"clir_only",false
-"","camille-holvoet","Camille Holvoet",false,0,"clir_only",false
-"","camille-holvoet-2","Camille Holvoet?",false,0,"clir_only",false
-"","carl-hendrickson","Carl Hendrickson",false,0,"clir_only",false
-"","co-op","Co-Op",false,0,"clir_only",false
-"","darlene","Darlene",false,0,"clir_only",false
-"","darlene-jafoya","Darlene Jafoya",false,0,"clir_only",false
-"","david-alvarez","David Alvarez",false,0,"clir_only",false
-"","donald-paterson","Donald Paterson",false,0,"clir_only",false
-"","earnest-spears","Earnest Spears",false,0,"clir_only",false
-"","eddie-lais","Eddie Lais",false,0,"clir_only",false
-"","edwin-wong","Edwin Wong",false,0,"clir_only",false
-"","eleanor-chackee","Eleanor Chackee",false,0,"clir_only",false
-"","eleanor-hackett","Eleanor Hackett",false,0,"clir_only",false
-"","feraidoon-nalan","Feraidoon Nalan",false,0,"clir_only",false
-"","geary-walker","Geary Walker",false,0,"clir_only",false
-"","george-kellogg","George Kellogg",false,0,"clir_only",false
-"","george-pames","George Pames",false,0,"clir_only",false
-"","gina-richardson","Gina Richardson",false,0,"clir_only",false
-"","gloria-gonzalez","Gloria Gonzalez",false,0,"clir_only",false
-"","jacqueline-frank","Jacqueline Frank",false,0,"clir_only",false
-"","jeanette-tessandori","Jeanette Tessandori",false,0,"clir_only",false
-"","kathleen-flannegau","Kathleen Flannegau",false,0,"clir_only",false
-"","ken-veasey","Ken Veasey",false,0,"clir_only",false
-"","laura-jo-pierce","Laura Jo Pierce",false,0,"clir_only",false
-"","lolita-triplette","Lolita Triplette",false,0,"clir_only",false
-"","louis-estape","Louis Estape",false,0,"clir_only",false
-"","maria-bustillos","Maria Bustillos",false,0,"clir_only",false
-"","maria-moreno","Maria Moreno",false,0,"clir_only",false
-"","mary-argen","Mary Argen",false,0,"clir_only",false
-"","merritt-wallace","Merritt Wallace",false,0,"clir_only",false
-"","mike-manfield","Mike Manfield",false,0,"clir_only",false
-"","murlin-antoine","Murlin Antoine",false,0,"clir_only",false
-"","nelson-tygart","Nelson Tygart",false,0,"clir_only",false
-"","paul-costa","Paul Costa",false,0,"clir_only",false
-"","ramon-avalos","Ramon Avalos",false,0,"clir_only",false
-"","regina-broussard","Regina Broussard",false,0,"clir_only",false
-"","rick-turner","Rick Turner",false,0,"clir_only",false
-"","robert-feise","Robert Feise",false,0,"clir_only",false
-"","stanley-carmen","Stanley Carmen",false,0,"clir_only",false
-"","thelma","Thelma",false,0,"clir_only",false
-"","vera-hollins","Vera Hollins",false,0,"clir_only",false
-"","vj-williamson","VJ Williamson",false,0,"clir_only",false
-"","william-savella","William Savella",false,0,"clir_only",false
-"","xzcxzcxzxcz","xzcxzcxzxcz'",false,0,"clir_only",false
-"","zelma-riley","Zelma Riley",false,0,"clir_only",false
+clir_name,admin_link,website_url,artwork_count,has_bio_on_website,bio_in_database,bio_length,match_type
+"Camille Holvoet","https://sj-atlas-d1y8.vercel.app/admin/artists/46a1179e-be30-4a85-a1cc-89ea6363d82f","",280,false,false,0,"clir_only"
+"Dan Miller","https://sj-atlas-d1y8.vercel.app/admin/artists/4e6b98f4-d861-4275-95e2-e4097e222d7c","https://www.creativegrowth.org/artist/dan-miller",111,true,true,1884,"exact_slug"
+"Judith Scott","https://sj-atlas-d1y8.vercel.app/admin/artists/45aa6a67-30dc-406e-b5f3-a7261624dcef","https://www.creativegrowth.org/artist/judith-scott",98,true,true,3104,"exact_slug"
+"Aurie Ramirez","https://sj-atlas-d1y8.vercel.app/admin/artists/647ee4af-709a-46e8-9704-85cc15dbd498","https://www.creativegrowth.org/artist/aurie-ramirez",83,true,true,2382,"exact_slug"
+"Nelson Tygart","https://sj-atlas-d1y8.vercel.app/admin/artists/87acaf6d-536b-4bc5-9071-9ac410de3363","",76,false,false,0,"clir_only"
+"Marion Bolton","https://sj-atlas-d1y8.vercel.app/admin/artists/09ca7058-353c-44be-ba67-e3f3cf584d37","https://www.creativegrowth.org/artist/marion-bolton",51,true,true,1114,"exact_slug"
+"Louis Estape","https://sj-atlas-d1y8.vercel.app/admin/artists/0b6850da-675b-4200-a69a-af50f2b6c48c","",22,false,false,0,"clir_only"
+"Paul Costa","https://sj-atlas-d1y8.vercel.app/admin/artists/2bd07333-b7e7-459a-a924-fad67d90e3c4","",22,false,false,0,"clir_only"
+"David Alvarez","https://sj-atlas-d1y8.vercel.app/admin/artists/1e12bbfc-9394-4f96-af4b-ddde1a432caa","",21,false,false,0,"clir_only"
+"Jeanette Tessandori","https://sj-atlas-d1y8.vercel.app/admin/artists/735a5903-b252-48ff-82ff-47470a1696c4","",21,false,false,0,"clir_only"
+"Maria Bustillos","https://sj-atlas-d1y8.vercel.app/admin/artists/153c03ad-7389-4711-b313-9d4410623933","",20,false,false,0,"clir_only"
+"VJ Williamson","https://sj-atlas-d1y8.vercel.app/admin/artists/6a4fe98c-0537-49f5-9dec-4c2f5e61c0ca","",20,false,false,0,"clir_only"
+"Franna Lusson","https://sj-atlas-d1y8.vercel.app/admin/artists/37676d99-1093-40c1-88d4-fcdbe282cf91","https://www.creativegrowth.org/artist/franna-lusson",19,true,true,3748,"exact_slug"
+"John Hiltunen","https://sj-atlas-d1y8.vercel.app/admin/artists/6922d169-f61d-455d-9544-8feacde4e96d","https://www.creativegrowth.org/artist/john-hiltunen",18,true,true,2624,"exact_slug"
+"Carl Hendrickson","https://sj-atlas-d1y8.vercel.app/admin/artists/06f8384b-c0e0-4207-ba69-5b9f17a5428f","",17,false,false,0,"clir_only"
+"Charles Nagle","https://sj-atlas-d1y8.vercel.app/admin/artists/5d7e186f-784a-4937-8e1d-cb81ce4bcd47","https://www.creativegrowth.org/artist/charles-nagle",12,false,false,0,"exact_slug"
+"Ben Liebermann","https://sj-atlas-d1y8.vercel.app/admin/artists/6d600621-6e27-4728-b58b-37e814406045","",11,false,false,0,"clir_only"
+"Geary Walker","https://sj-atlas-d1y8.vercel.app/admin/artists/8b7a038e-5882-4ab5-ac63-1f2d941a14d4","",8,false,false,0,"clir_only"
+"Ying Ge Zhou","https://sj-atlas-d1y8.vercel.app/admin/artists/7f19cb0a-acf4-473b-b585-6ed00b4f4926","https://www.creativegrowth.org/artist/ying-ge-zhou",7,true,true,1918,"exact_slug"
+"George Wilson","https://sj-atlas-d1y8.vercel.app/admin/artists/5658a437-ab90-4b85-b05d-e33418b5003d","https://www.creativegrowth.org/artist/george-wilson",7,true,true,1404,"exact_slug"
+"Jordan King","https://sj-atlas-d1y8.vercel.app/admin/artists/676e27ad-a347-49da-a993-b333a6a4addc","https://www.creativegrowth.org/artist/jordan-king",7,true,true,1214,"exact_slug"
+"Robert Feise","https://sj-atlas-d1y8.vercel.app/admin/artists/48bdc603-3154-4bad-9f28-711769c8a472","",7,false,false,0,"clir_only"
+"Jacqueline Frank","https://sj-atlas-d1y8.vercel.app/admin/artists/7dd75648-8920-427d-a877-467f7f97f2bb","",6,false,false,0,"clir_only"
+"Merritt Wallace","https://sj-atlas-d1y8.vercel.app/admin/artists/48990cf1-6176-4958-bd9b-b67fa2de9186","",6,false,false,0,"clir_only"
+"John Mullins","https://sj-atlas-d1y8.vercel.app/admin/artists/1e53602d-8187-4e77-bc89-14339c54f50d","https://www.creativegrowth.org/artist/john-mullins",5,true,true,508,"exact_slug"
+"William Scott","https://sj-atlas-d1y8.vercel.app/admin/artists/2676796e-97f1-44e5-8f85-221918a78f51","https://www.creativegrowth.org/artist/william-scott",4,true,true,4291,"exact_slug"
+"Earnest Spears","https://sj-atlas-d1y8.vercel.app/admin/artists/11f608c3-3788-47a3-84a3-a50f5cb3e14e","",4,false,false,0,"clir_only"
+"Valerie Tribble","https://sj-atlas-d1y8.vercel.app/admin/artists/29b6d17c-9362-4676-8be3-2fa2f577046c","https://www.creativegrowth.org/artist/valerie-tribble",3,true,true,114,"exact_slug"
+"Rosena Finister","https://sj-atlas-d1y8.vercel.app/admin/artists/225f85aa-ef23-42c2-8f84-5f9fb58ca92d","https://www.creativegrowth.org/artist/rosena-finister",3,true,true,1412,"exact_slug"
+"Andrea Leber","https://sj-atlas-d1y8.vercel.app/admin/artists/753d5a0c-353e-462e-a396-16c76c0247ef","https://www.creativegrowth.org/artist/andrea-leber",3,true,true,1522,"exact_slug"
+"Ken Veasey","https://sj-atlas-d1y8.vercel.app/admin/artists/18541d5e-7070-4690-a9bb-6262ef032326","",3,false,false,0,"clir_only"
+"Regina Broussard","https://sj-atlas-d1y8.vercel.app/admin/artists/521bf0fe-272d-4a09-86e0-c4958bb4ac2c","",3,false,false,0,"clir_only"
+"Terri Bowden","https://sj-atlas-d1y8.vercel.app/admin/artists/79f1f61e-ec8a-4792-8a57-cdbb99bd8812","https://www.creativegrowth.org/artist/terri-bowden",2,true,true,3407,"exact_slug"
+"Edwin Wong","https://sj-atlas-d1y8.vercel.app/admin/artists/391df936-de9f-4a44-84b2-46702f53790b","",2,false,false,0,"clir_only"
+"Gloria Gonzalez","https://sj-atlas-d1y8.vercel.app/admin/artists/29385a95-c4d6-4cbe-92c5-54ea0c158ca3","",2,false,false,0,"clir_only"
+"Jay Daley","https://sj-atlas-d1y8.vercel.app/admin/artists/71832d80-1de6-4945-8a56-0e6331ba8cbd","https://www.creativegrowth.org/artist/jay-daley",1,true,true,782,"exact_slug"
+"Maureen Clay","https://sj-atlas-d1y8.vercel.app/admin/artists/22963f7d-499a-45f7-bd1f-de8bc60f17e6","https://www.creativegrowth.org/artist/maureen-clay",1,true,true,1251,"exact_slug"
+"Casey Byrnes","https://sj-atlas-d1y8.vercel.app/admin/artists/0fb10e12-c092-4d58-a7ac-a6dfaf8f30c2","https://www.creativegrowth.org/artist/casey-byrnes",1,true,true,4555,"exact_slug"
+"Nicole Storm","https://sj-atlas-d1y8.vercel.app/admin/artists/7b0cf380-c314-4ea2-ac41-d5e1883d4f64","https://www.creativegrowth.org/artist/nicole-storm",1,true,true,3662,"exact_slug"
+"Juan Aguilera","https://sj-atlas-d1y8.vercel.app/admin/artists/34128b68-f6cf-4200-8ae5-3aa788ffa63c","https://www.creativegrowth.org/artist/juan-aguilera",1,true,true,1632,"exact_slug"
+"Kristian Cheek","https://sj-atlas-d1y8.vercel.app/admin/artists/758a84cf-2cec-4d7c-bf9c-8434a5536af3","https://www.creativegrowth.org/artist/kristian-cheek",1,true,true,249,"exact_slug"
+"Nancy Weigen","https://sj-atlas-d1y8.vercel.app/admin/artists/59a1d37a-f975-434c-9615-8887b87e620f","https://www.creativegrowth.org/artist/nancy-weigen",1,false,false,0,"exact_slug"
+"Camille Holvoet?","https://sj-atlas-d1y8.vercel.app/admin/artists/7252f109-d650-4812-b438-0f55c5f8df29","",1,false,false,0,"clir_only"
+"George Pames","https://sj-atlas-d1y8.vercel.app/admin/artists/02fcee76-269d-45a4-9d65-3073f6ee655f","",1,false,false,0,"clir_only"
+"Gina Richardson","https://sj-atlas-d1y8.vercel.app/admin/artists/5b49826a-6373-4710-9013-eadfaec3c92d","",1,false,false,0,"clir_only"
+"Kathleen Flannegau","https://sj-atlas-d1y8.vercel.app/admin/artists/07a07ae1-4cc9-462a-b1d8-299fe39f0a18","",1,false,false,0,"clir_only"
+"Mary Argen","https://sj-atlas-d1y8.vercel.app/admin/artists/8284f78e-46b4-45f7-a6a5-bf6a7052e7ba","",1,false,false,0,"clir_only"
+"Murlin Antoine","https://sj-atlas-d1y8.vercel.app/admin/artists/377b2506-c38b-4338-b7ea-8ed0c5241a9d","",1,false,false,0,"clir_only"
+"Rick Turner","https://sj-atlas-d1y8.vercel.app/admin/artists/8808206d-0a17-4294-97de-fc677ffd6c1e","",1,false,false,0,"clir_only"
+"xzcxzcxzxcz'","https://sj-atlas-d1y8.vercel.app/admin/artists/5e3118c0-d914-4eb2-8caf-7f9fcdec73c0","",1,false,false,0,"clir_only"
+"Zelma Riley","https://sj-atlas-d1y8.vercel.app/admin/artists/28062963-c5c0-40d8-9f97-30f18a3036e3","",1,false,false,0,"clir_only"
+"","","https://www.creativegrowth.org/artist/cedric-johnson",0,true,false,1543,"no_match"
+"Gail Lewis","https://sj-atlas-d1y8.vercel.app/admin/artists/b7ddfebd-d61b-4fa6-b4d1-ee3ef23d0f4d","https://www.creativegrowth.org/artist/gail-lewis",0,true,true,1167,"exact_slug"
+"Donald Mitchell","https://sj-atlas-d1y8.vercel.app/admin/artists/cac58983-217d-40e7-9ac7-0ab642b9e49c","https://www.creativegrowth.org/artist/donald-mitchell",0,true,true,1415,"exact_slug"
+"","","https://www.creativegrowth.org/artist/jessica-rodriguez",0,true,false,318,"no_match"
+"","","https://www.creativegrowth.org/artist/susan-janow",0,true,false,1652,"no_match"
+"","","https://www.creativegrowth.org/artist/lulu-sotelo",0,true,false,1792,"no_match"
+"","","https://www.creativegrowth.org/artist/tony-pedemonte",0,true,false,1868,"no_match"
+"Ron Veasey","https://sj-atlas-d1y8.vercel.app/admin/artists/ece9c54f-e2d7-4528-a9ea-86b00b553a98","https://www.creativegrowth.org/artist/ron-veasey",0,true,true,2987,"exact_slug"
+"","","https://www.creativegrowth.org/artist/daniel-gardiner",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/dinah-shapiro",0,true,false,3731,"no_match"
+"","","https://www.creativegrowth.org/artist/peter-salsman",0,true,false,1470,"no_match"
+"","","https://www.creativegrowth.org/artist/alice-wong",0,true,false,1649,"no_match"
+"Latefa Noorzai","https://sj-atlas-d1y8.vercel.app/admin/artists/cbab55e5-c359-4245-afa9-8042cfa7ffd5","https://www.creativegrowth.org/artist/latefa-noorzai",0,true,true,1680,"exact_slug"
+"","","https://www.creativegrowth.org/artist/rosa-giron",0,true,false,624,"no_match"
+"","","https://www.creativegrowth.org/artist/paul-fields",0,true,false,973,"no_match"
+"","","https://www.creativegrowth.org/artist/natascha-haehlen",0,true,false,1572,"no_match"
+"William Tyler","https://sj-atlas-d1y8.vercel.app/admin/artists/b37612a4-05c7-4250-91e8-bd49d8d27766","https://www.creativegrowth.org/artist/william-tyler",0,true,true,2110,"exact_slug"
+"","","https://www.creativegrowth.org/artist/zina-hall",0,true,false,2491,"no_match"
+"","","https://www.creativegrowth.org/artist/ray-vickers",0,true,false,2130,"no_match"
+"John Martin","https://sj-atlas-d1y8.vercel.app/admin/artists/c830f21f-ff22-479f-a7a6-422c7dda2928","https://www.creativegrowth.org/artist/john-martin",0,true,true,2133,"exact_slug"
+"","","https://www.creativegrowth.org/artist/jack-lahaderne",0,true,false,242,"no_match"
+"","","https://www.creativegrowth.org/artist/barry-regan",0,true,false,1666,"no_match"
+"David Albertsen","https://sj-atlas-d1y8.vercel.app/admin/artists/ff892fa6-bff7-4f26-8496-9719e5c28e16","https://www.creativegrowth.org/artist/david-albertsen",0,false,false,0,"exact_slug"
+"Gerone Spruill","https://sj-atlas-d1y8.vercel.app/admin/artists/bd09cf51-fb68-4c7b-b335-95792770d97d","https://www.creativegrowth.org/artist/gerone-spruill",0,true,true,149,"exact_slug"
+"","","https://www.creativegrowth.org/artist/kim-clark",0,true,false,264,"no_match"
+"","","https://www.creativegrowth.org/artist/jorge-gomez",0,true,false,1262,"no_match"
+"Dan Hamilton","https://sj-atlas-d1y8.vercel.app/admin/artists/b1b4e2b1-bfab-45df-8c8c-f5044e8f6bbc","https://www.creativegrowth.org/artist/dan-hamilton",0,true,true,1692,"exact_slug"
+"","","https://www.creativegrowth.org/artist/sherry-stanley",0,true,false,292,"no_match"
+"","","https://www.creativegrowth.org/artist/dlisa-fort",0,true,false,540,"no_match"
+"Dwight Mackintosh","https://sj-atlas-d1y8.vercel.app/admin/artists/e848f7ab-c4f2-4a70-88b1-47663a9f47d6","https://www.creativegrowth.org/artist/dwight-mackintosh",0,true,true,3855,"exact_slug"
+"","","https://www.creativegrowth.org/artist/allan-lofberg",0,true,false,1372,"no_match"
+"","","https://www.creativegrowth.org/artist/jason-jackson",0,true,false,48,"no_match"
+"Luis Aguilera","https://sj-atlas-d1y8.vercel.app/admin/artists/c9d0ebf1-52c3-4309-82ee-79f8247ecf7b","https://www.creativegrowth.org/artist/luis-aguilera",0,true,true,643,"exact_slug"
+"","","https://www.creativegrowth.org/artist/carlos-fernandez",0,true,false,1450,"no_match"
+"Larry Randolph","https://sj-atlas-d1y8.vercel.app/admin/artists/d2dd5476-ffec-4747-a7d8-623b243cbce1","https://www.creativegrowth.org/artist/larry-randolph",0,true,true,1863,"exact_slug"
+"","","https://www.creativegrowth.org/artist/joseph-alef",0,true,false,1423,"no_match"
+"","","https://www.creativegrowth.org/artist/barbara-guhl",0,true,false,280,"no_match"
+"","","https://www.creativegrowth.org/artist/barbara-mealey",0,true,false,469,"no_match"
+"","","https://www.creativegrowth.org/artist/monica-valentine",0,true,false,1570,"no_match"
+"","","https://www.creativegrowth.org/artist/rickie-algarva",0,true,false,2337,"no_match"
+"","","https://www.creativegrowth.org/artist/ruth-stafford",0,true,false,717,"no_match"
+"","","https://www.creativegrowth.org/artist/ricardo-gaitan",0,true,false,1078,"no_match"
+"","","https://www.creativegrowth.org/artist/christine-szeto",0,true,false,1780,"no_match"
+"","","https://www.creativegrowth.org/artist/carrie-oyama",0,true,false,2384,"no_match"
+"","","https://www.creativegrowth.org/artist/paulino-martin",0,true,false,1281,"no_match"
+"Lauren Dare","https://sj-atlas-d1y8.vercel.app/admin/artists/afa279aa-ce49-4469-94be-2d6d7a9e2e7a","https://www.creativegrowth.org/artist/lauren-dare",0,true,true,741,"exact_slug"
+"","","https://www.creativegrowth.org/artist/edwin-zalenski",0,true,false,1524,"no_match"
+"","","https://www.creativegrowth.org/artist/theresa-lambert",0,true,false,1182,"no_match"
+"","","https://www.creativegrowth.org/artist/angela-villalobos",0,true,false,855,"no_match"
+"","","https://www.creativegrowth.org/artist/shayla-weber",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/brian-nakahara",0,true,false,1008,"no_match"
+"","","https://www.creativegrowth.org/artist/sherrie-aradanas",0,true,false,1487,"no_match"
+"","","https://www.creativegrowth.org/artist/heather-edgar",0,true,false,867,"no_match"
+"","","https://www.creativegrowth.org/artist/mayra-gonzalez",0,true,false,1368,"no_match"
+"","","https://www.creativegrowth.org/artist/chris-corr-barberis",0,true,false,374,"no_match"
+"","","https://www.creativegrowth.org/artist/james-davis",0,true,false,982,"no_match"
+"","","https://www.creativegrowth.org/artist/lynn-pisco",0,true,false,356,"no_match"
+"","","https://www.creativegrowth.org/artist/stephanie-hill",0,true,false,819,"no_match"
+"","","https://www.creativegrowth.org/artist/carlos-perez",0,true,false,1637,"no_match"
+"","","https://www.creativegrowth.org/artist/madison-bandy",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/david-parsons",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/meyshe-shapiro-nygren",0,true,false,1294,"no_match"
+"","","https://www.creativegrowth.org/artist/sher-ron-freeman",0,true,false,584,"no_match"
+"","","https://www.creativegrowth.org/artist/sallie-williams",0,true,false,518,"no_match"
+"","","https://www.creativegrowth.org/artist/julie-swartout",0,true,false,131,"no_match"
+"","","https://www.creativegrowth.org/artist/stephanie-nguyen",0,true,false,623,"no_match"
+"","","https://www.creativegrowth.org/artist/gina-damerell",0,true,false,980,"no_match"
+"","","https://www.creativegrowth.org/artist/raydell-early",0,true,false,760,"no_match"
+"","","https://www.creativegrowth.org/artist/gregory-stoper",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/betty-hinman",0,true,false,62,"no_match"
+"","","https://www.creativegrowth.org/artist/alice-ung",0,true,false,961,"no_match"
+"","","https://www.creativegrowth.org/artist/katrina-taylor",0,true,false,462,"no_match"
+"","","https://www.creativegrowth.org/artist/angela-archuleta",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/jo-beal",0,true,false,919,"no_match"
+"","","https://www.creativegrowth.org/artist/shirley-chiu",0,true,false,257,"no_match"
+"Jane Kassner","https://sj-atlas-d1y8.vercel.app/admin/artists/95ea1530-b171-49b2-a46e-0e08dd21fe1c","https://www.creativegrowth.org/artist/jane-kassner",0,true,true,516,"exact_slug"
+"","","https://www.creativegrowth.org/artist/lawrence-choy",0,true,false,504,"no_match"
+"","","https://www.creativegrowth.org/artist/bruce-howell",0,true,false,1483,"no_match"
+"","","https://www.creativegrowth.org/artist/tanisha-warren",0,true,false,657,"no_match"
+"","","https://www.creativegrowth.org/artist/kathy-zhong",0,true,false,114,"no_match"
+"","","https://www.creativegrowth.org/artist/diana-lo",0,true,false,445,"no_match"
+"","","https://www.creativegrowth.org/artist/susan-glikbarg",0,true,false,570,"no_match"
+"","","https://www.creativegrowth.org/artist/emily-dunster-farey",0,true,false,228,"no_match"
+"Isaiah Jackson","https://sj-atlas-d1y8.vercel.app/admin/artists/e6f05d57-44b1-4f1a-99ff-c86bae9fcb8b","https://www.creativegrowth.org/artist/isaiah-jackson",0,true,true,731,"exact_slug"
+"","","https://www.creativegrowth.org/artist/jamie-ghilardi",0,true,false,418,"no_match"
+"","","https://www.creativegrowth.org/artist/debra-crider",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/lena-saavedra",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/avery-babon",0,true,false,290,"no_match"
+"Lena Salk","https://sj-atlas-d1y8.vercel.app/admin/artists/d053cd97-fe52-427d-893b-318dd7c2978b","https://www.creativegrowth.org/artist/lena-salk",0,false,false,0,"exact_slug"
+"","","https://www.creativegrowth.org/artist/ana-alegre",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/amid-ehsani",0,true,false,260,"no_match"
+"","","https://www.creativegrowth.org/artist/robbie-erion",0,true,false,1052,"no_match"
+"","","https://www.creativegrowth.org/artist/walter-baldwin",0,true,false,292,"no_match"
+"","","https://www.creativegrowth.org/artist/shui-wah-poon",0,true,false,59,"no_match"
+"","","https://www.creativegrowth.org/artist/nathaniel-jackson",0,true,false,416,"no_match"
+"","","https://www.creativegrowth.org/artist/lisa-craib",0,true,false,339,"no_match"
+"","","https://www.creativegrowth.org/artist/james-freid",0,true,false,2977,"no_match"
+"","","https://www.creativegrowth.org/artist/henry-trockle",0,true,false,523,"no_match"
+"","","https://www.creativegrowth.org/artist/janis-danker",0,true,false,48,"no_match"
+"","","https://www.creativegrowth.org/artist/eli-cooper",0,true,false,622,"no_match"
+"","","https://www.creativegrowth.org/artist/elizabeth-rangel",0,true,false,523,"no_match"
+"","","https://www.creativegrowth.org/artist/carol-fullen",0,true,false,157,"no_match"
+"","","https://www.creativegrowth.org/artist/donna-kurtz",0,true,false,229,"no_match"
+"","","https://www.creativegrowth.org/artist/ryan-williams",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/carmen-quinones",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/lisa-lipton",0,true,false,139,"no_match"
+"","","https://www.creativegrowth.org/artist/jack-starbuck",0,true,false,561,"no_match"
+"","","https://www.creativegrowth.org/artist/aj-herzfeld",0,true,false,444,"no_match"
+"","","https://www.creativegrowth.org/artist/jade-saren",0,true,false,1366,"no_match"
+"","","https://www.creativegrowth.org/artist/julian-ou",0,true,false,863,"no_match"
+"","","https://www.creativegrowth.org/artist/reginald-burton",0,true,false,397,"no_match"
+"","","https://www.creativegrowth.org/artist/trinity-joseph",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/karen-ridge",0,true,false,484,"no_match"
+"","","https://www.creativegrowth.org/artist/emily-witkin",0,true,false,476,"no_match"
+"","","https://www.creativegrowth.org/artist/emmanuel-gonzalez",0,true,false,444,"no_match"
+"","","https://www.creativegrowth.org/artist/kathleen-miller",0,true,false,469,"no_match"
+"","","https://www.creativegrowth.org/artist/jordan-evans",0,true,false,688,"no_match"
+"","","https://www.creativegrowth.org/artist/melissa-poe",0,true,false,598,"no_match"
+"","","https://www.creativegrowth.org/artist/gregg-nakanishi",0,true,false,539,"no_match"
+"","","https://www.creativegrowth.org/artist/tristram-day-schott",0,true,false,374,"no_match"
+"","","https://www.creativegrowth.org/artist/joe-spears-iii",0,true,false,371,"no_match"
+"","","https://www.creativegrowth.org/artist/akasha-cananizado",0,true,false,937,"no_match"
+"","","https://www.creativegrowth.org/artist/emma-holbrook",0,true,false,538,"no_match"
+"","","https://www.creativegrowth.org/artist/malia-ramsey",0,true,false,928,"no_match"
+"","","https://www.creativegrowth.org/artist/steven-pho",0,true,false,337,"no_match"
+"","","https://www.creativegrowth.org/artist/hyo-ju-mims",0,true,false,568,"no_match"
+"","","https://www.creativegrowth.org/artist/adumasa-ayinde",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/isaac-bar-zeev",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/brenda-estrada",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/oliver-santana",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/isabel-gallegos",0,true,false,61,"no_match"
+"","","https://www.creativegrowth.org/artist/oscar-bomse",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/erik-kodono",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/peter-ahn",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/zachary-barber",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/maya-rogers",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/alex-schaffer",0,true,false,446,"no_match"
+"","","https://www.creativegrowth.org/artist/angel-love",0,true,false,352,"no_match"
+"","","https://www.creativegrowth.org/artist/ernest-spears",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/eva-garrett",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/cathy-sampson",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/anthony-baio",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/james-ferrell",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/maria-lopez",0,false,false,0,"no_match"
+"Paul Gee","https://sj-atlas-d1y8.vercel.app/admin/artists/d427b23a-4576-48cd-8d68-b4e3a85de88e","https://www.creativegrowth.org/artist/paul-gee",0,false,false,0,"exact_slug"
+"","","https://www.creativegrowth.org/artist/pharroh-mosely-katakanga",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/victoria-sisneros",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/zar-shepard",0,true,false,822,"no_match"
+"","","https://www.creativegrowth.org/artist/peter-landau",0,true,false,162,"no_match"
+"","","https://www.creativegrowth.org/artist/jean-paul-vallence",0,true,false,182,"no_match"
+"Robert Lauricella","https://sj-atlas-d1y8.vercel.app/admin/artists/c2462d46-16a3-4fef-afb9-89464f8c92e3","https://www.creativegrowth.org/artist/robert-lauricella",0,false,false,0,"exact_slug"
+"","","https://www.creativegrowth.org/artist/andre-keenan",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/jarren-samuel",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/pharroh-mosley-katakanga",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/charles-brown",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/yolanda-vallance",0,true,false,239,"no_match"
+"","","https://www.creativegrowth.org/artist/benjamin-lew",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/calista-novenario",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/daniel-vallance",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/katherine-miller",0,true,false,147,"no_match"
+"","","https://www.creativegrowth.org/artist/elizabeth-rangel-i",0,true,false,153,"no_match"
+"","","https://www.creativegrowth.org/artist/darrel-davis",0,true,false,420,"no_match"
+"","","https://www.creativegrowth.org/artist/emily-hessenauer",0,true,false,352,"no_match"
+"Kerry Damianakes","https://sj-atlas-d1y8.vercel.app/admin/artists/b937cc55-44b7-4d99-ac77-57ce14b31d65","https://www.creativegrowth.org/artist/kerry-damianakes",0,true,true,717,"exact_slug"
+"","","https://www.creativegrowth.org/artist/moises-martinez",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/jorge-vargas",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/amaya-lee",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/hope-hendricks",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/dania-leyva",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/jorge-rodriguez-vargas",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/rey-rivero",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/camille-mcfarlane",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/comic-woodall",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/ben-lieberman-i",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/jason-monzon",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/jose-pena-i",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/andy-banchero",0,false,false,0,"no_match"
+"","","https://www.creativegrowth.org/artist/jerren-rylee-samuel",0,false,false,0,"no_match"
+"Ana Vasquez","https://sj-atlas-d1y8.vercel.app/admin/artists/b9b2ae59-1884-49d2-8acb-8f97ecdf174e","",0,false,false,0,"clir_only"
+"Co-Op","https://sj-atlas-d1y8.vercel.app/admin/artists/d4cc892f-2246-4767-b76a-6093839e5f10","",0,false,false,0,"clir_only"
+"Darlene","https://sj-atlas-d1y8.vercel.app/admin/artists/dd1af4ee-42d3-4654-bbcc-80ba917531ca","",0,false,false,0,"clir_only"
+"Darlene Jafoya","https://sj-atlas-d1y8.vercel.app/admin/artists/e16d120c-8444-4d56-9091-6d823d0cb26d","",0,false,false,0,"clir_only"
+"Donald Paterson","https://sj-atlas-d1y8.vercel.app/admin/artists/e3c77e80-399a-42ab-813b-d5c47a87c01a","",0,false,false,0,"clir_only"
+"Eddie Lais","https://sj-atlas-d1y8.vercel.app/admin/artists/c20244ba-7550-48ba-a597-ed947e340224","",0,false,false,0,"clir_only"
+"Eleanor Chackee","https://sj-atlas-d1y8.vercel.app/admin/artists/f0ed03a6-881e-4cf9-a174-1200d55eb811","",0,false,false,0,"clir_only"
+"Eleanor Hackett","https://sj-atlas-d1y8.vercel.app/admin/artists/d3d0ae91-d0eb-4d0d-9fe9-d0de6ec4bae7","",0,false,false,0,"clir_only"
+"Feraidoon Nalan","https://sj-atlas-d1y8.vercel.app/admin/artists/8a786ee8-7aac-4e2e-9f88-955017e5af9d","",0,false,false,0,"clir_only"
+"George Kellogg","https://sj-atlas-d1y8.vercel.app/admin/artists/ad747dbf-f1a7-439a-ab0f-93b928167bac","",0,false,false,0,"clir_only"
+"Laura Jo Pierce","https://sj-atlas-d1y8.vercel.app/admin/artists/ab701314-ccfb-4038-bea4-907da94d7c2a","",0,false,false,0,"clir_only"
+"Lolita Triplette","https://sj-atlas-d1y8.vercel.app/admin/artists/a71d20af-bfbe-47bb-9458-7fbc757c43b8","",0,false,false,0,"clir_only"
+"Maria Moreno","https://sj-atlas-d1y8.vercel.app/admin/artists/e6ace2f2-77ce-46de-97bb-766a9f862f60","",0,false,false,0,"clir_only"
+"Mike Manfield","https://sj-atlas-d1y8.vercel.app/admin/artists/ebee1962-540b-4dc3-a40a-671077361230","",0,false,false,0,"clir_only"
+"Ramon Avalos","https://sj-atlas-d1y8.vercel.app/admin/artists/917a8be6-4f30-4d6b-b13b-e03d57cac5d9","",0,false,false,0,"clir_only"
+"Stanley Carmen","https://sj-atlas-d1y8.vercel.app/admin/artists/9290fb7b-51f0-49a7-be6a-00a0b47af87a","",0,false,false,0,"clir_only"
+"Thelma","https://sj-atlas-d1y8.vercel.app/admin/artists/9be985db-8879-4886-a032-455ca229bb0c","",0,false,false,0,"clir_only"
+"Vera Hollins","https://sj-atlas-d1y8.vercel.app/admin/artists/e445aff8-ed85-4e78-98fa-d6f49bb59dec","",0,false,false,0,"clir_only"
+"William Savella","https://sj-atlas-d1y8.vercel.app/admin/artists/ceb940ce-94dc-4ad4-8c23-cdd72e22b970","",0,false,false,0,"clir_only"
