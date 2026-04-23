@@ -7,7 +7,9 @@
 
 ## Goal
 
-Import 590 manually-written, paragraph-length artwork descriptions from a CSV (`tmp/CLIR Image Descriptions Sheet - Brief Descriptions.csv`) into the artworks table, supersede the existing AI-generated descriptions for matched SKUs, and produce two artifacts: a per-row update log and a full-catalog export CSV that lets Creative Growth compare AI vs. human descriptions side-by-side for the ~1,500+ artworks still on AI-only descriptions.
+Import 590 manually-written, paragraph-length artwork descriptions from a CSV (`tmp/CLIR Image Descriptions Sheet - Brief Descriptions.csv`) into the `alt_text_long` field of the artworks table, supersede the existing AI-generated long descriptions for matched SKUs, and produce two artifacts: a per-row update log and a full-catalog export CSV that lets Creative Growth compare AI vs. human long descriptions side-by-side for the ~1,500+ artworks still on AI-only.
+
+The existing short `alt_text` (used by `<img alt>` on grid pages) is **left untouched** — the human CSV has only paragraph-form content, and there is no good algorithmic way to derive a screen-reader-quality short alt from it. The existing AI-generated short alt remains in place; an admin can later improve it manually via the admin console.
 
 Bundled into the same change: a schema cleanup that renames the two description fields to reflect their actual purpose (alt-text for two different page contexts, not "ai" content vs. "alt"), drops the dangerous fallback that pumps long content into grid `<img alt>` attributes, and removes the "About This Work" section from the artwork detail page (which was wrongly using the long-form alt text as visible body content).
 
@@ -65,17 +67,13 @@ The migration file `supabase/migrations/001_initial.sql` should be updated in so
 1. Parse the CSV. Required columns: `SKU`, `Item Description *`. Other columns are ignored.
 2. Build an in-memory map: `inventory_number → { description, source_row }`.
 3. Page through every artwork in `artworks` (using existing pagination pattern from `seed-categories.ts` / `migrate-images.ts` — the REST API caps at 1,000 rows per page). For each artwork:
-   - Capture `prior_alt_text_long` and `prior_alt_text` (current values).
+   - Capture `prior_alt_text_long` (current value).
    - If `inventory_number` is present in the human-CSV map:
      - Compute `new_alt_text_long` = the human paragraph, with leading/trailing whitespace stripped.
-     - Compute `new_alt_text`:
-       - Collapse newlines to single spaces, collapse runs of whitespace to one space.
-       - If the result is ≤150 chars, use it verbatim, no ellipsis.
-       - Otherwise: take the first 149 characters, find the last whitespace character within that slice, cut there, and append `…` (single Unicode ellipsis, U+2026). The total length including the ellipsis is therefore ≤150 chars. If no whitespace exists in the first 149 chars (extremely unlikely with prose), hard-cut at 149 + ellipsis.
-     - UPDATE the row: `alt_text_long = new_alt_text_long`, `alt_text = new_alt_text`, `description_origin = 'human'`.
-     - Append a log entry: `status='success'`, `prior_alt_text_long`, `prior_alt_text`, `new_alt_text_long`, `new_alt_text`.
-     - Append an export entry with both prior and new values populated.
-   - Else (artwork not in CSV): no DB update; add an export entry with current values only (`prior_ai_*` columns left blank since current = prior).
+     - UPDATE the row: `alt_text_long = new_alt_text_long`, `description_origin = 'human'`. The existing `alt_text` (short form) is **not** modified.
+     - Append a log entry: `status='success'`, `prior_alt_text_long`, `new_alt_text_long`.
+     - Append an export entry with the prior long-form value populated alongside the new one.
+   - Else (artwork not in CSV): no DB update; add an export entry with current values only (`prior_ai_alt_text_long` left blank since current = prior).
 4. After processing all artworks, also report any SKUs in the CSV that did not match any DB row — append fail log entries with `status='fail'`, `reason='sku not found in db'`.
 5. Write the two CSV artifacts to `tmp/`.
 
@@ -83,8 +81,7 @@ The migration file `supabase/migrations/001_initial.sql` should be updated in so
 
 - **Empty description in CSV row:** log as `fail`, `reason='empty description'`. Do not update.
 - **Whitespace-only description:** treated as empty after strip.
-- **Multi-line descriptions:** preserved as-is in `alt_text_long` (newlines kept). For `alt_text`, newlines are collapsed to single spaces before truncation (so the short version reads as one line).
-- **Description shorter than 150 chars:** copied verbatim to `alt_text`, no ellipsis appended.
+- **Multi-line descriptions:** preserved as-is in `alt_text_long` (newlines kept).
 - **SKU collision (CSV has multiple rows with same SKU):** last one wins, prior occurrences logged with `status='fail'`, `reason='superseded by later row in csv'`.
 - **DB update failure (network, RLS, etc.):** log as `fail`, `reason=<error message>`. Continue with next row.
 - **Idempotency:** the script can be re-run safely. It overwrites with the same values and produces fresh log + export artifacts each run (filenames carry timestamps).
@@ -100,9 +97,7 @@ The migration file `supabase/migrations/001_initial.sql` should be updated in so
 | `reason` | Empty on success; explanation on fail |
 | `artwork_id` | UUID if matched, empty if not |
 | `prior_alt_text_long` | Snapshot of what was overwritten (empty if no prior content) |
-| `prior_alt_text` | Snapshot of what was overwritten |
 | `new_alt_text_long` | The human paragraph as written |
-| `new_alt_text` | The truncated short version (with ellipsis if truncation occurred) |
 
 One row per CSV input row, plus one row per CSV SKU that didn't match the DB.
 
@@ -115,14 +110,13 @@ One row per CSV input row, plus one row per CSV SKU that didn't match the DB.
 | `sku` | `inventory_number` from DB |
 | `image_url` | Resolved via the same `resolveImageUrl()` helper the UI uses, so URLs match what's served |
 | `description_origin` | `'human'` / `'ai'` / empty |
-| `alt_text_long` | Current value (post-update) |
-| `alt_text` | Current value (post-update) |
+| `alt_text_long` | Current value (post-update — human for matched rows, AI for the rest) |
+| `alt_text` | Current value (untouched by this script — AI for all rows that ever ran through the AI pipeline) |
 | `prior_ai_alt_text_long` | The pre-update AI-generated long alt text — populated only for `description_origin='human'` rows where prior content existed; empty for AI rows (since current = prior) and for rows that had no prior content |
-| `prior_ai_alt_text` | Same logic for the short field |
 
 One row per artwork in the database. Sorted by `inventory_number` for stable diffing.
 
-The asymmetric `prior_ai_*` population (only for human-overwritten rows) is intentional: it lets Creative Growth compare AI vs. human side-by-side for the 590 overwritten rows without bloating the export with redundant duplicate columns for the ~1,500 AI-only rows.
+The asymmetric `prior_ai_alt_text_long` population (only for human-overwritten rows) is intentional: it lets Creative Growth compare AI vs. human long-descriptions side-by-side for the 590 overwritten rows without bloating the export with redundant duplicate columns for the ~1,500 AI-only rows. The short `alt_text` column is included so CG sees the complete current state of each row, even though this script never modifies it.
 
 ---
 
@@ -136,7 +130,7 @@ These ship together with the new import script in a single commit. The schema re
 - **`src/lib/utils.ts`** — `getAltText()` returns `alt_text` only. The fallback to the long form is removed (rationale above; the fallback would dump paragraphs into `<img alt>`). The fallback chain becomes: `alt_text` → title + medium fallback. (No fallback to `alt_text_long` even though it exists, because using the long form in `<img alt>` is exactly the bug we're fixing.)
 - **`src/app/artwork/[id]/page.tsx`** — `<img alt>` reads from `alt_text_long`; **delete the entire "About This Work" `<section>`** (lines 273-283). The section was rendering the alt text as visible body content, which is the wrong purpose for that field.
 - **`src/components/ArtworkCard.tsx`** — no functional change; continues to call `getAltText()` which now returns short form only.
-- **`src/app/admin/artworks/[id]/page.tsx`** — rename all `ai_description` → `alt_text_long` field references in the form state, fetch, and submit. Relabel the form fields: "Long alt text (detail page)" and "Short alt text (grid page)". The existing "copy long → short" button should also truncate to 150 chars + ellipsis to match the import script's logic. (Keep the button; it's useful when an admin writes a fresh long description and wants a starter short version.)
+- **`src/app/admin/artworks/[id]/page.tsx`** — rename all `ai_description` → `alt_text_long` field references in the form state, fetch, and submit. Relabel the form fields: "Long alt text (detail page)" and "Short alt text (grid page)". **Delete the existing "copy long → short" button** — under the new model `alt_text_long` and `alt_text` serve different page contexts and have different content sources (long is human-or-AI prose, short is concise screen-reader text), so direct copying no longer makes sense. An admin who wants a fresh short alt should write one.
 - **`public/review.html`** — rename all `ai_description` references (8 spots: query URLs, PATCH bodies, display markup, edit markup, in-memory mutations). Element IDs (`descDisplay`, `descEdit`) can stay as-is — they're internal labels, not column names.
 - **`scripts/generate-descriptions.ts`** — rename all `ai_description` references (4 spots: type, select, filter, update payload). Update payload should also set `description_origin: 'ai'`. Note: the JSON keys in the AI prompt response (`alt_text`, `description`) are internal to the prompt contract and do not need to change.
 - **`scripts/migrate-and-describe.ts`** — same rename (5 spots). Same `description_origin: 'ai'` addition on the update payload.
@@ -172,7 +166,7 @@ These ship together with the new import script in a single commit. The schema re
 | Risk | Mitigation |
 |---|---|
 | Rename breaks production until the code-side updates land | Migration was applied immediately before the code changes; minimize the gap by landing all rename edits in one commit |
-| Truncation at last word boundary could occasionally produce a too-short result (e.g., a 145-char paragraph that ends right before a long word starting at 130) | Acceptable; human descriptions average well above 150 chars, so this is a corner case. Anything ≤150 chars is copied verbatim (no truncation logic engages). |
 | CSV SKU format mismatch (e.g., trailing whitespace in `inventory_number` from import-csv.ts) | Trim both sides of the comparison. Log any unmatched SKUs in the fail log so we can spot-check whether the issue is data drift vs. genuine missing artworks. |
-| Existing AI descriptions are lost on overwrite | Captured in the per-row log (`prior_alt_text_long`, `prior_alt_text`) for any row touched. Recoverable from the timestamped log file in `tmp/`. |
+| Existing AI long descriptions are lost on overwrite | Captured in the per-row log (`prior_alt_text_long`) for any row touched. Recoverable from the timestamped log file in `tmp/`. |
 | FTS index recreation is non-trivial on 2,000+ rows | Migration was already run by user; not a concern at script-run time. |
+| Short `alt_text` becomes inconsistent with the long form for human rows (long is human-authored, short is still AI-generated) | Acknowledged tradeoff. `alt_text_long` and `alt_text` serve different contexts and don't need to match in tone or content. If CG eventually wants human-authored short alts too, that is a follow-up CSV import or admin-form workflow. |

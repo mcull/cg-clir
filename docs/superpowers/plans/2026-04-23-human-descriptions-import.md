@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Import 590 human-written paragraph descriptions from CSV, supersede AI-generated content for matched SKUs, produce a per-row update log and a full-catalog export with prior-AI snapshots; bundle the schema rename rollout (UI + scripts) needed because the DB column rename has already been applied.
+**Goal:** Import 590 human-written paragraph descriptions from CSV into `alt_text_long` only (leaving the existing short `alt_text` untouched), produce a per-row update log and a full-catalog export with prior-AI long-form snapshots; bundle the schema rename rollout (UI + scripts) needed because the DB column rename has already been applied.
 
 **Architecture:** Two phases. Phase 1 = the import + export script (independently runnable; produces both artifacts in one pass so prior values are captured at update time). Phase 2 = the rename rollout across UI components and adjacent scripts. Phase 1 ships first because the DB schema is already in the renamed state, so getting clean data in is the foundation; Phase 2 makes the codebase consistent with the data.
 
-**Tech Stack:** TypeScript, Node 20+, `tsx` runner, `csv-parse/sync`, `@supabase/supabase-js`, Node's built-in test runner (`node:test`) — no new dependencies.
+**Tech Stack:** TypeScript, Node 20+, `tsx` runner, `csv-parse/sync`, `@supabase/supabase-js`. No new dependencies.
 
 **Spec reference:** `docs/superpowers/specs/2026-04-23-human-descriptions-import-design.md`
 
@@ -15,8 +15,6 @@
 ## File Structure
 
 **New files:**
-- `src/lib/text.ts` — pure utility function `truncateForAlt` that turns a paragraph into a ≤150-char alt text with ellipsis. Lives in `src/lib/` so both the import script and the admin form can import it cleanly.
-- `scripts/test-text.ts` — `node:test` assertions for `truncateForAlt`.
 - `scripts/import-human-descriptions.ts` — main script. Parses CSV, pages through artworks, updates matched rows, writes the two CSV artifacts.
 
 **Modified files (Phase 1):**
@@ -27,7 +25,7 @@
 - `src/lib/types.ts` — rename `ai_description` field on `Artwork` to `alt_text_long`; add `description_origin`
 - `src/lib/utils.ts` — `getAltText()` drops the fallback-to-long-form (the bug that motivated this work)
 - `src/app/artwork/[id]/page.tsx` — read `alt_text_long` for `<img alt>`; delete the "About This Work" section
-- `src/app/admin/artworks/[id]/page.tsx` — rename column references; relabel form fields; update copy-button to truncate
+- `src/app/admin/artworks/[id]/page.tsx` — rename column references; relabel form fields; **delete** the "copy long → short" button
 - `public/review.html` — rename column references in fetch URLs and PATCH bodies
 - `scripts/generate-descriptions.ts` — rename column refs; set `description_origin: 'ai'` on insert
 - `scripts/migrate-and-describe.ts` — same as above
@@ -84,130 +82,11 @@ Expected: outputs the path, exit code 0.
 
 ---
 
-### Task 2: Create truncation utility — failing test first
-
-**Files:**
-- Create: `scripts/test-text.ts`
-
-- [ ] **Step 1: Write the test file**
-
-Create `scripts/test-text.ts`:
-
-```typescript
-import { strict as assert } from "node:assert";
-import { test } from "node:test";
-import { truncateForAlt } from "../src/lib/text";
-
-test("returns short input verbatim, no ellipsis", () => {
-  const input = "A short description.";
-  assert.equal(truncateForAlt(input, 150), input);
-});
-
-test("trims leading and trailing whitespace", () => {
-  assert.equal(truncateForAlt("  hello  ", 150), "hello");
-});
-
-test("collapses newlines to single spaces", () => {
-  assert.equal(truncateForAlt("line one\nline two", 150), "line one line two");
-});
-
-test("collapses runs of whitespace to one space", () => {
-  assert.equal(truncateForAlt("a   b\t\tc", 150), "a b c");
-});
-
-test("returns empty string for empty input", () => {
-  assert.equal(truncateForAlt("", 150), "");
-});
-
-test("returns empty string for whitespace-only input", () => {
-  assert.equal(truncateForAlt("   \n\t  ", 150), "");
-});
-
-test("truncates long input at last word boundary, ending with ellipsis", () => {
-  const longInput = "The quick brown fox jumps over the lazy dog. ".repeat(10);
-  const result = truncateForAlt(longInput, 150);
-  assert.ok(result.length <= 150, `length ${result.length} > 150`);
-  assert.ok(result.endsWith("…"), `"${result}" should end with ellipsis`);
-  const charBeforeEllipsis = result.slice(-2, -1);
-  assert.notEqual(charBeforeEllipsis, " ", "should not have trailing space before ellipsis");
-});
-
-test("hard-cuts when no whitespace exists in first maxLen-1 chars", () => {
-  const noSpaces = "x".repeat(200);
-  const result = truncateForAlt(noSpaces, 150);
-  assert.equal(result.length, 150);
-  assert.equal(result, "x".repeat(149) + "…");
-});
-
-test("respects custom maxLen", () => {
-  const input = "abcdefghij ".repeat(5);
-  const result = truncateForAlt(input, 20);
-  assert.ok(result.length <= 20, `length ${result.length} > 20`);
-  assert.ok(result.endsWith("…"));
-});
-
-test("does not append ellipsis when input is exactly maxLen", () => {
-  const input = "x".repeat(150);
-  const result = truncateForAlt(input, 150);
-  assert.equal(result, input);
-  assert.ok(!result.endsWith("…"));
-});
-```
-
-- [ ] **Step 2: Run the test and verify it fails**
-
-Run: `npx tsx --test scripts/test-text.ts`
-Expected: All tests fail with `Error: Cannot find module '../src/lib/text'` or similar.
-
----
-
-### Task 3: Implement truncation utility
-
-**Files:**
-- Create: `src/lib/text.ts`
-
-- [ ] **Step 1: Write the implementation**
-
-Create `src/lib/text.ts`:
-
-```typescript
-/**
- * Truncate a paragraph for use as a short alt text.
- *
- * Behavior:
- * - Collapses all whitespace (newlines, tabs, runs of spaces) to single spaces, then trims.
- * - If the result is <= maxLen chars, returns it verbatim with no ellipsis.
- * - Otherwise, slices to (maxLen - 1) chars, finds the last whitespace within that slice,
- *   cuts there, and appends a single Unicode ellipsis (U+2026). Total length <= maxLen.
- * - If no whitespace exists in the first (maxLen - 1) chars, hard-cuts at (maxLen - 1) + ellipsis.
- */
-export function truncateForAlt(input: string, maxLen: number = 150): string {
-  const collapsed = input.replace(/\s+/g, " ").trim();
-  if (collapsed.length <= maxLen) return collapsed;
-
-  const ellipsis = "…";
-  const slice = collapsed.slice(0, maxLen - 1);
-  const lastSpace = slice.lastIndexOf(" ");
-
-  if (lastSpace === -1) {
-    return slice + ellipsis;
-  }
-  return slice.slice(0, lastSpace) + ellipsis;
-}
-```
-
-- [ ] **Step 2: Run the test and verify it passes**
-
-Run: `npx tsx --test scripts/test-text.ts`
-Expected: All 10 tests pass.
-
----
-
-### Task 4: Verify column types align with what the script will fetch
+### Task 2: Verify `resolveImageUrl()` works in a Node-only context
 
 **Files:** none (read-only verification)
 
-- [ ] **Step 1: Confirm `resolveImageUrl()` works without React/Next runtime**
+- [ ] **Step 1: Smoke-test the helper outside Next**
 
 Run:
 ```bash
@@ -223,7 +102,7 @@ If this fails: the script's `resolveImageUrl` import needs replacement. Reproduc
 
 ---
 
-### Task 5: Implement the import + export script
+### Task 3: Implement the import + export script
 
 **Files:**
 - Create: `scripts/import-human-descriptions.ts`
@@ -239,10 +118,13 @@ Create `scripts/import-human-descriptions.ts`:
  *
  * Reads the human-authored description CSV at HUMAN_CSV_PATH (default:
  * tmp/CLIR Image Descriptions Sheet - Brief Descriptions.csv), updates
- * matched artworks (alt_text_long, alt_text, description_origin='human'),
- * and writes two timestamped CSV artifacts to tmp/:
+ * matched artworks (alt_text_long, description_origin='human'), and
+ * writes two timestamped CSV artifacts to tmp/:
  *   - import-human-descriptions-log_<ISO>.csv  per-row update log
  *   - descriptions-export_<ISO>.csv             full catalog snapshot
+ *
+ * The short alt_text is intentionally NOT modified — see the spec at
+ * docs/superpowers/specs/2026-04-23-human-descriptions-import-design.md.
  *
  * Run: npx tsx --env-file=.env.local scripts/import-human-descriptions.ts
  */
@@ -251,7 +133,6 @@ import fs from "fs";
 import path from "path";
 import { parse } from "csv-parse/sync";
 import { createClient } from "@supabase/supabase-js";
-import { truncateForAlt } from "../src/lib/text";
 import { resolveImageUrl } from "../src/lib/utils";
 
 // ─── Config ───────────────────────────────────────────────────────────────
@@ -278,7 +159,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 });
 
 const PAGE_SIZE = 1000;
-const ALT_MAX_LEN = 150;
 
 // ─── Types ────────────────────────────────────────────────────────────────
 interface CsvRow {
@@ -303,9 +183,7 @@ interface LogEntry {
   reason: string;
   artwork_id: string;
   prior_alt_text_long: string;
-  prior_alt_text: string;
   new_alt_text_long: string;
-  new_alt_text: string;
 }
 
 interface ExportEntry {
@@ -315,7 +193,6 @@ interface ExportEntry {
   alt_text_long: string;
   alt_text: string;
   prior_ai_alt_text_long: string;
-  prior_ai_alt_text: string;
 }
 
 // ─── CSV output helpers ───────────────────────────────────────────────────
@@ -393,7 +270,7 @@ async function main() {
   for (const art of allArtworks) {
     const sku = (art.inventory_number || "").trim();
     const priorLong = art.alt_text_long || "";
-    const priorShort = art.alt_text || "";
+    const currentShort = art.alt_text || "";
     const imageUrl = resolveImageUrl(art) || "";
 
     if (sku && skuMap.has(sku)) {
@@ -404,27 +281,26 @@ async function main() {
         logEntries.push({
           sku, status: "fail", reason: "empty description",
           artwork_id: art.id,
-          prior_alt_text_long: priorLong, prior_alt_text: priorShort,
-          new_alt_text_long: "", new_alt_text: "",
+          prior_alt_text_long: priorLong,
+          new_alt_text_long: "",
         });
         failCount++;
         exportEntries.push({
           sku, image_url: imageUrl,
           description_origin: art.description_origin || "",
-          alt_text_long: priorLong, alt_text: priorShort,
-          prior_ai_alt_text_long: "", prior_ai_alt_text: "",
+          alt_text_long: priorLong,
+          alt_text: currentShort,
+          prior_ai_alt_text_long: "",
         });
         continue;
       }
 
       const newLong = desc;
-      const newShort = truncateForAlt(desc, ALT_MAX_LEN);
 
       const { error: updateErr } = await supabase
         .from("artworks")
         .update({
           alt_text_long: newLong,
-          alt_text: newShort,
           description_origin: "human",
         })
         .eq("id", art.id);
@@ -433,15 +309,16 @@ async function main() {
         logEntries.push({
           sku, status: "fail", reason: `update error: ${updateErr.message}`,
           artwork_id: art.id,
-          prior_alt_text_long: priorLong, prior_alt_text: priorShort,
-          new_alt_text_long: newLong, new_alt_text: newShort,
+          prior_alt_text_long: priorLong,
+          new_alt_text_long: newLong,
         });
         failCount++;
         exportEntries.push({
           sku, image_url: imageUrl,
           description_origin: art.description_origin || "",
-          alt_text_long: priorLong, alt_text: priorShort,
-          prior_ai_alt_text_long: "", prior_ai_alt_text: "",
+          alt_text_long: priorLong,
+          alt_text: currentShort,
+          prior_ai_alt_text_long: "",
         });
         continue;
       }
@@ -449,24 +326,26 @@ async function main() {
       logEntries.push({
         sku, status: "success", reason: "",
         artwork_id: art.id,
-        prior_alt_text_long: priorLong, prior_alt_text: priorShort,
-        new_alt_text_long: newLong, new_alt_text: newShort,
+        prior_alt_text_long: priorLong,
+        new_alt_text_long: newLong,
       });
       successCount++;
 
       exportEntries.push({
         sku, image_url: imageUrl,
         description_origin: "human",
-        alt_text_long: newLong, alt_text: newShort,
-        prior_ai_alt_text_long: priorLong, prior_ai_alt_text: priorShort,
+        alt_text_long: newLong,
+        alt_text: currentShort,
+        prior_ai_alt_text_long: priorLong,
       });
     } else {
-      // Not in human CSV - export current state, no prior_ai_*
+      // Not in human CSV - export current state, no prior_ai_alt_text_long
       exportEntries.push({
         sku, image_url: imageUrl,
         description_origin: art.description_origin || "",
-        alt_text_long: priorLong, alt_text: priorShort,
-        prior_ai_alt_text_long: "", prior_ai_alt_text: "",
+        alt_text_long: priorLong,
+        alt_text: currentShort,
+        prior_ai_alt_text_long: "",
       });
     }
   }
@@ -477,8 +356,8 @@ async function main() {
       logEntries.push({
         sku, status: "fail", reason: "sku not found in db",
         artwork_id: "",
-        prior_alt_text_long: "", prior_alt_text: "",
-        new_alt_text_long: "", new_alt_text: "",
+        prior_alt_text_long: "",
+        new_alt_text_long: "",
       });
       failCount++;
     }
@@ -489,8 +368,8 @@ async function main() {
     logEntries.push({
       sku, status: "fail", reason: "superseded by later row in csv",
       artwork_id: "",
-      prior_alt_text_long: "", prior_alt_text: "",
-      new_alt_text_long: "", new_alt_text: "",
+      prior_alt_text_long: "",
+      new_alt_text_long: "",
     });
   }
 
@@ -498,12 +377,12 @@ async function main() {
   if (!fs.existsSync(TMP_DIR)) fs.mkdirSync(TMP_DIR, { recursive: true });
 
   writeCsv(LOG_FILE,
-    ["sku", "status", "reason", "artwork_id", "prior_alt_text_long", "prior_alt_text", "new_alt_text_long", "new_alt_text"],
+    ["sku", "status", "reason", "artwork_id", "prior_alt_text_long", "new_alt_text_long"],
     logEntries
   );
 
   writeCsv(EXPORT_FILE,
-    ["sku", "image_url", "description_origin", "alt_text_long", "alt_text", "prior_ai_alt_text_long", "prior_ai_alt_text"],
+    ["sku", "image_url", "description_origin", "alt_text_long", "alt_text", "prior_ai_alt_text_long"],
     exportEntries
   );
 
@@ -535,7 +414,7 @@ Expected: prints `imports OK`.
 
 ---
 
-### Task 6: Add npm script
+### Task 4: Add npm script
 
 **Files:**
 - Modify: `package.json`
@@ -573,7 +452,7 @@ Expected: `import:descriptions`
 
 ---
 
-### Task 7: Commit Phase 1 code
+### Task 5: Commit Phase 1 code
 
 **Files:** none (git only)
 
@@ -581,28 +460,30 @@ Expected: `import:descriptions`
 
 Run:
 ```bash
-git add .gitignore package.json src/lib/text.ts scripts/test-text.ts scripts/import-human-descriptions.ts
+git add .gitignore package.json scripts/import-human-descriptions.ts
 git status
 ```
 
-Expected: shows the 5 files staged. No untracked CSVs in `tmp/` because of the gitignore.
+Expected: shows the 3 files staged. No untracked CSVs in `tmp/` because of the gitignore.
 
 - [ ] **Step 2: Create commit**
 
 Run:
 ```bash
 git commit -m "$(cat <<'EOF'
-Add human descriptions import script with truncation utility
+Add human descriptions import script
 
 scripts/import-human-descriptions.ts reads the human-authored CSV,
-updates matched artworks (alt_text_long, alt_text, description_origin),
+updates matched artworks (alt_text_long, description_origin='human'),
 and produces two timestamped artifacts in tmp/:
   - per-row update log with prior values for audit
-  - full-catalog export with prior AI snapshots for human-overwritten
-    rows so Creative Growth can compare AI vs human side-by-side
+  - full-catalog export with prior AI long-form snapshots for
+    human-overwritten rows so Creative Growth can compare AI vs human
+    side-by-side
 
-Truncation logic for the short alt_text is extracted to
-scripts/lib/truncate.ts with node:test coverage. tmp/ is gitignored.
+The short alt_text is intentionally NOT modified by this script —
+the human CSV has only paragraph-form content, and the existing
+AI-generated short alt remains in place. tmp/ is gitignored.
 
 The script writes to renamed columns (alt_text_long) which were
 established by a manual schema migration on 2026-04-23. The codebase
@@ -617,7 +498,7 @@ Expected: commit succeeds.
 
 ---
 
-### Task 8: Run the import on real data
+### Task 6: Run the import on real data
 
 **Files:** none (execution only — produces gitignored artifacts)
 
@@ -641,12 +522,12 @@ If the script errors out: do NOT attempt fixes blind — report the error to the
 - [ ] **Step 2: Spot-check the log**
 
 Run: `head -5 tmp/import-human-descriptions-log_*.csv`
-Expected: header row + 4 rows. Each row has populated `prior_alt_text_long` (the previous AI text being overwritten) and a `new_alt_text` ending with `…` for any description longer than 150 chars.
+Expected: header row (`sku,status,reason,artwork_id,prior_alt_text_long,new_alt_text_long`) plus 4 data rows. Each successful row has populated `prior_alt_text_long` (the previous AI text being overwritten) and `new_alt_text_long` (the human paragraph).
 
 - [ ] **Step 3: Spot-check the export**
 
 Run: `head -3 tmp/descriptions-export_*.csv`
-Expected: header row + 2 rows. The first data row should have `description_origin = human` if the artwork was matched, or `ai` if not.
+Expected: header row (`sku,image_url,description_origin,alt_text_long,alt_text,prior_ai_alt_text_long`) plus 2 data rows. The first data row should have `description_origin = human` if the artwork was matched, or `ai` if not.
 
 - [ ] **Step 4: Sanity-check counts**
 
@@ -672,7 +553,7 @@ c.from('artworks').select('inventory_number, alt_text, alt_text_long, descriptio
 "
 ```
 
-Expected: `description_origin: 'human'`, `alt_text_long` is the full paragraph from the CSV, `alt_text` ends with `…` and is ≤150 chars.
+Expected: `description_origin: 'human'`, `alt_text_long` is the full paragraph from the CSV, `alt_text` unchanged from its prior value (whatever the AI pipeline had set).
 
 ---
 
@@ -680,7 +561,7 @@ Expected: `description_origin: 'human'`, `alt_text_long` is the full paragraph f
 
 The rename rollout brings the codebase into agreement with the renamed schema. Production code is currently broken against the new schema (queries `ai_description` which no longer exists) — this phase fixes that. All file edits land in one commit because the rename is logically atomic.
 
-### Task 9: Update TypeScript types
+### Task 7: Update TypeScript types
 
 **Files:**
 - Modify: `src/lib/types.ts`
@@ -709,7 +590,7 @@ Expected: no output.
 
 ---
 
-### Task 10: Update getAltText helper
+### Task 8: Update getAltText helper
 
 **Files:**
 - Modify: `src/lib/utils.ts`
@@ -741,33 +622,18 @@ export function getAltText(artwork: {
 - [ ] **Step 2: Verify no consumers expect the removed field in the signature**
 
 Run: `grep -rn "getAltText" src/ --include="*.ts" --include="*.tsx"`
-Expected: callers in `ArtworkCard.tsx` and `artwork/[id]/page.tsx` and `admin/artworks/[id]/page.tsx`. They pass full `artwork` objects so the narrower signature is fine.
+Expected: callers in `ArtworkCard.tsx`, `artwork/[id]/page.tsx`, and `admin/artworks/[id]/page.tsx`. They pass full `artwork` objects so the narrower signature is fine.
 
 ---
 
-### Task 11: Update artwork detail page — alt + remove "About This Work"
+### Task 9: Update artwork detail page — alt + remove "About This Work"
 
 **Files:**
 - Modify: `src/app/artwork/[id]/page.tsx`
 
 - [ ] **Step 1: Switch the `<img alt>` to the long form**
 
-Find this block (around line 162-169):
-
-```tsx
-            {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={altText}
-                fill
-                className="object-cover"
-                priority
-              />
-```
-
-Above the JSX `return`, the current code computes `const altText = getAltText(artwork);`. The detail page should use the long form for the image alt, since this is the page where rich description is appropriate.
-
-Replace the `altText` declaration (around line 122):
+The detail page should use the long form for the image alt, since this is the page where rich description is appropriate. Replace the `altText` declaration (around line 122):
 
 ```typescript
   const altText = getAltText(artwork);
@@ -808,28 +674,18 @@ Expected: no output.
 
 ---
 
-### Task 12: Update admin edit page
+### Task 10: Update admin edit page
 
 **Files:**
 - Modify: `src/app/admin/artworks/[id]/page.tsx`
 
 - [ ] **Step 1: Rename all field references**
 
-Run a find-and-replace across the file. Every occurrence of `ai_description` must become `alt_text_long` (10 spots: form-state init, DB-fetch destructuring, DB-update payload, copy-button source, label `htmlFor`, `<textarea id>`, `<textarea name>`, `value={formData.ai_description}`, the `formData.ai_description` guard, the `alt_text: prev.ai_description` assignment in the copy-button).
+Use the Edit tool with `replace_all: true` for `ai_description` → `alt_text_long` across the entire file (10 spots: form-state init, DB-fetch destructuring, DB-update payload, copy-button source, label `htmlFor`, `<textarea id>`, `<textarea name>`, `value={formData.ai_description}`, the `formData.ai_description` guard, the `alt_text: prev.ai_description` assignment).
 
-Use the Edit tool with `replace_all: true` for `ai_description` → `alt_text_long`.
+- [ ] **Step 2: Delete the "copy long → short" button**
 
-- [ ] **Step 2: Update the form labels**
-
-Find the label for what is now `alt_text_long`. The current label text reads something like "AI Description" or "Description". Replace with: `Long alt text (detail page)`.
-
-Find the label for `alt_text`. Replace with: `Short alt text (grid page)`.
-
-- [ ] **Step 3: Fix the copy-button to truncate**
-
-The existing copy button copies `ai_description` (now `alt_text_long`) directly into `alt_text`. After the rename, this would copy a paragraph into the short field — defeating the truncation discipline.
-
-Find this code (formerly used the old name):
+After the rename, the copy-button code now reads (approximately):
 
 ```typescript
     if (formData.alt_text_long) {
@@ -840,48 +696,32 @@ Find this code (formerly used the old name):
     }
 ```
 
-Replace with:
+Find the JSX that renders this button (look for the button element near `htmlFor="alt_text_long"` around line 317 — it has `disabled={!formData.alt_text_long}` after the rename). DELETE the entire button JSX element. Then DELETE the handler function above it (the `if (formData.alt_text_long) { ... }` block). The two fields become independent textareas with no copy affordance.
 
-```typescript
-    if (formData.alt_text_long) {
-      setFormData((prev) => ({
-        ...prev,
-        alt_text: truncateForAlt(prev.alt_text_long || "", 150),
-      }));
-    }
-```
+- [ ] **Step 3: Update the form labels**
 
-Add the import at the top of the file (the project uses a `@/` alias for `src/`):
+Find the label for `alt_text_long`. Its current text reads something like "AI Description" or "Description". Replace the visible text with: `Long alt text (detail page)`.
 
-```typescript
-import { truncateForAlt } from "@/lib/text";
-```
-
-If the alias isn't configured (check `tsconfig.json` for `paths`), use the relative path: `../../../../lib/text`.
+Find the label for `alt_text`. Replace its visible text with: `Short alt text (grid page)`.
 
 - [ ] **Step 4: Verify**
 
 Run: `grep -n "ai_description" src/app/admin/artworks/\[id\]/page.tsx`
 Expected: no output.
 
+Run: `grep -in "copy" src/app/admin/artworks/\[id\]/page.tsx`
+Expected: no output (or only unrelated occurrences). The copy-button is gone.
+
 ---
 
-### Task 13: Update review SPA
+### Task 11: Update review SPA
 
 **Files:**
 - Modify: `public/review.html`
 
 - [ ] **Step 1: Rename column references**
 
-8 occurrences of `ai_description` need to become `alt_text_long`. They appear in:
-- Two SELECT URL strings (lines around 329 and 352)
-- Two `=not.is.null` filter strings (same lines)
-- Two display elements (`a.ai_description` rendering)
-- Two `${a.ai_description}` in textareas
-- Two PATCH payload bodies (`ai_description: desc`)
-- Four in-memory mutations (`a.ai_description = desc`)
-
-Use the Edit tool with `replace_all: true` for `ai_description` → `alt_text_long`.
+Use the Edit tool with `replace_all: true` for `ai_description` → `alt_text_long` across the file. 8 occurrences should be replaced (2 SELECT URL strings, 2 `=not.is.null` filter strings, 2 display elements rendering `a.ai_description`, 2 textarea `${a.ai_description}` references, 2 PATCH payload bodies `ai_description: desc`, and 4 in-memory mutations `a.ai_description = desc`).
 
 - [ ] **Step 2: Verify**
 
@@ -895,20 +735,14 @@ Expected: both IDs appear at least once. They're internal labels for the textare
 
 ---
 
-### Task 14: Update generate-descriptions.ts
+### Task 12: Update generate-descriptions.ts
 
 **Files:**
 - Modify: `scripts/generate-descriptions.ts`
 
 - [ ] **Step 1: Rename column references**
 
-4 occurrences of `ai_description` need renaming:
-- The TypeScript interface field
-- The `select` clause (` ai_description, `)
-- The `.is("ai_description", null)` filter
-- The update payload key
-
-Use the Edit tool with `replace_all: true` for `ai_description` → `alt_text_long`.
+Use the Edit tool with `replace_all: true` for `ai_description` → `alt_text_long`. 4 occurrences should be replaced (the TypeScript interface field, the `select` clause, the `.is("ai_description", null)` filter, and the update payload key).
 
 - [ ] **Step 2: Add description_origin to the update payload**
 
@@ -940,14 +774,14 @@ Expected: no output.
 
 ---
 
-### Task 15: Update migrate-and-describe.ts
+### Task 13: Update migrate-and-describe.ts
 
 **Files:**
 - Modify: `scripts/migrate-and-describe.ts`
 
 - [ ] **Step 1: Rename column references**
 
-5 occurrences of `ai_description` need renaming. Use the Edit tool with `replace_all: true` for `ai_description` → `alt_text_long`.
+Use the Edit tool with `replace_all: true` for `ai_description` → `alt_text_long`. 5 occurrences should be replaced.
 
 - [ ] **Step 2: Add description_origin to the update payload**
 
@@ -977,7 +811,7 @@ Expected: no output.
 
 ---
 
-### Task 16: Sync the migration SQL with the applied state
+### Task 14: Sync the migration SQL with the applied state
 
 **Files:**
 - Modify: `supabase/migrations/001_initial.sql`
@@ -1035,7 +869,7 @@ Expected: no output.
 
 ---
 
-### Task 17: Verify dev server starts and pages render
+### Task 15: Verify dev server starts and pages render
 
 **Files:** none (verification)
 
@@ -1056,7 +890,7 @@ Wait until you see `Ready in <X>ms` in the output (use Monitor or BashOutput to 
 - [ ] **Step 3: Smoke-test the collection page**
 
 Run: `curl -s http://localhost:3000/collection | grep -o 'alt="[^"]*"' | head -5`
-Expected: 5 alt attributes printed. Each should be ≤150 chars (eyeball it). For artworks updated by the import, the alt should end with `…`.
+Expected: 5 alt attributes printed. Each should be the existing short AI alt — NOT the long human paragraph (since the script doesn't touch alt_text and the grid uses the short form).
 
 - [ ] **Step 4: Smoke-test a known-overwritten artwork detail page**
 
@@ -1073,7 +907,7 @@ c.from('artworks').select('id').eq('inventory_number', 'ABai 1').single().then((
 Then: `curl -s http://localhost:3000/artwork/<UUID> | grep -E 'alt=|About This Work'`
 
 Expected:
-- One `alt="..."` containing the full human paragraph (no `…` — the long form goes here)
+- One `alt="..."` containing the full human paragraph (long form goes here)
 - NO occurrence of `About This Work` (section was deleted)
 
 - [ ] **Step 5: Stop the dev server**
@@ -1082,7 +916,7 @@ Kill the background process.
 
 ---
 
-### Task 18: Commit Phase 2
+### Task 16: Commit Phase 2
 
 **Files:** none (git only)
 
@@ -1113,8 +947,9 @@ description_origin column). This commit catches the codebase up:
   "About This Work" section that was wrongly rendering the alt text
   as visible body content
 - Admin edit page: rename refs, relabel fields ("Long alt text /
-  detail page" vs "Short alt text / grid page"), make the copy button
-  truncate with the same logic as the import script
+  detail page" vs "Short alt text / grid page"), delete the
+  copy-long-to-short button (the two fields now serve different
+  purposes and shouldn't be derived from each other)
 - Review SPA: rename refs in fetch URLs, PATCH bodies, and renders
 - AI generation scripts: rename refs and set description_origin: 'ai'
   on insert
@@ -1136,10 +971,12 @@ Expected: commit succeeds.
 ## Done
 
 At this point:
-- DB has 590 (give or take) human-described artworks with `description_origin='human'`, ~1,500 AI-described with `description_origin='ai'`
+- DB has 590 (give or take) artworks with `description_origin='human'` and `alt_text_long` set to the human paragraph; ~1,500 AI-described with `description_origin='ai'`
+- `alt_text` (short form) is unchanged everywhere — still AI-generated
 - Two CSV artifacts in `tmp/` ready to share with Creative Growth
 - Codebase compiles, dev server renders correctly with the new schema
 - The misleading "About This Work" section is gone
-- Grid pages serve short alts; detail page serves long alts
+- Grid pages serve short alts (existing AI); detail page serves long alts (human where available, AI otherwise)
+- Admin form has independent textareas for short and long alt; no copy button
 
 Hand off the two `tmp/` CSVs to Creative Growth. Open issues for follow-up work flagged in the spec under "Out of scope" if you want them tracked.
