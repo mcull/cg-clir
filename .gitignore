@@ -40,6 +40,7 @@ next-env.d.ts
 scripts/.image-migration-progress.json
 scripts/.migrate-describe-progress.json
 scripts/.description-progress.json
+scripts/.archive-import-progress.json
 
 # CSV data (large)
 inventory_*.csv

@@ -25,3 +25,29 @@ The project already depends on `playwright` (currently used by `scripts/scrape-b
 **Why it'd pay off:** as the gallery grows more conditional UI (storytelling section, admin workflows, additional metadata fields), the cost of silent regressions rises. The figcaption + conditional metadata pattern landed in PR for `feat/artwork-detail-captions` is exactly the kind of thing that breaks silently if the conditional gets restructured.
 
 **Workaround for now:** ad-hoc smoke tests during PRs (curl + grep, dev-server-in-browser).
+
+---
+
+## TI-002: UNIQUE constraint on `artworks.sku`
+
+**Priority:** Medium
+**Added:** 2026-04-23
+
+`artworks.sku` was added with an index but not a UNIQUE constraint, intentionally — the source Art Cloud CSV has 2 legitimate duplicates (`DMi 662`, `JS 27`) representing distinct artworks that share an artist code. After running the archive import, our idempotency story for new-row inserts depends on the in-memory SKU map plus the progress checkpoint. If both are out of sync (e.g., a corrupted checkpoint after a crash), Branch B could silently insert duplicates.
+
+**What we'd build:** decide on a uniqueness story for SKU. Options: (a) keep as-is and harden the script's idempotency story (e.g., re-fetch SKU map periodically during long runs), (b) add a partial UNIQUE excluding the 2 known duplicates, (c) accept the duplicates and add UNIQUE on `(sku, inventory_number)` instead.
+
+**Why it'd pay off:** future imports won't have to depend on the right combination of caches + checkpoint files for correctness. DB enforces what it should enforce.
+
+---
+
+## TI-003: Original-variant image MIME type is hard-coded JPEG
+
+**Priority:** Low
+**Added:** 2026-04-23
+
+Both `scripts/import-archive.ts` and `scripts/migrate-and-describe.ts` upload the `original` image variant with `ContentType: image/jpeg` regardless of the source format. Sharp re-encodes the resized variants to JPEG, so those are correct, but if the source `Link 1` URL is a PNG or WebP, the original variant is served from R2 with the wrong MIME type.
+
+**What we'd build:** sniff the source bytes' magic numbers (or trust the URL extension) before setting the upload `ContentType`. ~5 lines per script.
+
+**Why it'd pay off:** Some images in our R2 bucket may already be misconfigured. Right now the public site only links to the resized `large_1600.jpg` variant on detail pages, so this is invisible — but if anyone ever links to the `original` variant directly, they'd get a JPEG-typed PNG.
