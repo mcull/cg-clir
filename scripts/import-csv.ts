@@ -13,6 +13,7 @@ import path from "path";
 import { parse } from "csv-parse/sync";
 import { createClient } from "@supabase/supabase-js";
 import { slugify, parseNumeric, parseTags } from "../src/lib/utils";
+import { dateToDecade } from "../src/lib/decades";
 
 // ─── Config ───────────────────────────────────────────────────────────────
 const CSV_PATH =
@@ -143,6 +144,7 @@ async function main() {
         title,
         artist_id: artistId,
         date_created: row["Date Created"]?.trim() || null,
+        decade: dateToDecade(row["Date Created"]?.trim() || null),
         medium: row.Medium?.trim() || null,
         height: parseNumeric(row.Height),
         width: parseNumeric(row.Width),

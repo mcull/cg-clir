@@ -51,6 +51,7 @@ CREATE TABLE artworks (
   alt_text_long     TEXT,
   description_origin TEXT CHECK (description_origin IN ('human', 'ai')),
   sku               TEXT,
+  decade            TEXT,
 
   -- Metadata
   tags              TEXT[],
@@ -67,6 +68,7 @@ CREATE INDEX idx_artworks_artist ON artworks(artist_id);
 CREATE INDEX idx_artworks_tags ON artworks USING GIN(tags);
 CREATE INDEX idx_artworks_inventory ON artworks(inventory_number);
 CREATE INDEX idx_artworks_sku ON artworks(sku);
+CREATE INDEX idx_artworks_decade ON artworks(decade);
 
 CREATE TABLE artwork_categories (
   artwork_id   UUID REFERENCES artworks(id) ON DELETE CASCADE,
