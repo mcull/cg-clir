@@ -34,7 +34,7 @@ export default function EditArtworkPage() {
     depth: "",
     tags: "",
     alt_text: "",
-    ai_description: "",
+    alt_text_long: "",
     on_website: true,
   });
 
@@ -66,7 +66,7 @@ export default function EditArtworkPage() {
             depth: artData.depth?.toString() || "",
             tags: artData.tags?.join(", ") || "",
             alt_text: artData.alt_text || "",
-            ai_description: artData.ai_description || "",
+            alt_text_long: artData.alt_text_long || "",
             on_website: artData.on_website || true,
           });
         }
@@ -113,7 +113,7 @@ export default function EditArtworkPage() {
         depth: formData.depth ? parseFloat(formData.depth) : null,
         tags: parseTags(formData.tags),
         alt_text: formData.alt_text || null,
-        ai_description: formData.ai_description || null,
+        alt_text_long: formData.alt_text_long || null,
         on_website: formData.on_website,
         updated_at: new Date().toISOString(),
       };
@@ -130,15 +130,6 @@ export default function EditArtworkPage() {
       setError(err instanceof Error ? err.message : "Error saving artwork");
     } finally {
       setSaving(false);
-    }
-  };
-
-  const copyAiToAlt = () => {
-    if (formData.ai_description) {
-      setFormData((prev) => ({
-        ...prev,
-        alt_text: prev.ai_description,
-      }));
     }
   };
 
@@ -311,35 +302,25 @@ export default function EditArtworkPage() {
           />
         </div>
 
-        {/* AI Description */}
+        {/* Long alt text - detail page */}
         <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <label htmlFor="ai_description" className="block text-sm font-bold text-gray-700">
-              AI Description (Suggestion)
-            </label>
-            <button
-              type="button"
-              onClick={copyAiToAlt}
-              disabled={!formData.ai_description}
-              className="text-xs text-blue-600 hover:text-blue-800 disabled:text-gray-400"
-            >
-              Copy to Alt Text
-            </button>
-          </div>
+          <label htmlFor="alt_text_long" className="block text-sm font-bold text-gray-700 mb-2">
+            Long alt text (detail page)
+          </label>
           <textarea
-            id="ai_description"
-            name="ai_description"
-            value={formData.ai_description}
+            id="alt_text_long"
+            name="alt_text_long"
+            value={formData.alt_text_long}
             onChange={handleChange}
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Alt Text */}
+        {/* Short alt text - grid page */}
         <div className="mb-6">
           <label htmlFor="alt_text" className="block text-sm font-bold text-gray-700 mb-2">
-            Alt Text (for accessibility)
+            Short alt text (grid page)
           </label>
           <textarea
             id="alt_text"

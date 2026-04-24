@@ -82,17 +82,18 @@ export function resolveImageUrl(artwork: {
 }
 
 /**
- * Get the effective alt text for an artwork (admin-edited takes priority).
+ * Get the short alt text for an artwork. Used in <img alt> on grid pages.
+ * Does NOT fall back to alt_text_long — that field is for the detail page,
+ * where dumping a paragraph into the alt attribute would force screen-reader
+ * users through a long announcement on every grid card. See
+ * docs/superpowers/specs/2026-04-23-human-descriptions-import-design.md.
  */
 export function getAltText(artwork: {
   alt_text: string | null;
-  ai_description: string | null;
   title: string;
   medium: string | null;
 }): string {
   if (artwork.alt_text) return artwork.alt_text;
-  if (artwork.ai_description) return artwork.ai_description;
-  // Fallback: title + medium
   const parts = [artwork.title];
   if (artwork.medium) parts.push(artwork.medium);
   return parts.join(". ");

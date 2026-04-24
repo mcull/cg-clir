@@ -119,7 +119,7 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
     artwork.artist_id &&
     (await getArtistArtworks(artwork.artist_id, artwork.id));
 
-  const altText = getAltText(artwork);
+  const altText = artwork.alt_text_long || getAltText(artwork);
   const imageUrl = resolveImageUrl(artwork);
   const artistName = artwork.artist
     ? formatArtistName(artwork.artist.first_name, artwork.artist.last_name)
@@ -269,18 +269,6 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
           <DownloadButton artworkId={artwork.id} title={artwork.title} />
         </div>
       </div>
-
-      {/* Description */}
-      {artwork.ai_description && (
-        <section className="mt-12 pt-12 border-t border-gray-200 max-w-2xl">
-          <h2 className="font-serif text-2xl font-bold text-gray-900 mb-4">
-            About This Work
-          </h2>
-          <p className="text-gray-700 leading-relaxed">
-            {artwork.ai_description}
-          </p>
-        </section>
-      )}
 
       {/* More by Artist */}
       {moreArtworks && moreArtworks.length > 0 && (

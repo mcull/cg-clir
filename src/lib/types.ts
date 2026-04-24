@@ -32,10 +32,12 @@ export interface Artwork {
   width: number | null;
   depth: number | null;
   inventory_number: string | null;
+  sku: string | null;
   image_url: string | null;
   image_original: string | null;
-  ai_description: string | null;
   alt_text: string | null;
+  alt_text_long: string | null;
+  description_origin: "human" | "ai" | null;
   tags: string[] | null;
   genre: string | null;
   notes: string | null;

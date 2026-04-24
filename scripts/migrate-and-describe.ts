@@ -226,7 +226,7 @@ type ArtworkRow = {
   width: number | null;
   image_original: string | null;
   image_url: string | null;
-  ai_description: string | null;
+  alt_text_long: string | null;
   artist: { first_name: string; last_name: string } | null;
 };
 
@@ -241,7 +241,7 @@ async function main() {
     const { data, error } = await supabase
       .from("artworks")
       .select(
-        "id, inventory_number, title, medium, height, width, image_original, image_url, ai_description, artist:artists(first_name, last_name)"
+        "id, inventory_number, title, medium, height, width, image_original, image_url, alt_text_long, artist:artists(first_name, last_name)"
       )
       .not("image_original", "is", null)
       .not("inventory_number", "is", null)
@@ -271,7 +271,7 @@ async function main() {
   const remaining = allArtworks.filter(
     (a) =>
       !imageDoneSet.has(a.inventory_number!) ||
-      (!descDoneSet.has(a.id) && !a.ai_description)
+      (!descDoneSet.has(a.id) && !a.alt_text_long)
   );
 
   console.log(`Total artworks with images: ${allArtworks.length}`);
@@ -292,7 +292,7 @@ async function main() {
   async function processArtwork(artwork: ArtworkRow) {
     const invNum = artwork.inventory_number!;
     const needsImage = !imageDoneSet.has(invNum);
-    const needsDesc = !SKIP_DESCRIPTIONS && !descDoneSet.has(artwork.id) && !artwork.ai_description;
+    const needsDesc = !SKIP_DESCRIPTIONS && !descDoneSet.has(artwork.id) && !artwork.alt_text_long;
 
     // If we only need a description but the image is already migrated,
     // we still need to download the image for Claude Vision
@@ -368,8 +368,9 @@ async function main() {
 
         // Build the DB update — include image_url if we also migrated
         const update: Record<string, string> = {
-          ai_description: desc.description,
+          alt_text_long: desc.description,
           alt_text: desc.alt_text,
+          description_origin: "ai",
         };
         if (newUrl) {
           update.image_url = newUrl;

@@ -41,9 +41,12 @@ CREATE TABLE artworks (
   image_url         TEXT,
   image_original    TEXT,
 
-  -- AI-generated accessibility content
-  ai_description    TEXT,
+  -- Accessibility alt text. alt_text_long is for <img alt> on the artwork
+  -- detail page; alt_text is the short form for grid pages.
   alt_text          TEXT,
+  alt_text_long     TEXT,
+  description_origin TEXT CHECK (description_origin IN ('human', 'ai')),
+  sku               TEXT,
 
   -- Metadata
   tags              TEXT[],
@@ -59,6 +62,7 @@ CREATE TABLE artworks (
 CREATE INDEX idx_artworks_artist ON artworks(artist_id);
 CREATE INDEX idx_artworks_tags ON artworks USING GIN(tags);
 CREATE INDEX idx_artworks_inventory ON artworks(inventory_number);
+CREATE INDEX idx_artworks_sku ON artworks(sku);
 
 CREATE TABLE artwork_categories (
   artwork_id   UUID REFERENCES artworks(id) ON DELETE CASCADE,
@@ -172,7 +176,7 @@ ALTER TABLE artworks ADD COLUMN IF NOT EXISTS fts tsvector
     setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
     setweight(to_tsvector('english', coalesce(medium, '')), 'B') ||
     setweight(to_tsvector('english', coalesce(alt_text, '')), 'C') ||
-    setweight(to_tsvector('english', coalesce(ai_description, '')), 'D')
+    setweight(to_tsvector('english', coalesce(alt_text_long, '')), 'D')
   ) STORED;
 
 CREATE INDEX idx_artworks_fts ON artworks USING GIN(fts);
