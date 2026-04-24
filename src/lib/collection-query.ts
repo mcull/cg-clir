@@ -2,17 +2,24 @@
 /**
  * Collection / Ephemera query builder.
  *
- * Given a FilterState and a cohort, fetch the matching artworks (with
- * pagination) and the facet counts for the multi-select dropdowns.
+ * Filter strategy by dimension:
+ *   - Cohort, on_website, search (FTS), decade, artist: applied inline
+ *     on the main query — small, indexed, fast.
+ *   - Theme XOR Format (one category dim active): embedded INNER join +
+ *     `.eq()` / `.in()` on the embedded path. PostgREST INNER JOIN
+ *     filters the parent rows correctly.
+ *   - Theme AND Format (both active): pre-resolve the intersected
+ *     artwork-id set via `categoryFilteredIds`, then `.in("id", ids)`.
+ *     The intersection is bounded by min(theme-pop, format-pop), which
+ *     is small enough to fit comfortably in a PostgREST URL.
+ *   - We avoid `.in("id", hugeSet)` patterns (e.g., 1,400-id Drawings
+ *     filter), which exceed PostgREST's URI length limit.
  *
- * Cohort filter:
- *   'artwork'  → artworks where 'ephemera' is NOT present in tags
- *   'ephemera' → artworks where 'ephemera' IS present in tags
+ * Filters compose with AND across dimensions, OR within each.
  *
- * Other filters compose with AND across dimensions, OR within each.
- *
- * Performance note: at ~3k rows this is comfortably sub-100ms in
- * Postgres + Supabase. The facet count queries run in parallel.
+ * Cohort:
+ *   'artwork'  → tags does NOT contain 'ephemera'
+ *   'ephemera' → tags contains 'ephemera'
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -39,117 +46,191 @@ export interface FacetCounts {
   themes: Record<string, number>;
   formats: Record<string, number>;
   decades: Record<string, number>;
-  // For Artist (single-select with typeahead) we just produce the set of
-  // artist slugs that have at least one match given the current filters
-  // EXCLUDING the artist filter itself. UI hides artists not in this set.
   availableArtistSlugs: Set<string>;
 }
 
 const PAGE_SIZE = 24;
+const MAX_FETCH = 9999;
 
-// ── Helpers ─────────────────────────────────────────────────────────────
+type ExceptDim = "themes" | "formats" | "decades" | "artist" | "q" | "none";
+
+// ─── Cohort + artist resolution ─────────────────────────────────────────
 function applyCohort(query: any, cohort: Cohort): any {
-  // Postgres array NOT-contains: filter('tags', 'not.cs', '{ephemera}')
+  // For 'artwork' we include rows with NULL tags too — Postgres's
+  // NOT(NULL @> '{ephemera}') is NULL, not TRUE, so a plain
+  // .not("tags", "cs", ...) would drop them.
   return cohort === "artwork"
-    ? query.not("tags", "cs", "{ephemera}")
+    ? query.or("tags.is.null,tags.not.cs.{ephemera}")
     : query.contains("tags", ["ephemera"]);
 }
 
-/**
- * Given the FilterState, produce a Supabase query that applies all
- * filters EXCEPT one specified dimension (used for facet count queries
- * so you can switch among that dimension's values without un-selecting).
- */
-function applyFilters(
-  base: any,
-  state: FilterState,
-  except: "themes" | "formats" | "decades" | "artist" | "none"
-): any {
-  let q = base;
+async function resolveArtistId(
+  supabase: SupabaseClient,
+  slug: string | null
+): Promise<string | null> {
+  if (!slug) return null;
+  const { data, error } = await supabase
+    .from("artists")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data.id;
+}
 
-  if (state.q) {
-    // FTS for title/medium/alt_text/alt_text_long. Artist name handled
-    // via a separate ILIKE pass below.
+/**
+ * Resolve themes + formats to the intersected set of artwork IDs that
+ * satisfy both. Used only when BOTH dimensions are active. Returns null
+ * sentinel only when caller misuses (neither dim active).
+ */
+async function categoryFilteredIds(
+  supabase: SupabaseClient,
+  themes: string[],
+  formats: string[]
+): Promise<string[]> {
+  async function idsFor(slugs: string[], kind: "theme" | "format"): Promise<Set<string>> {
+    if (slugs.length === 0) return new Set();
+    const { data, error } = await supabase
+      .from("artwork_categories")
+      .select("artwork_id, category:categories!inner(slug, kind)")
+      .eq("category.kind", kind)
+      .in("category.slug", slugs)
+      .range(0, MAX_FETCH);
+    if (error) throw new Error(`categoryFilteredIds(${kind}): ${error.message}`);
+    return new Set((data || []).map((r: any) => r.artwork_id));
+  }
+
+  const [themeIds, formatIds] = await Promise.all([
+    idsFor(themes, "theme"),
+    idsFor(formats, "format"),
+  ]);
+
+  return [...themeIds].filter((id) => formatIds.has(id));
+}
+
+// ─── Scalar + category filter application (sync; no thenable trap) ──────
+function applyScalarFilters(
+  query: any,
+  state: FilterState,
+  cohort: Cohort,
+  artistId: string | null,
+  except: ExceptDim
+): any {
+  let q = query.eq("on_website", true);
+  q = applyCohort(q, cohort);
+
+  if (except !== "q" && state.q) {
     const safe = state.q.replace(/[&|!()<>:*]/g, " ").trim();
     if (safe) {
-      // wsearch syntax: "& "-join words for AND, single-word fallback
       const tsq = safe.split(/\s+/).join(" & ");
-      q = q.or(`fts.fts.${tsq},artist_name_search.ilike.%${state.q}%`);
-      // ^ For now, we'll use fts column for body text. Artist name OR
-      // is awkward in PostgREST without a denormalized column; v1
-      // implementation uses a TWO-QUERY APPROACH below in queryArtworks.
+      q = q.textSearch("fts", tsq);
     }
-  }
-
-  if (except !== "themes" && state.themes.length) {
-    // Filter by theme via the artwork_categories join. Using PostgREST's
-    // embedded resource filter pattern:
-    q = q.in("artwork_categories.category.slug", state.themes);
-    q = q.eq("artwork_categories.category.kind", "theme");
-  }
-  if (except !== "formats" && state.formats.length) {
-    q = q.in("artwork_categories.category.slug", state.formats);
   }
   if (except !== "decades" && state.decades.length) {
     q = q.in("decade", state.decades);
   }
   if (except !== "artist" && state.artist) {
-    q = q.eq("artist.slug", state.artist);
+    if (artistId) {
+      q = q.eq("artist_id", artistId);
+    } else {
+      q = q.eq("id", "00000000-0000-0000-0000-000000000000");
+    }
   }
   return q;
 }
 
+function applySingleDimEmbeddedFilter(q: any, themes: string[], formats: string[]): any {
+  if (themes.length > 0) {
+    return q
+      .eq("artwork_categories.category.kind", "theme")
+      .in("artwork_categories.category.slug", themes);
+  }
+  if (formats.length > 0) {
+    return q
+      .eq("artwork_categories.category.kind", "format")
+      .in("artwork_categories.category.slug", formats);
+  }
+  return q;
+}
+
+function buildSelect(hasCategoryEmbed: boolean, fields: "rich" | "id"): string {
+  const richFields = `id, sku, title, medium, date_created, decade, image_url, image_original, alt_text, alt_text_long, description_origin, sort_order, artist:artists(id, first_name, last_name, slug)`;
+  const base = fields === "rich" ? richFields : "id";
+  if (!hasCategoryEmbed) return base;
+  return `${base}, artwork_categories!inner(category:categories!inner(slug, kind))`;
+}
+
+// ─── Sort ───────────────────────────────────────────────────────────────
 function applySort(query: any, state: FilterState): any {
-  const effective: string =
-    state.sort ?? (state.q ? "relevance" : "featured");
+  const effective: string = state.sort ?? (state.q ? "relevance" : "featured");
 
   switch (effective) {
     case "featured":
-      return query.order("sort_order", { ascending: true }).order("created_at", { ascending: false });
+      return query
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: false });
     case "relevance":
-      // FTS rank handled by fts.fts.<query> ordering naturally; here we just keep insertion order.
+      // Postgres FTS rank ordering would need an explicit function call;
+      // v1 falls through to insertion-order. Worth revisiting.
       return query.order("sort_order", { ascending: true });
     case "artist":
-      return query.order("artists.last_name", { ascending: true }).order("artists.first_name", { ascending: true }).order("sort_order", { ascending: true });
+      return query
+        .order("last_name", { foreignTable: "artists", ascending: true })
+        .order("first_name", { foreignTable: "artists", ascending: true })
+        .order("sort_order", { ascending: true });
     case "newest":
-      return query.order("decade", { ascending: false, nullsFirst: false }).order("date_created", { ascending: false, nullsFirst: false }).order("sort_order", { ascending: true });
+      return query
+        .order("decade", { ascending: false, nullsFirst: false })
+        .order("date_created", { ascending: false, nullsFirst: false })
+        .order("sort_order", { ascending: true });
     case "oldest":
-      return query.order("decade", { ascending: true, nullsFirst: false }).order("date_created", { ascending: true, nullsFirst: false }).order("sort_order", { ascending: true });
+      return query
+        .order("decade", { ascending: true, nullsFirst: false })
+        .order("date_created", { ascending: true, nullsFirst: false })
+        .order("sort_order", { ascending: true });
     case "title":
-      return query.order("title", { ascending: true }).order("sort_order", { ascending: true });
+      return query
+        .order("title", { ascending: true })
+        .order("sort_order", { ascending: true });
     default:
       return query.order("sort_order", { ascending: true });
   }
 }
 
-// ── Main query ──────────────────────────────────────────────────────────
+// ─── Main query ─────────────────────────────────────────────────────────
 export async function queryArtworks(
   supabase: SupabaseClient,
   state: FilterState,
   cohort: Cohort
 ): Promise<{ artworks: ArtworkResult[]; total: number }> {
-  // Build base
-  let base = supabase
-    .from("artworks")
-    .select(
-      `
-      id, sku, title, medium, date_created, decade, image_url, image_original,
-      alt_text, alt_text_long, description_origin, sort_order,
-      artist:artists(id, first_name, last_name, slug),
-      artwork_categories!left(category:categories(slug, kind))
-      `,
-      { count: "exact" }
-    )
-    .eq("on_website", true);
+  const artistId = await resolveArtistId(supabase, state.artist);
+  const themes = state.themes;
+  const formats = state.formats;
+  const isOneDim = (themes.length > 0) !== (formats.length > 0);
+  const isTwoDim = themes.length > 0 && formats.length > 0;
 
-  base = applyCohort(base, cohort);
-  base = applyFilters(base, state, "none");
-  base = applySort(base, state);
+  let intersectedIds: string[] | null = null;
+  if (isTwoDim) {
+    intersectedIds = await categoryFilteredIds(supabase, themes, formats);
+    if (intersectedIds.length === 0) return { artworks: [], total: 0 };
+  }
+
+  const selectStr = buildSelect(isOneDim, "rich");
+  let q = supabase.from("artworks").select(selectStr, { count: "exact" });
+  q = applyScalarFilters(q, state, cohort, artistId, "none");
+
+  if (isOneDim) {
+    q = applySingleDimEmbeddedFilter(q, themes, formats);
+  } else if (isTwoDim) {
+    q = q.in("id", intersectedIds!);
+  }
+
+  q = applySort(q, state);
 
   const from = (state.page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  const { data, error, count } = await base.range(from, to);
+  const { data, error, count } = await q.range(from, to);
   if (error) throw new Error(`queryArtworks: ${error.message}`);
 
   return {
@@ -158,98 +239,129 @@ export async function queryArtworks(
   };
 }
 
-// ── Facet counts ────────────────────────────────────────────────────────
+// ─── Facet counts ───────────────────────────────────────────────────────
 export async function getFacetCounts(
   supabase: SupabaseClient,
   state: FilterState,
   cohort: Cohort
 ): Promise<FacetCounts> {
-  // Run 4 queries in parallel: one per dimension, each excluding its own filter.
-  const [themesRes, formatsRes, decadesRes, artistsRes] = await Promise.all([
-    facetCountFor(supabase, state, cohort, "themes"),
-    facetCountFor(supabase, state, cohort, "formats"),
-    facetCountFor(supabase, state, cohort, "decades"),
-    artistAvailability(supabase, state, cohort),
+  const artistId = await resolveArtistId(supabase, state.artist);
+
+  const [themeIds, formatIds, decadeIds, artistIds] = await Promise.all([
+    candidateIdsExcept(supabase, state, cohort, artistId, "themes"),
+    candidateIdsExcept(supabase, state, cohort, artistId, "formats"),
+    candidateIdsExcept(supabase, state, cohort, artistId, "decades"),
+    candidateIdsExcept(supabase, state, cohort, artistId, "artist"),
   ]);
 
-  return {
-    themes: themesRes,
-    formats: formatsRes,
-    decades: decadesRes,
-    availableArtistSlugs: artistsRes,
-  };
+  const [themes, formats, decades, availableArtistSlugs] = await Promise.all([
+    countCategoriesForIds(supabase, themeIds, "theme"),
+    countCategoriesForIds(supabase, formatIds, "format"),
+    countDecadesForIds(supabase, decadeIds),
+    artistsForIds(supabase, artistIds),
+  ]);
+
+  return { themes, formats, decades, availableArtistSlugs };
 }
 
-/**
- * For dimensions backed by a join (theme, format), and for `decade`
- * which is a column on artworks: fetch artworks that match all OTHER
- * filters, then count occurrences per value of the requested dimension.
- *
- * For 3k rows, fetching the relevant subset and counting client-side is
- * the simplest correct implementation (we don't need to push GROUP BY
- * through PostgREST). Revisit if catalog grows >50k.
- */
-async function facetCountFor(
+async function candidateIdsExcept(
   supabase: SupabaseClient,
   state: FilterState,
   cohort: Cohort,
-  dim: "themes" | "formats" | "decades"
+  artistId: string | null,
+  except: ExceptDim
+): Promise<Set<string>> {
+  const themes = except === "themes" ? [] : state.themes;
+  const formats = except === "formats" ? [] : state.formats;
+  const isOneDim = (themes.length > 0) !== (formats.length > 0);
+  const isTwoDim = themes.length > 0 && formats.length > 0;
+
+  let intersectedIds: string[] | null = null;
+  if (isTwoDim) {
+    intersectedIds = await categoryFilteredIds(supabase, themes, formats);
+    if (intersectedIds.length === 0) return new Set();
+  }
+
+  const selectStr = buildSelect(isOneDim, "id");
+  let q = supabase.from("artworks").select(selectStr);
+  q = applyScalarFilters(q, state, cohort, artistId, except);
+
+  if (isOneDim) {
+    q = applySingleDimEmbeddedFilter(q, themes, formats);
+  } else if (isTwoDim) {
+    q = q.in("id", intersectedIds!);
+  }
+
+  const { data, error } = await q.range(0, MAX_FETCH);
+  if (error) throw new Error(`candidateIdsExcept(${except}): ${error.message}`);
+  return new Set((data || []).map((r: any) => r.id));
+}
+
+/**
+ * Count category-attachment slugs of a given kind, intersected with a
+ * candidate ID set. We fetch ALL attachments of that kind (~6,800 rows)
+ * and filter client-side via Set lookup — avoids passing the candidate
+ * set through `.in()` which can blow URL limits.
+ */
+async function countCategoriesForIds(
+  supabase: SupabaseClient,
+  candidateIds: Set<string>,
+  kind: "theme" | "format"
 ): Promise<Record<string, number>> {
-  let base = supabase
-    .from("artworks")
-    .select(
-      `
-      id, decade,
-      artwork_categories!left(category:categories(slug, kind))
-      `
-    )
-    .eq("on_website", true);
-
-  base = applyCohort(base, cohort);
-  base = applyFilters(base, state, dim);
-
-  // No pagination — we need the full set to count facets accurately.
-  const { data, error } = await base.range(0, 9999);
-  if (error) throw new Error(`facetCountFor(${dim}): ${error.message}`);
+  if (candidateIds.size === 0) return {};
+  const { data, error } = await supabase
+    .from("artwork_categories")
+    .select("artwork_id, category:categories!inner(slug, kind)")
+    .eq("category.kind", kind)
+    .range(0, MAX_FETCH);
+  if (error) throw new Error(`countCategoriesForIds(${kind}): ${error.message}`);
 
   const counts: Record<string, number> = {};
   for (const row of data || []) {
-    if (dim === "decades") {
-      const d = (row as any).decade;
-      if (d) counts[d] = (counts[d] || 0) + 1;
-    } else {
-      const wantKind = dim === "themes" ? "theme" : "format";
-      const cats: any[] = (row as any).artwork_categories || [];
-      const slugs = new Set<string>();
-      for (const ac of cats) {
-        if (ac.category?.kind === wantKind && ac.category?.slug) {
-          slugs.add(ac.category.slug);
-        }
-      }
-      for (const s of slugs) counts[s] = (counts[s] || 0) + 1;
-    }
+    if (!candidateIds.has((row as any).artwork_id)) continue;
+    const slug = (row as any).category?.slug;
+    if (slug) counts[slug] = (counts[slug] || 0) + 1;
   }
   return counts;
 }
 
-async function artistAvailability(
+async function countDecadesForIds(
   supabase: SupabaseClient,
-  state: FilterState,
-  cohort: Cohort
-): Promise<Set<string>> {
-  let base = supabase
+  candidateIds: Set<string>
+): Promise<Record<string, number>> {
+  if (candidateIds.size === 0) return {};
+  const { data, error } = await supabase
     .from("artworks")
-    .select(`id, artist:artists(slug)`)
-    .eq("on_website", true);
-  base = applyCohort(base, cohort);
-  base = applyFilters(base, state, "artist");
+    .select("id, decade")
+    .not("decade", "is", null)
+    .range(0, MAX_FETCH);
+  if (error) throw new Error(`countDecadesForIds: ${error.message}`);
 
-  const { data, error } = await base.range(0, 9999);
-  if (error) throw new Error(`artistAvailability: ${error.message}`);
+  const counts: Record<string, number> = {};
+  for (const row of data || []) {
+    const r = row as any;
+    if (!candidateIds.has(r.id)) continue;
+    if (r.decade) counts[r.decade] = (counts[r.decade] || 0) + 1;
+  }
+  return counts;
+}
+
+async function artistsForIds(
+  supabase: SupabaseClient,
+  candidateIds: Set<string>
+): Promise<Set<string>> {
+  if (candidateIds.size === 0) return new Set();
+  const { data, error } = await supabase
+    .from("artworks")
+    .select("id, artist:artists(slug)")
+    .range(0, MAX_FETCH);
+  if (error) throw new Error(`artistsForIds: ${error.message}`);
 
   const set = new Set<string>();
   for (const row of data || []) {
-    const slug = (row as any).artist?.slug;
+    const r = row as any;
+    if (!candidateIds.has(r.id)) continue;
+    const slug = r.artist?.slug;
     if (slug) set.add(slug);
   }
   return set;

@@ -17,7 +17,7 @@ export default function ActiveFilterChips({ chips, onClearAll }: ActiveFilterChi
       <span className="text-gray-600 mr-1">Active:</span>
       {chips.map((c, i) => (
         <button
-          key={i}
+          key={`${c.label}-${i}`}
           type="button"
           onClick={c.onRemove}
           className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-900"
