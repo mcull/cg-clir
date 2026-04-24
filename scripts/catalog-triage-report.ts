@@ -372,7 +372,10 @@ async function main() {
   console.log(`Per-artist rows:  ${perArtist.length}`);
   console.log(`Tag-freq rows:    ${tagFreq.length}`);
   if (unknownSourceCount > 0) {
-    console.log(`\nWARNING: ${unknownSourceCount} artworks in DB but in neither source CSV (bucket='unknown_source'). Investigate.`);
+    const unknownSkus = perArtwork
+      .filter((r) => r.bucket === "unknown_source")
+      .map((r) => r.sku || `<empty sku, title="${r.title}">`);
+    console.log(`\nWARNING: ${unknownSourceCount} artworks in DB but in neither source CSV (bucket='unknown_source'): ${unknownSkus.join(", ")}`);
   }
   console.log(`\nPer-artwork: ${PER_ARTWORK_FILE}`);
   console.log(`Per-artist:  ${PER_ARTIST_FILE}`);
