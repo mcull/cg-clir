@@ -9,6 +9,8 @@
 
 Import 590 manually-written, paragraph-length artwork descriptions from a CSV (`tmp/CLIR Image Descriptions Sheet - Brief Descriptions.csv`) into the `alt_text_long` field of the artworks table, supersede the existing AI-generated long descriptions for matched SKUs, and produce two artifacts: a per-row update log and a full-catalog export CSV that lets Creative Growth compare AI vs. human long descriptions side-by-side for the ~1,500+ artworks still on AI-only.
 
+**Spec revision 2026-04-23 (mid-execution):** First execution attempt revealed that the human CSV's `SKU` column does NOT correspond to the DB's `inventory_number` column. They are two separate columns in the original Art Cloud export (column 28 = "Inventory Number", numeric like `38754`; column 31 = "SKU", artist-coded like `ABai 1`), and only "Inventory Number" was imported on the original load. Before the human descriptions can be matched, a new `sku` column must be added to `artworks` and backfilled from `inventory_2026-04-02.csv` keyed on `inventory_number`. See "Schema (already migrated)" and "Component 0: SKU column" sections below.
+
 The existing short `alt_text` (used by `<img alt>` on grid pages) is **left untouched** — the human CSV has only paragraph-form content, and there is no good algorithmic way to derive a screen-reader-quality short alt from it. The existing AI-generated short alt remains in place; an admin can later improve it manually via the admin console.
 
 Bundled into the same change: a schema cleanup that renames the two description fields to reflect their actual purpose (alt-text for two different page contexts, not "ai" content vs. "alt"), drops the dangerous fallback that pumps long content into grid `<img alt>` attributes, and removes the "About This Work" section from the artwork detail page (which was wrongly using the long-form alt text as visible body content).
@@ -43,12 +45,35 @@ ALTER TABLE artworks ADD COLUMN fts tsvector GENERATED ALWAYS AS (
 CREATE INDEX idx_artworks_fts ON artworks USING GIN(fts);
 ```
 
+**Additional SQL (mid-execution revision, 2026-04-23):** Adding the SKU column required by Component 0:
+
+```sql
+ALTER TABLE artworks ADD COLUMN sku TEXT;
+CREATE INDEX idx_artworks_sku ON artworks(sku);
+```
+
+The `sku` column is intentionally **not** UNIQUE — the source Art Cloud CSV has 2 duplicate SKUs (`DMi 662`, `JS 27`) representing distinct artworks that share an artist code. They have different `inventory_number` values, so primary-key uniqueness is preserved.
+
 **Resulting field semantics:**
 - `alt_text` — short alt text (≤150 chars, may end with `…`), used in `<img alt>` on grid pages
 - `alt_text_long` — full alt text (paragraph), used in `<img alt>` on artwork detail page
 - `description_origin` — `'human'` for human-authored, `'ai'` for AI-generated, `NULL` if neither field has content
+- `sku` — artist-coded identifier from the Art Cloud `SKU` column (e.g., `ABai 1`, `CLIR2022.25`). Distinct from `inventory_number` (which is a numeric Art Cloud ID). Both are preserved.
 
 The migration file `supabase/migrations/001_initial.sql` should be updated in source control to reflect the new state, even though the schema change has already been applied — otherwise a fresh environment built from migrations will diverge from production.
+
+---
+
+## Component 0: SKU column add and backfill
+
+The `sku` column was missing from the original import; the human-descriptions CSV keys on it. Backfilling restores parity with the Art Cloud source.
+
+**Backfill script** (`scripts/backfill-sku.ts`, one-shot):
+1. Read `inventory_2026-04-02.csv`. For each row, read `Inventory Number` (column 28) and `SKU` (column 31).
+2. For each row with both values present: `UPDATE artworks SET sku = :sku WHERE inventory_number = :inv`.
+3. Log a summary: rows in CSV, rows with both values, rows updated, rows skipped (no inv match).
+
+**Going-forward import** (`scripts/import-csv.ts`): add `sku` to the upsert payload so subsequent CSV refreshes also map the SKU column. The conflict key remains `inventory_number` (still unique).
 
 ---
 
@@ -66,14 +91,16 @@ The migration file `supabase/migrations/001_initial.sql` should be updated in so
 
 1. Parse the CSV. Required columns: `SKU`, `Item Description *`. Other columns are ignored.
 2. Build an in-memory map: `inventory_number → { description, source_row }`.
-3. Page through every artwork in `artworks` (using existing pagination pattern from `seed-categories.ts` / `migrate-images.ts` — the REST API caps at 1,000 rows per page). For each artwork:
+3. Page through every artwork in `artworks` (using existing pagination pattern from `seed-categories.ts` / `migrate-images.ts` — the REST API caps at 1,000 rows per page). Select must include the new `sku` column. For each artwork:
    - Capture `prior_alt_text_long` (current value).
-   - If `inventory_number` is present in the human-CSV map:
+   - If `sku` is present in the human-CSV map:
      - Compute `new_alt_text_long` = the human paragraph, with leading/trailing whitespace stripped.
      - UPDATE the row: `alt_text_long = new_alt_text_long`, `description_origin = 'human'`. The existing `alt_text` (short form) is **not** modified.
      - Append a log entry: `status='success'`, `prior_alt_text_long`, `new_alt_text_long`.
      - Append an export entry with the prior long-form value populated alongside the new one.
    - Else (artwork not in CSV): no DB update; add an export entry with current values only (`prior_ai_alt_text_long` left blank since current = prior).
+
+   Note: when two DB rows share the same SKU (the `DMi 662` / `JS 27` case), both will be updated with the same human description if that SKU appears in the human CSV — intentional, since the CSV speaks of artworks by SKU and ambiguity in the source data should propagate to both copies.
 4. After processing all artworks, also report any SKUs in the CSV that did not match any DB row — append fail log entries with `status='fail'`, `reason='sku not found in db'`.
 5. Write the two CSV artifacts to `tmp/`.
 
@@ -107,7 +134,8 @@ One row per CSV input row, plus one row per CSV SKU that didn't match the DB.
 
 | Column | Notes |
 |---|---|
-| `sku` | `inventory_number` from DB |
+| `sku` | `sku` field from DB (artist-coded, e.g., `ABai 1`) |
+| `inventory_number` | `inventory_number` field from DB (numeric Art Cloud ID) — included so CG can cross-reference with their internal records |
 | `image_url` | Resolved via the same `resolveImageUrl()` helper the UI uses, so URLs match what's served |
 | `description_origin` | `'human'` / `'ai'` / empty |
 | `alt_text_long` | Current value (post-update — human for matched rows, AI for the rest) |

@@ -15,7 +15,11 @@
 ## File Structure
 
 **New files:**
+- `scripts/backfill-sku.ts` — one-shot backfill that reads `inventory_2026-04-02.csv` and populates the new `artworks.sku` column keyed on `inventory_number`.
 - `scripts/import-human-descriptions.ts` — main script. Parses CSV, pages through artworks, updates matched rows, writes the two CSV artifacts.
+
+**Modified files (Phase 0.5):**
+- `scripts/import-csv.ts` — also map the `SKU` source column to `artworks.sku` so future re-imports keep the field populated.
 
 **Modified files (Phase 1):**
 - `package.json` — add `import:descriptions` npm script
@@ -39,7 +43,7 @@
 
 **Files:** none (read-only)
 
-- [ ] **Step 1: Confirm columns exist in production**
+- [ ] **Step 1: Confirm rename + origin columns exist in production**
 
 Run:
 ```bash
@@ -56,6 +60,193 @@ c.from('artworks').select('id, alt_text, alt_text_long, description_origin').lim
 Expected: `OK - columns exist: [ 'id', 'alt_text', 'alt_text_long', 'description_origin' ]`
 
 If this fails: stop. The schema migration was not applied as expected; user must re-run the SQL from the spec's "Schema (already migrated)" section before proceeding.
+
+---
+
+## Phase 0.5: SKU column prep
+
+This phase exists because the original import never populated a SKU field. The human descriptions CSV keys on artist-coded SKUs (e.g., `ABai 1`), which live in column 31 of the source Art Cloud CSV — separate from `Inventory Number`. We add the column, backfill it from the source CSV, and update the existing import script so future runs keep it populated.
+
+### Task 0.5a: Verify the sku column exists
+
+**Files:** none (read-only verification, gated on user-run SQL)
+
+- [ ] **Step 1: User runs the SQL** (already provided in chat):
+
+```sql
+ALTER TABLE artworks ADD COLUMN sku TEXT;
+CREATE INDEX idx_artworks_sku ON artworks(sku);
+```
+
+- [ ] **Step 2: Confirm the column exists**
+
+Run:
+```bash
+npx tsx --env-file=.env.local -e "
+import { createClient } from '@supabase/supabase-js';
+const c = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+c.from('artworks').select('id, inventory_number, sku').limit(1).then(({data, error}) => {
+  if (error) { console.error('NOT YET:', error.message); process.exit(1); }
+  console.log('OK - sku column exists:', Object.keys(data[0]));
+});
+"
+```
+
+Expected: `OK - sku column exists: [ 'id', 'inventory_number', 'sku' ]`
+
+---
+
+### Task 0.5b: Write and run the backfill script
+
+**Files:**
+- Create: `scripts/backfill-sku.ts`
+
+- [ ] **Step 1: Write the backfill script**
+
+Create `scripts/backfill-sku.ts`:
+
+```typescript
+#!/usr/bin/env npx tsx
+/**
+ * backfill-sku.ts
+ *
+ * Reads inventory_2026-04-02.csv, populates artworks.sku from the source
+ * SKU column (column 31), keyed on inventory_number (column 28). One-shot.
+ *
+ * Run: npx tsx --env-file=.env.local scripts/backfill-sku.ts
+ */
+
+import fs from "fs";
+import path from "path";
+import { parse } from "csv-parse/sync";
+import { createClient } from "@supabase/supabase-js";
+
+const CSV_PATH = path.join(__dirname, "..", "inventory_2026-04-02.csv");
+
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  console.error("Error: Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY");
+  process.exit(1);
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
+
+interface CsvRow {
+  "Inventory Number"?: string;
+  SKU?: string;
+  [key: string]: string | undefined;
+}
+
+async function main() {
+  const raw = fs.readFileSync(CSV_PATH, "utf-8");
+  const rows: CsvRow[] = parse(raw, {
+    columns: true,
+    skip_empty_lines: true,
+    relax_quotes: true,
+    relax_column_count: true,
+  });
+  console.log(`Parsed ${rows.length} rows from ${path.basename(CSV_PATH)}`);
+
+  let updated = 0;
+  let skippedNoInv = 0;
+  let skippedNoSku = 0;
+  let updateErrors = 0;
+
+  for (const row of rows) {
+    const inv = (row["Inventory Number"] || "").trim();
+    const sku = (row.SKU || "").trim();
+    if (!inv) { skippedNoInv++; continue; }
+    if (!sku) { skippedNoSku++; continue; }
+
+    const { error, count } = await supabase
+      .from("artworks")
+      .update({ sku }, { count: "exact" })
+      .eq("inventory_number", inv);
+
+    if (error) {
+      console.error(`Update error for inv=${inv}: ${error.message}`);
+      updateErrors++;
+      continue;
+    }
+    if (count && count > 0) updated++;
+  }
+
+  console.log("\n=== Summary ===");
+  console.log(`Total CSV rows:           ${rows.length}`);
+  console.log(`Skipped (no inv number):  ${skippedNoInv}`);
+  console.log(`Skipped (no SKU):         ${skippedNoSku}`);
+  console.log(`Update errors:            ${updateErrors}`);
+  console.log(`Rows updated in DB:       ${updated}`);
+}
+
+main().catch((err) => {
+  console.error("Fatal:", err);
+  process.exit(1);
+});
+```
+
+- [ ] **Step 2: Run the backfill**
+
+Run: `npx tsx --env-file=.env.local scripts/backfill-sku.ts`
+
+Expected:
+```
+Parsed 2189 rows from inventory_2026-04-02.csv
+
+=== Summary ===
+Total CSV rows:           2189
+Skipped (no inv number):  1
+Skipped (no SKU):         0
+Update errors:            0
+Rows updated in DB:       ~2112
+```
+
+The "updated" count should match the artwork count in the DB (~2,112) minus any source rows whose inventory_number doesn't have a corresponding DB row.
+
+- [ ] **Step 3: Spot-check**
+
+Run:
+```bash
+npx tsx --env-file=.env.local -e "
+import { createClient } from '@supabase/supabase-js';
+const c = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+c.from('artworks').select('inventory_number, sku, title').not('sku', 'is', null).limit(5).then(({data}) => {
+  data.forEach(r => console.log(JSON.stringify(r)));
+});
+"
+```
+
+Expected: 5 rows, each with a populated `sku` field that matches the artist code embedded in `title` (e.g., title `"Untitled, JS 17"` → `sku: "JS 17"`).
+
+---
+
+### Task 0.5c: Update import-csv.ts for future runs
+
+**Files:**
+- Modify: `scripts/import-csv.ts`
+
+- [ ] **Step 1: Add SKU to the import payload**
+
+In `scripts/import-csv.ts`:
+
+1. Find the `CsvRow` interface (around line 38). Add `SKU: string;` to it.
+2. Find where the artwork record object is built (around line 142, where `inventory_number: inventoryNumber` appears). Add a sibling line:
+   ```typescript
+   sku: row.SKU?.trim() || null,
+   ```
+
+- [ ] **Step 2: Verify the script still parses**
+
+Run: `npx tsx -e "import('./scripts/import-csv.ts').then(() => console.log('imports OK'))"`
+
+This will start a real import — abort with Ctrl+C as soon as you see "imports OK" or "Parsed N rows" so it doesn't actually re-import. (The script doesn't have a no-op flag; if you'd rather not risk it, just rely on TypeScript not erroring out as your validation.)
+
+Alternative: just `grep -n "sku" scripts/import-csv.ts` to confirm the edits are present.
 
 ---
 
@@ -169,6 +360,7 @@ interface CsvRow {
 
 interface ArtworkRow {
   id: string;
+  sku: string | null;
   inventory_number: string | null;
   image_url: string | null;
   image_original: string | null;
@@ -188,6 +380,7 @@ interface LogEntry {
 
 interface ExportEntry {
   sku: string;
+  inventory_number: string;
   image_url: string;
   description_origin: string;
   alt_text_long: string;
@@ -246,8 +439,8 @@ async function main() {
   while (true) {
     const { data, error } = await supabase
       .from("artworks")
-      .select("id, inventory_number, image_url, image_original, alt_text, alt_text_long, description_origin")
-      .order("inventory_number", { ascending: true, nullsFirst: false })
+      .select("id, sku, inventory_number, image_url, image_original, alt_text, alt_text_long, description_origin")
+      .order("sku", { ascending: true, nullsFirst: false })
       .range(offset, offset + PAGE_SIZE - 1);
     if (error) {
       console.error("Error fetching artworks:", error);
@@ -268,7 +461,8 @@ async function main() {
   let failCount = 0;
 
   for (const art of allArtworks) {
-    const sku = (art.inventory_number || "").trim();
+    const sku = (art.sku || "").trim();
+    const inv = art.inventory_number || "";
     const priorLong = art.alt_text_long || "";
     const currentShort = art.alt_text || "";
     const imageUrl = resolveImageUrl(art) || "";
@@ -286,7 +480,7 @@ async function main() {
         });
         failCount++;
         exportEntries.push({
-          sku, image_url: imageUrl,
+          sku, inventory_number: inv, image_url: imageUrl,
           description_origin: art.description_origin || "",
           alt_text_long: priorLong,
           alt_text: currentShort,
@@ -314,7 +508,7 @@ async function main() {
         });
         failCount++;
         exportEntries.push({
-          sku, image_url: imageUrl,
+          sku, inventory_number: inv, image_url: imageUrl,
           description_origin: art.description_origin || "",
           alt_text_long: priorLong,
           alt_text: currentShort,
@@ -332,7 +526,7 @@ async function main() {
       successCount++;
 
       exportEntries.push({
-        sku, image_url: imageUrl,
+        sku, inventory_number: inv, image_url: imageUrl,
         description_origin: "human",
         alt_text_long: newLong,
         alt_text: currentShort,
@@ -341,7 +535,7 @@ async function main() {
     } else {
       // Not in human CSV - export current state, no prior_ai_alt_text_long
       exportEntries.push({
-        sku, image_url: imageUrl,
+        sku, inventory_number: inv, image_url: imageUrl,
         description_origin: art.description_origin || "",
         alt_text_long: priorLong,
         alt_text: currentShort,
@@ -382,7 +576,7 @@ async function main() {
   );
 
   writeCsv(EXPORT_FILE,
-    ["sku", "image_url", "description_origin", "alt_text_long", "alt_text", "prior_ai_alt_text_long"],
+    ["sku", "inventory_number", "image_url", "description_origin", "alt_text_long", "alt_text", "prior_ai_alt_text_long"],
     exportEntries
   );
 
@@ -546,14 +740,14 @@ Pick a SKU from the CSV's first row (e.g., `ABai 1`). Run:
 npx tsx --env-file=.env.local -e "
 import { createClient } from '@supabase/supabase-js';
 const c = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-c.from('artworks').select('inventory_number, alt_text, alt_text_long, description_origin').eq('inventory_number', 'ABai 1').single().then(({data, error}) => {
+c.from('artworks').select('sku, inventory_number, alt_text, alt_text_long, description_origin').eq('sku', 'ABai 1').then(({data, error}) => {
   if (error) { console.error(error); process.exit(1); }
   console.log(JSON.stringify(data, null, 2));
 });
 "
 ```
 
-Expected: `description_origin: 'human'`, `alt_text_long` is the full paragraph from the CSV, `alt_text` unchanged from its prior value (whatever the AI pipeline had set).
+Expected: at least one row with `description_origin: 'human'`, `alt_text_long` is the full paragraph from the CSV, `alt_text` unchanged from its prior value (whatever the AI pipeline had set).
 
 ---
 
