@@ -15,6 +15,7 @@
     "import:descriptions": "tsx --env-file=.env.local scripts/import-human-descriptions.ts",
     "import:archive": "tsx --env-file=.env.local scripts/import-archive.ts",
     "triage:report": "tsx --env-file=.env.local scripts/catalog-triage-report.ts",
+    "backfill:decade": "tsx --env-file=.env.local scripts/backfill-decade.ts",
     "migrate:all": "tsx --env-file=.env.local scripts/migrate-and-describe.ts",
     "db:migrate": "tsx scripts/run-migration.ts"
   },

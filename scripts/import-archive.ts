@@ -30,6 +30,7 @@ import sharp from "sharp";
 import Anthropic from "@anthropic-ai/sdk";
 import { normalizeThemes, VALID_THEMES } from "../src/lib/themes";
 import { slugify, parseNumeric } from "../src/lib/utils";
+import { dateToDecade } from "../src/lib/decades";
 
 // ─── Config ───────────────────────────────────────────────────────────────
 const TMP_DIR = path.join(__dirname, "..", "tmp");
@@ -454,6 +455,7 @@ async function main() {
           artist_id: artistId,
           medium: (row["Medium 1 *"] || "").trim() || null,
           date_created: dateStr || null,
+          decade: dateToDecade(dateStr || null),
           height: parseNumeric(row["Height *"] || ""),
           width: parseNumeric(row.Width || ""),
           depth: parseNumeric(row.Depth || ""),
