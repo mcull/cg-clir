@@ -119,7 +119,7 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
     artwork.artist_id &&
     (await getArtistArtworks(artwork.artist_id, artwork.id));
 
-  const altText = artwork.alt_text_long || getAltText(artwork);
+  const altText = getAltText(artwork);
   const imageUrl = resolveImageUrl(artwork);
   const artistName = artwork.artist
     ? formatArtistName(artwork.artist.first_name, artwork.artist.last_name)
@@ -158,21 +158,28 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Image */}
         <div className="lg:col-span-2">
-          <div className="bg-gray-100 aspect-square relative mb-4">
-            {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={altText}
-                fill
-                className="object-cover"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
-                No image available
-              </div>
+          <figure>
+            <div className="bg-gray-100 aspect-square relative mb-3">
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt={altText}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  No image available
+                </div>
+              )}
+            </div>
+            {artwork.alt_text && (
+              <figcaption className="text-sm text-gray-600 italic">
+                {artwork.alt_text}
+              </figcaption>
             )}
-          </div>
+          </figure>
         </div>
 
         {/* Metadata */}
@@ -217,17 +224,6 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
               </div>
             )}
 
-            {artwork.inventory_number && (
-              <div>
-                <dt className="text-sm font-semibold text-gray-600">
-                  Inventory Number
-                </dt>
-                <dd className="text-gray-900 font-mono">
-                  {artwork.inventory_number}
-                </dd>
-              </div>
-            )}
-
             {artwork.categories && artwork.categories.length > 0 && (
               <div>
                 <dt className="text-sm font-semibold text-gray-600">
@@ -247,19 +243,13 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
               </div>
             )}
 
-            {artwork.tags && artwork.tags.length > 0 && (
+            {artwork.description_origin === "human" && artwork.alt_text_long && (
               <div>
-                <dt className="text-sm font-semibold text-gray-600">Tags</dt>
-                <dd className="flex flex-wrap gap-2">
-                  {artwork.tags.map((tag: string) => (
-                    <Link
-                      key={tag}
-                      href={`/collection?tag=${encodeURIComponent(tag)}`}
-                      className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
-                    >
-                      {tag}
-                    </Link>
-                  ))}
+                <dt className="text-sm font-semibold text-gray-600">
+                  Visual description
+                </dt>
+                <dd className="text-gray-900 leading-relaxed">
+                  {artwork.alt_text_long}
                 </dd>
               </div>
             )}
