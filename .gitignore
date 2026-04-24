@@ -47,3 +47,6 @@ inventory_*.csv
 
 # Working directory for CSV imports/exports (input + generated artifacts)
 tmp/
+
+# Visual brainstorm session files (mockups + state, regenerated per session)
+.superpowers/
