@@ -164,7 +164,7 @@ async function main() {
     width: number | null;
     image_original: string | null;
     image_url: string | null;
-    ai_description: string | null;
+    alt_text_long: string | null;
     artist: { first_name: string; last_name: string } | null;
   };
   let allArtworks: ArtworkRow[] = [];
@@ -174,8 +174,8 @@ async function main() {
   while (true) {
     const { data, error } = await supabase
       .from("artworks")
-      .select("id, title, medium, height, width, image_original, image_url, ai_description, artist:artists(first_name, last_name)")
-      .is("ai_description", null)
+      .select("id, title, medium, height, width, image_original, image_url, alt_text_long, artist:artists(first_name, last_name)")
+      .is("alt_text_long", null)
       .not("image_original", "is", null)
       .range(offset, offset + PAGE_SIZE - 1);
 
@@ -234,8 +234,9 @@ async function main() {
       const { error: updateErr } = await supabase
         .from("artworks")
         .update({
-          ai_description: result.description,
+          alt_text_long: result.description,
           alt_text: result.alt_text,
+          description_origin: "ai",
         })
         .eq("id", artwork.id);
 

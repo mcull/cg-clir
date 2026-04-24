@@ -326,7 +326,7 @@
     let offset = 0;
     const limit = 1000;
     while (true) {
-      const url = `${SUPABASE_URL}/rest/v1/artworks?select=id,title,medium,image_url,image_original,ai_description,alt_text,description_reviewed,inventory_number,artist:artists(first_name,last_name)&ai_description=not.is.null&order=title.asc&offset=${offset}&limit=${limit}`;
+      const url = `${SUPABASE_URL}/rest/v1/artworks?select=id,title,medium,image_url,image_original,alt_text_long,alt_text,description_reviewed,inventory_number,artist:artists(first_name,last_name)&alt_text_long=not.is.null&order=title.asc&offset=${offset}&limit=${limit}`;
       const res = await fetch(url, { headers });
       if (!res.ok) {
         // If description_reviewed column doesn't exist, retry without it
@@ -349,7 +349,7 @@
     let offset = 0;
     const limit = 1000;
     while (true) {
-      const url = `${SUPABASE_URL}/rest/v1/artworks?select=id,title,medium,image_url,image_original,ai_description,alt_text,inventory_number,artist:artists(first_name,last_name)&ai_description=not.is.null&order=title.asc&offset=${offset}&limit=${limit}`;
+      const url = `${SUPABASE_URL}/rest/v1/artworks?select=id,title,medium,image_url,image_original,alt_text_long,alt_text,inventory_number,artist:artists(first_name,last_name)&alt_text_long=not.is.null&order=title.asc&offset=${offset}&limit=${limit}`;
       const res = await fetch(url, { headers });
       const data = await res.json();
       // Add synthetic description_reviewed field
@@ -448,7 +448,7 @@
 
           <div class="desc-section">
             <div class="desc-label">AI Description</div>
-            <div class="desc-text" id="descDisplay">${a.ai_description || '<em style="color:#999">No description</em>'}</div>
+            <div class="desc-text" id="descDisplay">${a.alt_text_long || '<em style="color:#999">No description</em>'}</div>
           </div>
 
           <div class="actions" id="actionButtons">
@@ -503,7 +503,7 @@
       <div class="char-count" id="altCharCount">${(a.alt_text || '').length} / 125</div>
     `;
     descDisplay.outerHTML = `
-      <textarea class="desc-edit" id="descEdit">${a.ai_description || ''}</textarea>
+      <textarea class="desc-edit" id="descEdit">${a.alt_text_long || ''}</textarea>
     `;
     actions.innerHTML = `
       <button class="btn btn-save" onclick="saveEdit()">Save</button>
@@ -528,12 +528,12 @@
 
     const ok = await updateArtwork(a.id, {
       alt_text: altText,
-      ai_description: desc,
+      alt_text_long: desc,
     });
 
     if (ok) {
       a.alt_text = altText;
-      a.ai_description = desc;
+      a.alt_text_long = desc;
       editing = false;
       showToast('Saved!');
       renderCurrent();
@@ -549,13 +549,13 @@
 
     const ok = await updateArtwork(a.id, {
       alt_text: altText,
-      ai_description: desc,
+      alt_text_long: desc,
       description_reviewed: true,
     });
 
     if (ok) {
       a.alt_text = altText;
-      a.ai_description = desc;
+      a.alt_text_long = desc;
       a.description_reviewed = true;
       editing = false;
       showToast('Saved & Approved!');

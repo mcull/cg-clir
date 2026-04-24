@@ -45,6 +45,7 @@ interface CsvRow {
   Width: string;
   Depth: string;
   "Inventory Number": string;
+  SKU: string;
   Tags: string;
   Genre: string;
   Notes: string;
@@ -147,6 +148,7 @@ async function main() {
         width: parseNumeric(row.Width),
         depth: parseNumeric(row.Depth),
         inventory_number: inventoryNumber,
+        sku: row.SKU?.trim() || null,
         image_original: row.Image?.trim() || null,
         image_url: row.Image?.trim() || null, // Will be updated after R2 migration
         tags: parseTags(row.Tags),
