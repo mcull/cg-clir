@@ -12,6 +12,7 @@
     "import:images": "tsx scripts/migrate-images.ts",
     "seed:categories": "tsx scripts/seed-categories.ts",
     "generate:descriptions": "tsx scripts/generate-descriptions.ts",
+    "import:descriptions": "tsx --env-file=.env.local scripts/import-human-descriptions.ts",
     "migrate:all": "tsx --env-file=.env.local scripts/migrate-and-describe.ts",
     "db:migrate": "tsx scripts/run-migration.ts"
   },
