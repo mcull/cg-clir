@@ -195,9 +195,14 @@ function applySort(query: any, state: FilterState): any {
       // v1 falls through to insertion-order. Worth revisiting.
       return query.order("sort_order", { ascending: true });
     case "artist":
+      // PostgREST syntax for ordering PARENT rows by an embedded resource
+      // is `?order=artist(last_name).asc`. Supabase JS's `referencedTable`
+      // / `foreignTable` option generates `artist.order=last_name.asc`
+      // instead, which orders the EMBED, not the parent rows. So we
+      // pass the embed-as-column form directly.
       return query
-        .order("last_name", { foreignTable: "artists", ascending: true })
-        .order("first_name", { foreignTable: "artists", ascending: true })
+        .order("artist(last_name)", { ascending: true })
+        .order("artist(first_name)", { ascending: true })
         .order("sort_order", { ascending: true });
     case "newest":
       return query
