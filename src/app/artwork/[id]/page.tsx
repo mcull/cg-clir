@@ -44,18 +44,20 @@ async function getArtistArtworks(
   artistId: string,
   excludeId: string,
   limit: number = 6
-): Promise<
-  (Artwork & { artist?: { id: string; first_name: string; last_name: string } })[]
-> {
+): Promise<{
+  items: (Artwork & { artist?: { id: string; first_name: string; last_name: string } })[];
+  total: number;
+}> {
   const supabase = createServerSupabaseClient();
 
-  const { data, error } = await supabase
+  const { data, error, count } = await supabase
     .from("artworks")
     .select(
       `
       *,
       artist:artists(id, first_name, last_name)
-      `
+      `,
+      { count: "exact" }
     )
     .eq("artist_id", artistId)
     .eq("on_website", true)
@@ -65,10 +67,10 @@ async function getArtistArtworks(
 
   if (error) {
     console.error("Error fetching artist artworks:", error);
-    return [];
+    return { items: [], total: 0 };
   }
 
-  return data || [];
+  return { items: data || [], total: count || 0 };
 }
 
 interface ArtworkPageProps {
@@ -115,9 +117,9 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
     notFound();
   }
 
-  const moreArtworks =
-    artwork.artist_id &&
-    (await getArtistArtworks(artwork.artist_id, artwork.id));
+  const more = artwork.artist_id
+    ? await getArtistArtworks(artwork.artist_id, artwork.id)
+    : { items: [], total: 0 };
 
   const altText = getAltText(artwork);
   const imageUrl = resolveImageUrl(artwork);
@@ -253,16 +255,26 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
       </div>
 
       {/* More by Artist */}
-      {moreArtworks && moreArtworks.length > 0 && (
+      {more.items.length > 0 && (
         <section className="mt-16 pt-16 border-t border-gray-200">
           <h2 className="font-serif text-2xl font-bold text-gray-900 mb-8">
             More by {artistName}
           </h2>
           <ArtworkGrid columns="3">
-            {moreArtworks.slice(0, 6).map((art) => (
+            {more.items.map((art) => (
               <ArtworkCard key={art.id} artwork={art} />
             ))}
           </ArtworkGrid>
+          {more.total > more.items.length && artwork.artist?.slug && (
+            <p className="mt-8 text-center">
+              <Link
+                href={`/?artist=${artwork.artist.slug}`}
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
+                …and {more.total - more.items.length} more by {artistName} →
+              </Link>
+            </p>
+          )}
         </section>
       )}
     </div>
