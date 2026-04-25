@@ -26,7 +26,7 @@ async function getArtwork(
       `
       *,
       artist:artists(id, first_name, last_name, slug),
-      categories:artwork_categories(category:categories(id, name, slug))
+      categories:artwork_categories(category:categories(id, name, slug, kind))
       `
     )
     .eq("id", id)
