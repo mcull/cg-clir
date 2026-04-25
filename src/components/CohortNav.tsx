@@ -6,9 +6,9 @@ interface CohortNavProps {
 
 export default function CohortNav({ active }: CohortNavProps) {
   return (
-    <div className="flex items-center justify-end gap-2 mb-3 text-sm">
+    <div className="flex items-center gap-2 text-sm">
       <Link
-        href="/collection"
+        href="/"
         className={active === "artwork" ? "text-green-700 font-semibold" : "text-gray-500 hover:text-gray-900"}
       >
         Artwork

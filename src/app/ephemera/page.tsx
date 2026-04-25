@@ -40,9 +40,10 @@ export default async function EphemeraPage({ searchParams }: EphemeraPageProps) 
 
   return (
     <div className="container-max py-12">
-      <h1 className="font-sans text-5xl font-bold text-gray-900 mb-6 tracking-tight">CGPA ARCHIVE</h1>
-
-      <CohortNav active="ephemera" />
+      <div className="flex items-baseline justify-between gap-6 mb-6 flex-wrap">
+        <h1 className="font-sans text-5xl font-bold text-gray-900 tracking-tight">CGPA ARCHIVE</h1>
+        <CohortNav active="ephemera" />
+      </div>
 
       <FilterBar
         state={state}

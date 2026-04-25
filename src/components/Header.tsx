@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 // Raw CG header HTML extracted from creativegrowth.org via Playwright
@@ -47,15 +46,6 @@ export default function Header() {
     };
     document.addEventListener("click", handleClick);
 
-    // Wire up search button to navigate to /search
-    const searchBtn = wrapper.querySelector<HTMLAnchorElement>(".search__btn");
-    if (searchBtn) {
-      searchBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        window.location.href = "/search";
-      });
-    }
-
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
@@ -71,62 +61,6 @@ export default function Header() {
         className="cg-header-wrapper"
         dangerouslySetInnerHTML={{ __html: cgHeaderHtml }}
       />
-
-      {/* CLIR gallery sub-nav */}
-      <div className="border-t border-b border-gray-200 bg-gray-50">
-        <div className="px-[50px] py-3 flex items-center gap-6">
-          <Link
-            href="/"
-            className={`text-sm font-semibold transition-colors ${
-              pathname === "/"
-                ? "text-[#198639]"
-                : "text-gray-700 hover:text-[#198639]"
-            }`}
-          >
-            CLIR Collection
-          </Link>
-          <Link
-            href="/collection"
-            className={`text-sm font-semibold transition-colors ${
-              pathname === "/collection"
-                ? "text-[#198639]"
-                : "text-gray-700 hover:text-[#198639]"
-            }`}
-          >
-            Browse
-          </Link>
-          <Link
-            href="/artists"
-            className={`text-sm font-semibold transition-colors ${
-              pathname?.startsWith("/artists")
-                ? "text-[#198639]"
-                : "text-gray-700 hover:text-[#198639]"
-            }`}
-          >
-            Artists
-          </Link>
-          <Link
-            href="/search"
-            className={`text-sm font-semibold transition-colors ${
-              pathname === "/search"
-                ? "text-[#198639]"
-                : "text-gray-700 hover:text-[#198639]"
-            }`}
-          >
-            Search
-          </Link>
-          <Link
-            href="/about"
-            className={`text-sm font-semibold transition-colors ${
-              pathname === "/about"
-                ? "text-[#198639]"
-                : "text-gray-700 hover:text-[#198639]"
-            }`}
-          >
-            About This Project
-          </Link>
-        </div>
-      </div>
     </header>
   );
 }

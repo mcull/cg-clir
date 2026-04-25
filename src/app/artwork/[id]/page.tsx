@@ -137,7 +137,7 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
         aria-label="Breadcrumb"
         className="text-sm text-gray-600 mb-8 flex gap-2 flex-wrap"
       >
-        <Link href="/collection" className="hover:text-blue-600">
+        <Link href="/" className="hover:text-blue-600">
           Collection
         </Link>
         <span>/</span>
@@ -230,15 +230,18 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
                   Categories
                 </dt>
                 <dd className="flex flex-wrap gap-2">
-                  {artwork.categories?.map((cat: any) => (
-                    <Link
-                      key={cat.category.id}
-                      href={`/collection?category=${cat.category.slug}`}
-                      className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
-                    >
-                      {cat.category.name}
-                    </Link>
-                  ))}
+                  {artwork.categories?.map((cat: any) => {
+                    const param = cat.category.kind === "theme" ? "theme" : "format";
+                    return (
+                      <Link
+                        key={cat.category.id}
+                        href={`/?${param}=${cat.category.slug}`}
+                        className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                      >
+                        {cat.category.name}
+                      </Link>
+                    );
+                  })}
                 </dd>
               </div>
             )}

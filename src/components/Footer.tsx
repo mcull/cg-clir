@@ -27,18 +27,13 @@ export default function Footer() {
             <h3 className="font-serif font-bold text-gray-900 mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="/collection" className="text-blue-600 hover:text-blue-800">
+                <a href="/" className="text-blue-600 hover:text-blue-800">
                   View Collection
                 </a>
               </li>
               <li>
                 <a href="/artists" className="text-blue-600 hover:text-blue-800">
                   Browse Artists
-                </a>
-              </li>
-              <li>
-                <a href="/about" className="text-blue-600 hover:text-blue-800">
-                  About This Project
                 </a>
               </li>
             </ul>
