@@ -17,17 +17,17 @@ export default function ArtworkCard({ artwork }: ArtworkCardProps) {
   return (
     <Link href={`/artwork/${artwork.id}`}>
       <article className="group cursor-pointer">
-        <div className="aspect-square relative bg-gray-100 overflow-hidden rounded-sm mb-3">
+        <div className="aspect-square relative bg-white overflow-hidden rounded-sm mb-3">
           {imageUrl ? (
             <Image
               src={imageUrl}
               alt={altText}
               fill
-              className="object-cover group-hover:opacity-90 transition-opacity"
+              className="object-contain group-hover:opacity-90 transition-opacity"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
+            <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100">
               No image available
             </div>
           )}
