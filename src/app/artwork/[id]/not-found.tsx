@@ -10,7 +10,7 @@ export default function NotFound() {
         This artwork doesn&apos;t exist or has been removed.
       </p>
 
-      <Link href="/collection" className="text-blue-600 hover:text-blue-800">
+      <Link href="/" className="text-blue-600 hover:text-blue-800">
         Back to Collection
       </Link>
     </div>
