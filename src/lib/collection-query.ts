@@ -50,9 +50,30 @@ export interface FacetCounts {
 }
 
 const PAGE_SIZE = 24;
-const MAX_FETCH = 9999;
+const FETCH_PAGE = 1000;
 
 type ExceptDim = "themes" | "formats" | "decades" | "artist" | "q" | "none";
+
+/**
+ * Page through all matching rows. PostgREST has a default `max-rows`
+ * limit of 1,000 per request, so a single `.range(0, 9999)` silently
+ * truncates. The caller passes a builder factory because Supabase
+ * query builders are single-use.
+ */
+async function fetchAllRows<T>(buildQuery: () => any): Promise<T[]> {
+  const all: T[] = [];
+  let offset = 0;
+  while (true) {
+    const q = buildQuery().range(offset, offset + FETCH_PAGE - 1);
+    const { data, error } = await q;
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    if (data.length < FETCH_PAGE) break;
+    offset += FETCH_PAGE;
+  }
+  return all;
+}
 
 // ─── Cohort + artist resolution ─────────────────────────────────────────
 function applyCohort(query: any, cohort: Cohort): any {
@@ -90,14 +111,14 @@ async function categoryFilteredIds(
 ): Promise<string[]> {
   async function idsFor(slugs: string[], kind: "theme" | "format"): Promise<Set<string>> {
     if (slugs.length === 0) return new Set();
-    const { data, error } = await supabase
-      .from("artwork_categories")
-      .select("artwork_id, category:categories!inner(slug, kind)")
-      .eq("category.kind", kind)
-      .in("category.slug", slugs)
-      .range(0, MAX_FETCH);
-    if (error) throw new Error(`categoryFilteredIds(${kind}): ${error.message}`);
-    return new Set((data || []).map((r: any) => r.artwork_id));
+    const rows = await fetchAllRows<{ artwork_id: string }>(() =>
+      supabase
+        .from("artwork_categories")
+        .select("artwork_id, category:categories!inner(slug, kind)")
+        .eq("category.kind", kind)
+        .in("category.slug", slugs)
+    );
+    return new Set(rows.map((r: any) => r.artwork_id));
   }
 
   const [themeIds, formatIds] = await Promise.all([
@@ -283,18 +304,19 @@ async function candidateIdsExcept(
   }
 
   const selectStr = buildSelect(isOneDim, "id");
-  let q = supabase.from("artworks").select(selectStr);
-  q = applyScalarFilters(q, state, cohort, artistId, except);
 
-  if (isOneDim) {
-    q = applySingleDimEmbeddedFilter(q, themes, formats);
-  } else if (isTwoDim) {
-    q = q.in("id", intersectedIds!);
-  }
+  const rows = await fetchAllRows<{ id: string }>(() => {
+    let q = supabase.from("artworks").select(selectStr);
+    q = applyScalarFilters(q, state, cohort, artistId, except);
+    if (isOneDim) {
+      q = applySingleDimEmbeddedFilter(q, themes, formats);
+    } else if (isTwoDim) {
+      q = q.in("id", intersectedIds!);
+    }
+    return q;
+  });
 
-  const { data, error } = await q.range(0, MAX_FETCH);
-  if (error) throw new Error(`candidateIdsExcept(${except}): ${error.message}`);
-  return new Set((data || []).map((r: any) => r.id));
+  return new Set(rows.map((r: any) => r.id));
 }
 
 /**
@@ -309,17 +331,17 @@ async function countCategoriesForIds(
   kind: "theme" | "format"
 ): Promise<Record<string, number>> {
   if (candidateIds.size === 0) return {};
-  const { data, error } = await supabase
-    .from("artwork_categories")
-    .select("artwork_id, category:categories!inner(slug, kind)")
-    .eq("category.kind", kind)
-    .range(0, MAX_FETCH);
-  if (error) throw new Error(`countCategoriesForIds(${kind}): ${error.message}`);
+  const rows = await fetchAllRows<any>(() =>
+    supabase
+      .from("artwork_categories")
+      .select("artwork_id, category:categories!inner(slug, kind)")
+      .eq("category.kind", kind)
+  );
 
   const counts: Record<string, number> = {};
-  for (const row of data || []) {
-    if (!candidateIds.has((row as any).artwork_id)) continue;
-    const slug = (row as any).category?.slug;
+  for (const row of rows) {
+    if (!candidateIds.has(row.artwork_id)) continue;
+    const slug = row.category?.slug;
     if (slug) counts[slug] = (counts[slug] || 0) + 1;
   }
   return counts;
@@ -330,18 +352,14 @@ async function countDecadesForIds(
   candidateIds: Set<string>
 ): Promise<Record<string, number>> {
   if (candidateIds.size === 0) return {};
-  const { data, error } = await supabase
-    .from("artworks")
-    .select("id, decade")
-    .not("decade", "is", null)
-    .range(0, MAX_FETCH);
-  if (error) throw new Error(`countDecadesForIds: ${error.message}`);
+  const rows = await fetchAllRows<any>(() =>
+    supabase.from("artworks").select("id, decade").not("decade", "is", null)
+  );
 
   const counts: Record<string, number> = {};
-  for (const row of data || []) {
-    const r = row as any;
-    if (!candidateIds.has(r.id)) continue;
-    if (r.decade) counts[r.decade] = (counts[r.decade] || 0) + 1;
+  for (const row of rows) {
+    if (!candidateIds.has(row.id)) continue;
+    if (row.decade) counts[row.decade] = (counts[row.decade] || 0) + 1;
   }
   return counts;
 }
@@ -351,17 +369,14 @@ async function artistsForIds(
   candidateIds: Set<string>
 ): Promise<Set<string>> {
   if (candidateIds.size === 0) return new Set();
-  const { data, error } = await supabase
-    .from("artworks")
-    .select("id, artist:artists(slug)")
-    .range(0, MAX_FETCH);
-  if (error) throw new Error(`artistsForIds: ${error.message}`);
+  const rows = await fetchAllRows<any>(() =>
+    supabase.from("artworks").select("id, artist:artists(slug)")
+  );
 
   const set = new Set<string>();
-  for (const row of data || []) {
-    const r = row as any;
-    if (!candidateIds.has(r.id)) continue;
-    const slug = r.artist?.slug;
+  for (const row of rows) {
+    if (!candidateIds.has(row.id)) continue;
+    const slug = row.artist?.slug;
     if (slug) set.add(slug);
   }
   return set;
