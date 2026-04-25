@@ -138,20 +138,9 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
         className="text-sm text-gray-600 mb-8 flex gap-2 flex-wrap"
       >
         <Link href="/" className="hover:text-blue-600">
-          Collection
+          CGPA Archive
         </Link>
         <span>/</span>
-        {artwork.artist && (
-          <>
-            <Link
-              href={`/artists/${artwork.artist.slug}`}
-              className="hover:text-blue-600"
-            >
-              {artistName}
-            </Link>
-            <span>/</span>
-          </>
-        )}
         <span className="text-gray-900 font-semibold">{artwork.title}</span>
       </nav>
 
