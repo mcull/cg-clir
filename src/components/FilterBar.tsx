@@ -83,7 +83,7 @@ export default function FilterBar({
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search artwork & artists"
-            className="border-2 border-gray-900 rounded-md pl-4 pr-10 py-2 text-sm w-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-400 rounded-md pl-4 pr-10 py-2 text-sm w-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700" aria-label="Search">
             ⌕
