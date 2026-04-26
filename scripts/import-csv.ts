@@ -42,7 +42,11 @@ let bucketMap: BucketMap = {};
 let bucketIdByName: Record<string, string> = {};
 if (fs.existsSync(BUCKETS_FILE)) {
   const lookup = JSON.parse(fs.readFileSync(BUCKETS_FILE, "utf-8"));
-  bucketMap = lookup.map || {};
+  if (!lookup.map || typeof lookup.map !== "object") {
+    console.warn(`WARNING: ${BUCKETS_FILE} is missing a 'map' key — medium attachments disabled.`);
+  } else {
+    bucketMap = lookup.map;
+  }
   // bucketIdByName is populated below after we resolve category IDs from the DB.
 }
 
@@ -135,6 +139,12 @@ async function main() {
       .eq("kind", "medium");
     for (const c of mediumCats || []) bucketIdByName[c.name] = c.id;
     console.log(`Loaded ${Object.keys(bucketIdByName).length} medium category IDs.`);
+    if (Object.keys(bucketIdByName).length === 0) {
+      console.warn(
+        "WARNING: bucket map exists but no kind='medium' categories in the DB. " +
+        "Run `npm run medium:apply -- <csv>` first or medium tags will be skipped."
+      );
+    }
   }
 
   // ── Step 2: Upsert artworks ────────────────────────────────────────────
@@ -242,7 +252,9 @@ async function main() {
         }
       }
 
-      // Insert records without inventory numbers (can't upsert without unique key)
+      // Insert records without inventory numbers (can't upsert without unique key).
+      // Note: medium-category attachment is intentionally skipped here — without a
+      // stable unique key we can't reliably re-fetch their ids after insert.
       if (withoutInventory.length > 0) {
         const { error } = await supabase
           .from("artworks")
