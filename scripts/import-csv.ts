@@ -14,6 +14,7 @@ import { parse } from "csv-parse/sync";
 import { createClient } from "@supabase/supabase-js";
 import { slugify, parseNumeric, parseTags } from "../src/lib/utils";
 import { dateToDecade } from "../src/lib/decades";
+import { mediumToBuckets, BucketMap } from "./lib/medium-buckets";
 
 // ─── Config ───────────────────────────────────────────────────────────────
 const CSV_PATH =
@@ -33,6 +34,17 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
+
+// Load the persisted medium bucket map (from the medium normalization workflow).
+// Importers attach medium categories to new artworks based on this map.
+const BUCKETS_FILE = path.join(__dirname, "data", "medium-buckets.json");
+let bucketMap: BucketMap = {};
+let bucketIdByName: Record<string, string> = {};
+if (fs.existsSync(BUCKETS_FILE)) {
+  const lookup = JSON.parse(fs.readFileSync(BUCKETS_FILE, "utf-8"));
+  bucketMap = lookup.map || {};
+  // bucketIdByName is populated below after we resolve category IDs from the DB.
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────
 interface CsvRow {
@@ -114,6 +126,17 @@ async function main() {
   }
   console.log(`Upserted ${upsertedArtists?.length || 0} artists.`);
 
+  // Resolve medium-category IDs (name → id) so we can attach without
+  // per-row category lookups during the artwork upsert loop.
+  if (Object.keys(bucketMap).length > 0) {
+    const { data: mediumCats } = await supabase
+      .from("categories")
+      .select("id, name")
+      .eq("kind", "medium");
+    for (const c of mediumCats || []) bucketIdByName[c.name] = c.id;
+    console.log(`Loaded ${Object.keys(bucketIdByName).length} medium category IDs.`);
+  }
+
   // ── Step 2: Upsert artworks ────────────────────────────────────────────
   console.log("\n--- Upserting artworks ---");
 
@@ -121,6 +144,7 @@ async function main() {
   const BATCH_SIZE = 100;
   let artworkCount = 0;
   let skippedCount = 0;
+  const unknownMediums = new Set<string>();
 
   for (let i = 0; i < rows.length; i += BATCH_SIZE) {
     const batch = rows.slice(i, i + BATCH_SIZE);
@@ -184,6 +208,39 @@ async function main() {
           );
         } else {
           artworkCount += withInventory.length;
+
+          // Attach medium categories from the lookup map for any rows whose
+          // medium string is in the bucket map. Single batched select gets
+          // ids; then a single upsert applies all attachments for the batch.
+          if (Object.keys(bucketMap).length > 0) {
+            const inventoryNumbers = withInventory.map((r) => r.inventory_number!);
+            const { data: artRows } = await supabase
+              .from("artworks")
+              .select("id, inventory_number, medium")
+              .in("inventory_number", inventoryNumbers);
+            const idByInv = new Map<string, string>();
+            for (const a of artRows || []) idByInv.set(a.inventory_number, a.id);
+
+            const acRows: { artwork_id: string; category_id: string }[] = [];
+            const unknownInThisBatch = new Set<string>();
+            for (const a of artRows || []) {
+              const buckets = mediumToBuckets(bucketMap, a.medium);
+              if (buckets.length === 0) {
+                if (a.medium) unknownInThisBatch.add(a.medium);
+                continue;
+              }
+              for (const b of buckets) {
+                const categoryId = bucketIdByName[b];
+                if (categoryId) acRows.push({ artwork_id: a.id, category_id: categoryId });
+              }
+            }
+            if (acRows.length > 0) {
+              await supabase
+                .from("artwork_categories")
+                .upsert(acRows, { onConflict: "artwork_id,category_id", ignoreDuplicates: true });
+            }
+            for (const m of unknownInThisBatch) unknownMediums.add(m);
+          }
         }
       }
 
@@ -212,6 +269,12 @@ async function main() {
   console.log(
     `\n\nDone! Imported ${artworkCount} artworks, skipped ${skippedCount} (no title).`
   );
+
+  if (unknownMediums.size > 0) {
+    console.warn(`\nWARNING: ${unknownMediums.size} medium strings not in bucket map (artworks have no medium tag):`);
+    [...unknownMediums].sort().forEach((m) => console.warn(`  ${m}`));
+    console.warn("Re-run `npm run medium:propose` to absorb these into the vocabulary.");
+  }
 
   // ── Step 3: Summary ────────────────────────────────────────────────────
   const { count: totalArtworks } = await supabase
