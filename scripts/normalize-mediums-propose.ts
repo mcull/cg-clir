@@ -114,6 +114,10 @@ async function main() {
     messages: [{ role: "user", content: userMessage }],
   });
 
+  if (response.stop_reason === "max_tokens") {
+    console.error("Claude hit max_tokens limit — response truncated. Increase max_tokens or reduce input.");
+    process.exit(1);
+  }
   const text = response.content[0].type === "text" ? response.content[0].text : "";
   const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
