@@ -162,7 +162,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                 src={imageUrl}
                 alt={altText}
                 fill
-                className="object-contain"
+                className="object-contain object-top"
                 priority
               />
             ) : (
