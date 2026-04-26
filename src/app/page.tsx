@@ -24,11 +24,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const state = parseSearchParams(raw);
   const supabase = createServerSupabaseClient();
 
-  const [{ artworks, total }, facets, formatCats, themeCats, allArtists] = await Promise.all([
+  const [{ artworks, total }, facets, formatCats, themeCats, mediumCats, allArtists] = await Promise.all([
     queryArtworks(supabase, state, "artwork"),
     getFacetCounts(supabase, state, "artwork"),
     supabase.from("categories").select("name, slug").eq("kind", "format").order("name"),
     supabase.from("categories").select("name, slug").eq("kind", "theme").order("name"),
+    supabase.from("categories").select("name, slug").eq("kind", "medium").order("name"),
     supabase.from("artists").select("slug, first_name, last_name").order("last_name").order("first_name"),
   ]);
 
@@ -41,6 +42,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     value: c.slug,
     label: c.name,
     count: facets.formats[c.slug] || 0,
+  }));
+  const mediumOptions = (mediumCats.data || []).map((c) => ({
+    value: c.slug,
+    label: c.name,
+    count: facets.mediums[c.slug] || 0,
   }));
   const decadeOptions = Object.keys(facets.decades).sort().map((d) => ({
     value: d,
@@ -67,6 +73,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         cohort="artwork"
         themeOptions={themeOptions}
         formatOptions={formatOptions}
+        mediumOptions={mediumOptions}
         decadeOptions={decadeOptions}
         artistOptions={artistOptions}
       />
@@ -89,7 +96,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               currentPage={state.page}
               totalPages={totalPages}
               baseUrl="/"
-              preserveParams={["q", "theme", "format", "decade", "artist", "sort"]}
+              preserveParams={["q", "theme", "format", "medium", "decade", "artist", "sort"]}
             />
           )}
         </>

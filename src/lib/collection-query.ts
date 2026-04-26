@@ -337,13 +337,26 @@ async function candidateIdsExcept(
 
   const selectStr = buildSelect(isOneDim, "id");
 
+  // Multi-dim path: a stripped facet (e.g. formats∩mediums while computing
+  // the themes facet) can produce 700+ intersected IDs. Passing those through
+  // `.in("id", ids)` blows PostgREST's URL length limit, so for multi-dim we
+  // fetch candidates matching the scalar filters and intersect client-side
+  // — the same pattern as countCategoriesForIds / artistsForIds below.
+  if (isMultiDim) {
+    const intersectedSet = new Set(intersectedIds!);
+    const rows = await fetchAllRows<{ id: string }>(() => {
+      let q = supabase.from("artworks").select("id");
+      q = applyScalarFilters(q, state, cohort, artistId, except);
+      return q;
+    });
+    return new Set(rows.filter((r: any) => intersectedSet.has(r.id)).map((r: any) => r.id));
+  }
+
   const rows = await fetchAllRows<{ id: string }>(() => {
     let q = supabase.from("artworks").select(selectStr);
     q = applyScalarFilters(q, state, cohort, artistId, except);
     if (isOneDim) {
       q = applySingleDimEmbeddedFilter(q, themes, formats, mediums);
-    } else if (isMultiDim) {
-      q = q.in("id", intersectedIds!);
     }
     return q;
   });

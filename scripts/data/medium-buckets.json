@@ -1,0 +1,1048 @@
+{
+  "version": "2026-04-26T16-02-51-738Z",
+  "buckets": [
+    "Acrylic",
+    "Ceramic",
+    "Collage",
+    "Color Stix",
+    "Colored pencil",
+    "Crayon",
+    "Fiber/Yarn",
+    "Graphite/Pencil",
+    "Ink",
+    "Marker",
+    "Oil pastel",
+    "Other",
+    "Pastel",
+    "Sequins/Beads",
+    "Watercolor",
+    "Wood"
+  ],
+  "map": {
+    "Ink on paper": [
+      "Ink"
+    ],
+    "Oil pastel on paper": [
+      "Oil pastel"
+    ],
+    "Acrylic on paper": [
+      "Acrylic"
+    ],
+    "Pastel on paper": [
+      "Pastel"
+    ],
+    "Color Stix on paper": [
+      "Color Stix"
+    ],
+    "Colored pencil on paper": [
+      "Colored pencil"
+    ],
+    "Acrylic and ink on paper": [
+      "Acrylic",
+      "Ink"
+    ],
+    "Color Stix, ink, and colored pencil on paper": [
+      "Color Stix",
+      "Ink",
+      "Colored pencil"
+    ],
+    "Ceramic": [
+      "Ceramic"
+    ],
+    "Watercolor on paper": [
+      "Watercolor"
+    ],
+    "Graphite, ink and watercolor on paper": [
+      "Graphite/Pencil",
+      "Ink",
+      "Watercolor"
+    ],
+    "Mixed media on paper": [
+      "Other"
+    ],
+    "Colored pencil and ink on paper": [
+      "Colored pencil",
+      "Ink"
+    ],
+    "Watercolor and ink on paper": [
+      "Watercolor",
+      "Ink"
+    ],
+    "Pen on paper": [
+      "Ink"
+    ],
+    "Ink and pastel on paper": [
+      "Ink",
+      "Pastel"
+    ],
+    "Ink and watercolor on paper": [
+      "Ink",
+      "Watercolor"
+    ],
+    "Acrylic on magazine": [
+      "Acrylic"
+    ],
+    "Ink on newspaper": [
+      "Ink"
+    ],
+    "Prismastix on wood": [
+      "Color Stix",
+      "Wood"
+    ],
+    "Ink and marker on paper": [
+      "Ink",
+      "Marker"
+    ],
+    "Collage": [
+      "Collage"
+    ],
+    "Acrylic on wood": [
+      "Acrylic",
+      "Wood"
+    ],
+    "Fiber and found objects": [
+      "Fiber/Yarn"
+    ],
+    "Prismastix on paper": [
+      "Color Stix"
+    ],
+    "Ink and colored pencil on paper": [
+      "Ink",
+      "Colored pencil"
+    ],
+    "Graphite on paper": [
+      "Graphite/Pencil"
+    ],
+    "Ink on magazine": [
+      "Ink"
+    ],
+    "Sharpie on paper": [
+      "Marker"
+    ],
+    "Rug": [
+      "Fiber/Yarn"
+    ],
+    "Marker on paper": [
+      "Marker"
+    ],
+    "Acrylic and Sharpie on paper": [
+      "Acrylic",
+      "Marker"
+    ],
+    "Color Stix and Sharpie on paper": [
+      "Color Stix",
+      "Marker"
+    ],
+    "Oil pastel and ink on paper": [
+      "Oil pastel",
+      "Ink"
+    ],
+    "Ink and pencil on paper": [
+      "Ink",
+      "Graphite/Pencil"
+    ],
+    "Acrylic and pen on paper": [
+      "Acrylic",
+      "Ink"
+    ],
+    "Pen and colored pencil on paper": [
+      "Ink",
+      "Colored pencil"
+    ],
+    "Wrapped sculpture": [
+      "Other"
+    ],
+    "Wool, Roving, twine, cardboard": [
+      "Fiber/Yarn"
+    ],
+    "Acrylic and colored pencil on paper": [
+      "Acrylic",
+      "Colored pencil"
+    ],
+    "Ink and crayon on paper": [
+      "Ink",
+      "Crayon"
+    ],
+    "Acrylic on wood sculpture": [
+      "Acrylic",
+      "Wood"
+    ],
+    "Crayon and ink on paper": [
+      "Crayon",
+      "Ink"
+    ],
+    "Color Stix and ink on paper": [
+      "Color Stix",
+      "Ink"
+    ],
+    "Watercolor and oil pastel on paper": [
+      "Watercolor",
+      "Oil pastel"
+    ],
+    "Wood sculpture": [
+      "Wood"
+    ],
+    "Pencil on paper": [
+      "Graphite/Pencil"
+    ],
+    "Acrylic on canvas": [
+      "Acrylic"
+    ],
+    "Acrylic on found photograph": [
+      "Acrylic"
+    ],
+    "Wrapped fiber sculpture": [
+      "Fiber/Yarn"
+    ],
+    "Color Stix and graphite on paper": [
+      "Color Stix",
+      "Graphite/Pencil"
+    ],
+    "Art Stix on paper": [
+      "Color Stix"
+    ],
+    "Acrylic on found photo": [
+      "Acrylic"
+    ],
+    "Weaving": [
+      "Fiber/Yarn"
+    ],
+    "Acrylic and graphite on paper": [
+      "Acrylic",
+      "Graphite/Pencil"
+    ],
+    "Watercolor and graphite on paper": [
+      "Watercolor",
+      "Graphite/Pencil"
+    ],
+    "Watercolor and Sharpie on paper": [
+      "Watercolor",
+      "Marker"
+    ],
+    "Art Stix on paper puppet": [
+      "Color Stix"
+    ],
+    "Art Stix on paper cutout": [
+      "Color Stix"
+    ],
+    "Chalk pastel on paper": [
+      "Pastel"
+    ],
+    "Acrylic and watercolor on paper": [
+      "Acrylic",
+      "Watercolor"
+    ],
+    "Oil pastel and acrylic on paper": [
+      "Oil pastel",
+      "Acrylic"
+    ],
+    "Pencil and watercolor on paper": [
+      "Graphite/Pencil",
+      "Watercolor"
+    ],
+    "Ink and oil pastel on paper": [
+      "Ink",
+      "Oil pastel"
+    ],
+    "Acrylic on photograph": [
+      "Acrylic"
+    ],
+    "Relief print": [
+      "Other"
+    ],
+    "Color pencil on paper": [
+      "Colored pencil"
+    ],
+    "Pastel and ink on paper": [
+      "Pastel",
+      "Ink"
+    ],
+    "Etching": [
+      "Other"
+    ],
+    "Tempera on paper": [
+      "Acrylic"
+    ],
+    "Watercolor pencil on paper": [
+      "Colored pencil",
+      "Watercolor"
+    ],
+    "Sequin sculpture": [
+      "Sequins/Beads"
+    ],
+    "Wrap sculpture": [
+      "Other"
+    ],
+    "Sequins on styrofoam": [
+      "Sequins/Beads"
+    ],
+    "Acrylic, graphite and ink on paper": [
+      "Acrylic",
+      "Graphite/Pencil",
+      "Ink"
+    ],
+    "Burned wood": [
+      "Wood"
+    ],
+    "Ink and watercolor pencil on paper": [
+      "Ink",
+      "Colored pencil",
+      "Watercolor"
+    ],
+    "Pastel and watercolor on paper": [
+      "Pastel",
+      "Watercolor"
+    ],
+    "Gel pen on paper": [
+      "Ink"
+    ],
+    "Ink, crayon, and watercolor on paper": [
+      "Ink",
+      "Crayon",
+      "Watercolor"
+    ],
+    "Watercolor, acrylic and Sharpie on paper": [
+      "Watercolor",
+      "Acrylic",
+      "Marker"
+    ],
+    "Ink on paper cutout": [
+      "Ink"
+    ],
+    "Oil pastel and Sharpie on paper": [
+      "Oil pastel",
+      "Marker"
+    ],
+    "Oil pastel and watercolor on paper": [
+      "Oil pastel",
+      "Watercolor"
+    ],
+    "Paper,Oil pastel": [
+      "Oil pastel"
+    ],
+    "Hand colored etching": [
+      "Other"
+    ],
+    "Basket": [
+      "Fiber/Yarn"
+    ],
+    "Mixed media on wood": [
+      "Wood",
+      "Other"
+    ],
+    "Oil pastel on wood": [
+      "Oil pastel",
+      "Wood"
+    ],
+    "Ink on found photograph": [
+      "Ink"
+    ],
+    "Mixed media on wood panel": [
+      "Wood",
+      "Other"
+    ],
+    "Prisma on paper": [
+      "Colored pencil"
+    ],
+    "Acrylic on found paper": [
+      "Acrylic"
+    ],
+    "Pins and sequins in styrofoam": [
+      "Sequins/Beads"
+    ],
+    "Prisma stix on paper": [
+      "Color Stix"
+    ],
+    "Ink and acrylic on paper": [
+      "Ink",
+      "Acrylic"
+    ],
+    "watercolor and ink": [
+      "Watercolor",
+      "Ink"
+    ],
+    "Acrylic, watercolor, and ink on paper": [
+      "Acrylic",
+      "Watercolor",
+      "Ink"
+    ],
+    "ink on acetate": [
+      "Ink"
+    ],
+    "Acrylic and ink on panel": [
+      "Acrylic",
+      "Ink"
+    ],
+    "Ink on matboard": [
+      "Ink"
+    ],
+    "Ink and graphite on paper": [
+      "Ink",
+      "Graphite/Pencil"
+    ],
+    "Wool yarn, Acrylic yarn, Branches, Cardboard cones, Polyester fabric, Silk fabric": [
+      "Fiber/Yarn"
+    ],
+    "Watercolor and crayon on paper": [
+      "Watercolor",
+      "Crayon"
+    ],
+    "Acrylic, ink, and Sharpie on paper": [
+      "Acrylic",
+      "Ink",
+      "Marker"
+    ],
+    "Mixed media": [
+      "Other"
+    ],
+    "Pen and colored pencil": [
+      "Ink",
+      "Colored pencil"
+    ],
+    "Acrylic yarn, twine, wooden sticks, Raffia": [
+      "Fiber/Yarn"
+    ],
+    "Print on paper": [
+      "Other"
+    ],
+    "Ink on wood": [
+      "Ink",
+      "Wood"
+    ],
+    "Watercolor, graphite, and crayon on paper": [
+      "Watercolor",
+      "Graphite/Pencil",
+      "Crayon"
+    ],
+    "Acrylic on unstretched canvas": [
+      "Acrylic"
+    ],
+    "Pencil and pastel on paper": [
+      "Graphite/Pencil",
+      "Pastel"
+    ],
+    "Oil pastel and Color Stix on paper": [
+      "Oil pastel",
+      "Color Stix"
+    ],
+    "Acrylic and pastel on paper": [
+      "Acrylic",
+      "Pastel"
+    ],
+    "Paper,Oil pastel,Sharpie": [
+      "Oil pastel",
+      "Marker"
+    ],
+    "Acrylic": [
+      "Acrylic"
+    ],
+    "Watercolor and colored pencil on paper": [
+      "Watercolor",
+      "Colored pencil"
+    ],
+    "Oil pastel and colored pencil on paper": [
+      "Oil pastel",
+      "Colored pencil"
+    ],
+    "Graphite and crayon": [
+      "Graphite/Pencil",
+      "Crayon"
+    ],
+    "Acrylic yarn,Polyester fabric": [
+      "Fiber/Yarn"
+    ],
+    "Poster": [
+      "Other"
+    ],
+    "Textile": [
+      "Fiber/Yarn"
+    ],
+    "Chalk and oil pastel on paper": [
+      "Pastel",
+      "Oil pastel"
+    ],
+    "Pen on wood": [
+      "Ink",
+      "Wood"
+    ],
+    "Handmade book": [
+      "Other"
+    ],
+    "Sequined sculpture": [
+      "Sequins/Beads"
+    ],
+    "Crochet": [
+      "Fiber/Yarn"
+    ],
+    "Colored Pencil/Sharpie on paper": [
+      "Colored pencil",
+      "Marker"
+    ],
+    "Acrylic Marker on Wood": [
+      "Acrylic",
+      "Marker",
+      "Wood"
+    ],
+    "Chine-collé etching": [
+      "Collage"
+    ],
+    "Cardboard sculpture": [
+      "Other"
+    ],
+    "Graphite and crayon on paper": [
+      "Graphite/Pencil",
+      "Crayon"
+    ],
+    "Acrylic on leather and textile pillow": [
+      "Acrylic",
+      "Fiber/Yarn"
+    ],
+    "Acrylic on record": [
+      "Acrylic"
+    ],
+    "Monoprint": [
+      "Other"
+    ],
+    "Acrylic and ink on wood": [
+      "Acrylic",
+      "Ink",
+      "Wood"
+    ],
+    "Pillow": [
+      "Fiber/Yarn"
+    ],
+    "Pencil and acrylic on paper": [
+      "Graphite/Pencil",
+      "Acrylic"
+    ],
+    "Oil pastel acrylic and watercolor on paper": [
+      "Oil pastel",
+      "Acrylic",
+      "Watercolor"
+    ],
+    "white ink and typewriter on paper": [
+      "Ink"
+    ],
+    "acrylic, ink, and color stix on paper": [
+      "Acrylic",
+      "Ink",
+      "Color Stix"
+    ],
+    "Acrylic yarn,Cotton fabric,String,Silk flowers,Mixed media": [
+      "Fiber/Yarn"
+    ],
+    "Ink, marker, and oil pastel on paper": [
+      "Ink",
+      "Marker",
+      "Oil pastel"
+    ],
+    "LD21": [
+      "Other"
+    ],
+    "Acrylic yarn,cardboard": [
+      "Fiber/Yarn"
+    ],
+    "Color Stix and marker on paper": [
+      "Color Stix",
+      "Marker"
+    ],
+    "Sharpie": [
+      "Marker"
+    ],
+    "Hooked Rug": [
+      "Fiber/Yarn"
+    ],
+    "Sharpie and magazine cutouts on mat board": [
+      "Marker",
+      "Collage"
+    ],
+    "Handcolored print on paper": [
+      "Other"
+    ],
+    "Ink and pastel on folded paper card": [
+      "Ink",
+      "Pastel"
+    ],
+    "acrylic, ink, and typewriter on paper": [
+      "Acrylic",
+      "Ink"
+    ],
+    "Looped rug": [
+      "Fiber/Yarn"
+    ],
+    "wax pencil": [
+      "Graphite/Pencil"
+    ],
+    "Acrylic on foamboard": [
+      "Acrylic"
+    ],
+    "Silkscreen on paper": [
+      "Other"
+    ],
+    "Fiber sculpture": [
+      "Fiber/Yarn"
+    ],
+    "Risograph print": [
+      "Other"
+    ],
+    "Acrylic and textile on wood sculpture": [
+      "Acrylic",
+      "Fiber/Yarn",
+      "Wood"
+    ],
+    "LD1": [
+      "Other"
+    ],
+    "Acrylic, Sharpie, and acrylic pen on paper": [
+      "Acrylic",
+      "Marker"
+    ],
+    "Ink and colorstix on paper": [
+      "Ink",
+      "Color Stix"
+    ],
+    "Ink, pencil, and watercolor on paper": [
+      "Ink",
+      "Graphite/Pencil",
+      "Watercolor"
+    ],
+    "Magazine cutouts": [
+      "Collage"
+    ],
+    "Colored pecnil on paper": [
+      "Colored pencil"
+    ],
+    "Color Stix and colored pencil on paper": [
+      "Color Stix",
+      "Colored pencil"
+    ],
+    "LD2": [
+      "Other"
+    ],
+    "Ceramic and wood": [
+      "Ceramic",
+      "Wood"
+    ],
+    "Ceramic with light bulb": [
+      "Ceramic"
+    ],
+    "Fabric sculpture": [
+      "Fiber/Yarn"
+    ],
+    "Monoprint on paper": [
+      "Other"
+    ],
+    "Sharpie, graphite, colored pencil, and Color Stix on paper": [
+      "Marker",
+      "Graphite/Pencil",
+      "Colored pencil",
+      "Color Stix"
+    ],
+    "watercolor, ink, and glitter on paper": [
+      "Watercolor",
+      "Ink",
+      "Other"
+    ],
+    "Acrylic, Sharpie and Color Stix on paper": [
+      "Acrylic",
+      "Marker",
+      "Color Stix"
+    ],
+    "Acrylic yarn, Polyester fabric": [
+      "Fiber/Yarn"
+    ],
+    "Ink on paper,Graphite on paper": [
+      "Ink",
+      "Graphite/Pencil"
+    ],
+    "Pastel on paper book": [
+      "Pastel"
+    ],
+    "Ceramic with light fixture": [
+      "Ceramic"
+    ],
+    "Acrylic and Sharpie on canvas": [
+      "Acrylic",
+      "Marker"
+    ],
+    "Sharpie and watercolor on paper": [
+      "Marker",
+      "Watercolor"
+    ],
+    "Paper,Acrylic": [
+      "Acrylic"
+    ],
+    "Acrylic on Canvas": [
+      "Acrylic"
+    ],
+    "DS 057": [
+      "Other"
+    ],
+    "Yarn basket": [
+      "Fiber/Yarn"
+    ],
+    "Paper,Oil pastel,Watercolor": [
+      "Oil pastel",
+      "Watercolor"
+    ],
+    "Acrylic, paint pen, and ink on paper": [
+      "Acrylic",
+      "Marker",
+      "Ink"
+    ],
+    "Mixed media wood sculpture": [
+      "Wood",
+      "Other"
+    ],
+    "Ink on clothing": [
+      "Ink"
+    ],
+    "Acrylic yarn, cardboard, plexiglass, Paper": [
+      "Fiber/Yarn"
+    ],
+    "Acrylic and foil on paper": [
+      "Acrylic",
+      "Other"
+    ],
+    "Sequin, beads, and styrofoam": [
+      "Sequins/Beads"
+    ],
+    "Mixed media sculpture": [
+      "Other"
+    ],
+    "Cotton yarn": [
+      "Fiber/Yarn"
+    ],
+    "wax pencil on paper": [
+      "Graphite/Pencil"
+    ],
+    "Embroidered canvas": [
+      "Fiber/Yarn"
+    ],
+    "Cyanotype": [
+      "Other"
+    ],
+    "Colored pencil and ink": [
+      "Colored pencil",
+      "Ink"
+    ],
+    "DS 68": [
+      "Other"
+    ],
+    "Sharpie and crayon on paper": [
+      "Marker",
+      "Crayon"
+    ],
+    "Watercolor collage": [
+      "Watercolor",
+      "Collage"
+    ],
+    "Pastel and colored pencil on paper": [
+      "Pastel",
+      "Colored pencil"
+    ],
+    "Oil pastel": [
+      "Oil pastel"
+    ],
+    "Woven basket": [
+      "Fiber/Yarn"
+    ],
+    "Oil pastel, marker, and crayon on paper": [
+      "Oil pastel",
+      "Marker",
+      "Crayon"
+    ],
+    "Watercolor and pencil on paper": [
+      "Watercolor",
+      "Graphite/Pencil"
+    ],
+    "Watercolor": [
+      "Watercolor"
+    ],
+    "Ink, crayon, and print cutout on mat board": [
+      "Ink",
+      "Crayon",
+      "Collage"
+    ],
+    "Pastel and color pencil on paper": [
+      "Pastel",
+      "Colored pencil"
+    ],
+    "Acrylic and charcoal on unstretched canvas": [
+      "Acrylic"
+    ],
+    "Ink on folded paper": [
+      "Ink"
+    ],
+    "Ink on book page": [
+      "Ink"
+    ],
+    "Artstix on paper": [
+      "Color Stix"
+    ],
+    "Acrylic on Wood": [
+      "Acrylic",
+      "Wood"
+    ],
+    "Colored pencil on wood cutout": [
+      "Colored pencil",
+      "Wood"
+    ],
+    "Mixed media collage on paper": [
+      "Collage",
+      "Other"
+    ],
+    "Watercolor, acrylic and Sharpie on paper,Watercolor and graphite on paper": [
+      "Watercolor",
+      "Acrylic",
+      "Marker",
+      "Graphite/Pencil"
+    ],
+    "DS 67": [
+      "Other"
+    ],
+    "Graphite and color pencil": [
+      "Graphite/Pencil",
+      "Colored pencil"
+    ],
+    "Acrylic yarn, cardboard, plexiglass, paper": [
+      "Fiber/Yarn"
+    ],
+    "Pencil and ink on paper": [
+      "Graphite/Pencil",
+      "Ink"
+    ],
+    "Paper,Crayon": [
+      "Crayon"
+    ],
+    "Acrylic and ink on wood cutout": [
+      "Acrylic",
+      "Ink",
+      "Wood"
+    ],
+    "Ink on dress": [
+      "Ink"
+    ],
+    "Ink and pencil and paper": [
+      "Ink",
+      "Graphite/Pencil"
+    ],
+    "Acrylic on book page": [
+      "Acrylic"
+    ],
+    "Pastel on wood": [
+      "Pastel",
+      "Wood"
+    ],
+    "Ink on magazine page": [
+      "Ink"
+    ],
+    "Oil pastel on wood sculpture": [
+      "Oil pastel",
+      "Wood"
+    ],
+    "Crayon on paper": [
+      "Crayon"
+    ],
+    "Mixed media on board": [
+      "Other"
+    ],
+    "Acrylic yarn,Paper,Bike wheel,Roving,Fleece,Upholstery fabric,String,Wicker basket,Wooden chair": [],
+    "Paint markers on wood": [
+      "Marker",
+      "Wood"
+    ],
+    "LD23": [
+      "Other"
+    ],
+    "LD24": [
+      "Other"
+    ],
+    "Beads, found objects, acrylic resin on wood": [
+      "Sequins/Beads",
+      "Wood"
+    ],
+    "Acrylic yarn, Cotton fabric, String, Silk flowers, Mixed media": [
+      "Fiber/Yarn"
+    ],
+    "Acrylic and pencil on paper": [
+      "Acrylic",
+      "Graphite/Pencil"
+    ],
+    "Woven bag": [
+      "Fiber/Yarn"
+    ],
+    "Acrylic on lamp shade": [
+      "Acrylic"
+    ],
+    "Pastel and pencil on paper": [
+      "Pastel",
+      "Graphite/Pencil"
+    ],
+    "Prismacolor on paper": [
+      "Colored pencil"
+    ],
+    "Acrylic, marker, and ink on paper": [
+      "Acrylic",
+      "Marker",
+      "Ink"
+    ],
+    "Oil pastel, crayon, watercolor, and colored pencil on paper collage": [
+      "Oil pastel",
+      "Crayon",
+      "Watercolor",
+      "Colored pencil",
+      "Collage"
+    ],
+    "Sculpture wrapped with a variety of materials": [
+      "Other"
+    ],
+    "Watercolor, ink, and sticker on paper": [
+      "Watercolor",
+      "Ink",
+      "Other"
+    ],
+    "Pastel on paper record sleeve": [
+      "Pastel"
+    ],
+    "Acrylic and oil pastel on paper": [
+      "Acrylic",
+      "Oil pastel"
+    ],
+    "Oil pastel and marker on paper": [
+      "Oil pastel",
+      "Marker"
+    ],
+    "15.5x22": [
+      "Other"
+    ],
+    "Colored pencil and watercolor on paper": [
+      "Colored pencil",
+      "Watercolor"
+    ],
+    "Marker and crayon on paper": [
+      "Marker",
+      "Crayon"
+    ],
+    "Watercolor, acrylic, and graphite on paper": [
+      "Watercolor",
+      "Acrylic",
+      "Graphite/Pencil"
+    ],
+    "Oil pastel and graphite on paper": [
+      "Oil pastel",
+      "Graphite/Pencil"
+    ],
+    "Prisma color on wood": [
+      "Colored pencil",
+      "Wood"
+    ],
+    "Pastel on wood cutout": [
+      "Pastel",
+      "Wood"
+    ],
+    "Ink and masking tape on paper": [
+      "Ink",
+      "Other"
+    ],
+    "Beads, Sequins and Dress Pins on Styrofoam": [
+      "Sequins/Beads"
+    ],
+    "Yarn on monks cloth": [
+      "Fiber/Yarn"
+    ],
+    "Ink and acrylic on paper book": [
+      "Ink",
+      "Acrylic"
+    ],
+    "Colored pencil and graphite on paper": [
+      "Colored pencil",
+      "Graphite/Pencil"
+    ],
+    "Prisma stix on wood": [
+      "Color Stix",
+      "Wood"
+    ],
+    "gel pen and ink on wood": [
+      "Ink",
+      "Wood"
+    ],
+    "Glitter and relief print": [
+      "Other"
+    ],
+    "ColorStix on Paper": [
+      "Color Stix"
+    ],
+    "Soft sculpture": [
+      "Fiber/Yarn"
+    ],
+    "Marker and pen on paper": [
+      "Marker",
+      "Ink"
+    ],
+    "Marker on vintage linen": [
+      "Marker",
+      "Fiber/Yarn"
+    ],
+    "Ink and acrylic marker on paper": [
+      "Ink",
+      "Acrylic",
+      "Marker"
+    ],
+    "Watercolor on paper cutout": [
+      "Watercolor"
+    ],
+    "Pen on wood sculpture": [
+      "Ink",
+      "Wood"
+    ],
+    "Print": [
+      "Other"
+    ],
+    "Colorstix on paper": [
+      "Color Stix"
+    ],
+    "Color Stix, acrylic, ink, and colored pencil on paper": [
+      "Color Stix",
+      "Acrylic",
+      "Ink",
+      "Colored pencil"
+    ],
+    "Incised clay": [
+      "Ceramic"
+    ],
+    "Colored pencil and chalk pastel on paper": [
+      "Colored pencil",
+      "Pastel"
+    ],
+    "Crayon on textile": [
+      "Crayon",
+      "Fiber/Yarn"
+    ],
+    "Acrylic yarn,Raffia,Cotton fabric,Cotton yarn,Wool,Wood,Plastic coated wire,Felt": [
+      "Fiber/Yarn",
+      "Wood"
+    ],
+    "Collage and ink on paper": [
+      "Collage",
+      "Ink"
+    ],
+    "Watercolor, oil pastel, and pencil on paper": [
+      "Watercolor",
+      "Oil pastel",
+      "Graphite/Pencil"
+    ],
+    "Paper,Oil pastel,Acrylic": [
+      "Oil pastel",
+      "Acrylic"
+    ],
+    "Wool,Roving,twine,cardboard": [
+      "Fiber/Yarn"
+    ],
+    "Oil pastel, acrylic, and watercolor on paper": [
+      "Oil pastel",
+      "Acrylic",
+      "Watercolor"
+    ]
+  }
+}
