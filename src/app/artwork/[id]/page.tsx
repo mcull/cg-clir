@@ -75,6 +75,7 @@ async function getArtistArtworks(
 
 interface ArtworkPageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ params }: ArtworkPageProps) {
@@ -109,13 +110,19 @@ export async function generateMetadata({ params }: ArtworkPageProps) {
   };
 }
 
-export default async function ArtworkPage({ params }: ArtworkPageProps) {
+export default async function ArtworkPage({ params, searchParams }: ArtworkPageProps) {
   const { id } = await params;
+  const sp = await searchParams;
+  const showAi = sp.ai === "1" || sp.ai === "true";
   const artwork = await getArtwork(id);
 
   if (!artwork) {
     notFound();
   }
+
+  const showVisualDescription =
+    artwork.description_origin === "human" ||
+    (showAi && artwork.description_origin === "ai");
 
   const more = artwork.artist_id
     ? await getArtistArtworks(artwork.artist_id, artwork.id)
@@ -149,28 +156,21 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Image */}
         <div className="lg:col-span-2">
-          <figure>
-            <div className="bg-gray-100 aspect-square relative mb-3">
-              {imageUrl ? (
-                <Image
-                  src={imageUrl}
-                  alt={altText}
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  No image available
-                </div>
-              )}
-            </div>
-            {artwork.alt_text && (
-              <figcaption className="text-sm text-gray-600 italic">
-                {artwork.alt_text}
-              </figcaption>
+          <div className="bg-white aspect-square relative">
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={altText}
+                fill
+                className="object-contain"
+                priority
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                No image available
+              </div>
             )}
-          </figure>
+          </div>
         </div>
 
         {/* Metadata */}
@@ -237,14 +237,17 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
               </div>
             )}
 
-            {artwork.description_origin === "human" && artwork.alt_text_long && (
+            {showVisualDescription && (artwork.alt_text || artwork.alt_text_long) && (
               <div>
                 <dt className="text-sm font-semibold text-gray-600">
                   Visual description
                 </dt>
-                <dd className="text-gray-900 leading-relaxed">
-                  {artwork.alt_text_long}
-                </dd>
+                {artwork.alt_text && (
+                  <dd className="text-gray-900 italic mb-2">{artwork.alt_text}</dd>
+                )}
+                {artwork.alt_text_long && (
+                  <dd className="text-gray-900 leading-relaxed">{artwork.alt_text_long}</dd>
+                )}
               </div>
             )}
           </div>
