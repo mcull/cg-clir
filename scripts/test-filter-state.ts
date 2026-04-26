@@ -8,6 +8,7 @@ test("parseSearchParams: empty input yields empty state", () => {
     q: "",
     themes: [],
     formats: [],
+    mediums: [],
     decades: [],
     artist: null,
     sort: null,
@@ -55,6 +56,7 @@ test("toQueryString: round-trips a populated state", () => {
     q: "lightbulbs",
     themes: ["animals", "abstract"],
     formats: ["drawings"],
+    mediums: [],
     decades: ["1990s"],
     artist: "dan-miller",
     sort: "newest",
@@ -67,21 +69,21 @@ test("toQueryString: round-trips a populated state", () => {
 
 test("toQueryString: omits empty fields", () => {
   const state: FilterState = {
-    q: "", themes: [], formats: [], decades: [], artist: null, sort: null, page: 1,
+    q: "", themes: [], formats: [], mediums: [], decades: [], artist: null, sort: null, page: 1,
   };
   assert.equal(toQueryString(state), "");
 });
 
 test("toQueryString: omits page=1 (default)", () => {
   const state: FilterState = {
-    q: "x", themes: [], formats: [], decades: [], artist: null, sort: null, page: 1,
+    q: "x", themes: [], formats: [], mediums: [], decades: [], artist: null, sort: null, page: 1,
   };
   assert.equal(toQueryString(state), "q=x");
 });
 
 test("toQueryString: includes page when > 1", () => {
   const state: FilterState = {
-    q: "", themes: [], formats: [], decades: [], artist: null, sort: null, page: 3,
+    q: "", themes: [], formats: [], mediums: [], decades: [], artist: null, sort: null, page: 3,
   };
   assert.equal(toQueryString(state), "page=3");
 });

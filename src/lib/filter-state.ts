@@ -10,6 +10,7 @@ export interface FilterState {
   q: string;
   themes: string[];
   formats: string[];
+  mediums: string[];
   decades: string[];
   artist: string | null;
   sort: SortKey | null;
@@ -47,6 +48,7 @@ export function parseSearchParams(params: Record<string, RawParam>): FilterState
     q: pickFirst(params.q),
     themes: parseList(params.theme),
     formats: parseList(params.format),
+    mediums: parseList(params.medium),
     decades: parseList(params.decade),
     artist: pickFirst(params.artist) || null,
     sort: parseSort(params.sort),
@@ -59,6 +61,7 @@ export function toQueryString(state: FilterState): string {
   if (state.q) out.set("q", state.q);
   if (state.themes.length) out.set("theme", state.themes.join(","));
   if (state.formats.length) out.set("format", state.formats.join(","));
+  if (state.mediums.length) out.set("medium", state.mediums.join(","));
   if (state.decades.length) out.set("decade", state.decades.join(","));
   if (state.artist) out.set("artist", state.artist);
   if (state.sort) out.set("sort", state.sort);
