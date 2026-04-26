@@ -25,8 +25,9 @@ CREATE TABLE categories (
   ai_suggested  BOOLEAN DEFAULT false,
   -- Discriminator for what kind of category this is. 'format' is the
   -- existing AI-suggested taxonomy (Drawings, Paintings, etc.); 'theme'
-  -- is the controlled subject taxonomy added in 2026-04-23.
-  kind          TEXT CHECK (kind IN ('format', 'theme')),
+  -- is the controlled subject taxonomy added in 2026-04-23; 'medium' is
+  -- the normalized material taxonomy added in 2026-04-25.
+  kind          TEXT CHECK (kind IN ('format', 'theme', 'medium')),
   created_at    TIMESTAMPTZ DEFAULT now()
 );
 

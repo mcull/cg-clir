@@ -8,6 +8,7 @@ test("parseSearchParams: empty input yields empty state", () => {
     q: "",
     themes: [],
     formats: [],
+    mediums: [],
     decades: [],
     artist: null,
     sort: null,
@@ -55,6 +56,7 @@ test("toQueryString: round-trips a populated state", () => {
     q: "lightbulbs",
     themes: ["animals", "abstract"],
     formats: ["drawings"],
+    mediums: [],
     decades: ["1990s"],
     artist: "dan-miller",
     sort: "newest",
@@ -67,21 +69,48 @@ test("toQueryString: round-trips a populated state", () => {
 
 test("toQueryString: omits empty fields", () => {
   const state: FilterState = {
-    q: "", themes: [], formats: [], decades: [], artist: null, sort: null, page: 1,
+    q: "", themes: [], formats: [], mediums: [], decades: [], artist: null, sort: null, page: 1,
   };
   assert.equal(toQueryString(state), "");
 });
 
 test("toQueryString: omits page=1 (default)", () => {
   const state: FilterState = {
-    q: "x", themes: [], formats: [], decades: [], artist: null, sort: null, page: 1,
+    q: "x", themes: [], formats: [], mediums: [], decades: [], artist: null, sort: null, page: 1,
   };
   assert.equal(toQueryString(state), "q=x");
 });
 
 test("toQueryString: includes page when > 1", () => {
   const state: FilterState = {
-    q: "", themes: [], formats: [], decades: [], artist: null, sort: null, page: 3,
+    q: "", themes: [], formats: [], mediums: [], decades: [], artist: null, sort: null, page: 3,
   };
   assert.equal(toQueryString(state), "page=3");
+});
+
+test("parseSearchParams: parses mediums from medium= param", () => {
+  const s = parseSearchParams({ medium: "ink,acrylic" });
+  assert.deepEqual(s.mediums, ["ink", "acrylic"]);
+});
+
+test("parseSearchParams: empty input has empty mediums array", () => {
+  const s = parseSearchParams({});
+  assert.deepEqual(s.mediums, []);
+});
+
+test("toQueryString: serializes mediums to medium= param", () => {
+  const state = {
+    q: "", themes: [], formats: [], decades: [], artist: null, sort: null, page: 1,
+    mediums: ["ink", "acrylic"],
+  };
+  assert.equal(toQueryString(state), "medium=ink%2Cacrylic");
+});
+
+test("toQueryString round-trip preserves mediums", () => {
+  const state = {
+    q: "x", themes: ["animals"], formats: [], decades: [], artist: null, sort: null, page: 1,
+    mediums: ["ink", "acrylic"],
+  };
+  const re = parseSearchParams(Object.fromEntries(new URLSearchParams(toQueryString(state))));
+  assert.deepEqual(re.mediums, state.mediums);
 });

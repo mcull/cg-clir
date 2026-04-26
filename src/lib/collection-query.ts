@@ -5,13 +5,13 @@
  * Filter strategy by dimension:
  *   - Cohort, on_website, search (FTS), decade, artist: applied inline
  *     on the main query — small, indexed, fast.
- *   - Theme XOR Format (one category dim active): embedded INNER join +
- *     `.eq()` / `.in()` on the embedded path. PostgREST INNER JOIN
- *     filters the parent rows correctly.
- *   - Theme AND Format (both active): pre-resolve the intersected
- *     artwork-id set via `categoryFilteredIds`, then `.in("id", ids)`.
- *     The intersection is bounded by min(theme-pop, format-pop), which
- *     is small enough to fit comfortably in a PostgREST URL.
+ *   - Exactly one category dim active (theme XOR format XOR medium):
+ *     embedded INNER join + `.eq()` / `.in()` on the embedded path.
+ *     PostgREST INNER JOIN filters the parent rows correctly.
+ *   - ≥2 category dims active: pre-resolve the intersected artwork-id
+ *     set via `categoryFilteredIds`, then `.in("id", ids)`. The
+ *     intersection is bounded by min(active-dim populations), which is
+ *     small enough to fit comfortably in a PostgREST URL.
  *   - We avoid `.in("id", hugeSet)` patterns (e.g., 1,400-id Drawings
  *     filter), which exceed PostgREST's URI length limit.
  *
@@ -45,6 +45,7 @@ export interface ArtworkResult {
 export interface FacetCounts {
   themes: Record<string, number>;
   formats: Record<string, number>;
+  mediums: Record<string, number>;
   decades: Record<string, number>;
   availableArtistSlugs: Set<string>;
 }
@@ -52,7 +53,7 @@ export interface FacetCounts {
 const PAGE_SIZE = 24;
 const FETCH_PAGE = 1000;
 
-type ExceptDim = "themes" | "formats" | "decades" | "artist" | "q" | "none";
+type ExceptDim = "themes" | "formats" | "mediums" | "decades" | "artist" | "q" | "none";
 
 /**
  * Page through all matching rows. PostgREST has a default `max-rows`
@@ -100,16 +101,16 @@ async function resolveArtistId(
 }
 
 /**
- * Resolve themes + formats to the intersected set of artwork IDs that
- * satisfy both. Used only when BOTH dimensions are active. Returns null
- * sentinel only when caller misuses (neither dim active).
+ * Resolve themes + formats + mediums to the intersected set of artwork IDs
+ * that satisfy all active dimensions. Used only when ≥2 dimensions are active.
  */
 async function categoryFilteredIds(
   supabase: SupabaseClient,
   themes: string[],
-  formats: string[]
+  formats: string[],
+  mediums: string[]
 ): Promise<string[]> {
-  async function idsFor(slugs: string[], kind: "theme" | "format"): Promise<Set<string>> {
+  async function idsFor(slugs: string[], kind: "theme" | "format" | "medium"): Promise<Set<string>> {
     if (slugs.length === 0) return new Set();
     const rows = await fetchAllRows<{ artwork_id: string }>(() =>
       supabase
@@ -121,12 +122,22 @@ async function categoryFilteredIds(
     return new Set(rows.map((r: any) => r.artwork_id));
   }
 
-  const [themeIds, formatIds] = await Promise.all([
+  const [themeIds, formatIds, mediumIds] = await Promise.all([
     idsFor(themes, "theme"),
     idsFor(formats, "format"),
+    idsFor(mediums, "medium"),
   ]);
 
-  return [...themeIds].filter((id) => formatIds.has(id));
+  // Intersect only the active sets; an inactive dim doesn't constrain.
+  const sets: Set<string>[] = [];
+  if (themes.length > 0) sets.push(themeIds);
+  if (formats.length > 0) sets.push(formatIds);
+  if (mediums.length > 0) sets.push(mediumIds);
+  if (sets.length === 0) return []; // shouldn't be called in this case
+  if (sets.length === 1) return [...sets[0]];
+  // Iterate the smallest set; cost is O(|smallest| * (sets.length - 1)) lookups.
+  sets.sort((a, b) => a.size - b.size);
+  return [...sets[0]].filter((id) => sets.slice(1).every((s) => s.has(id)));
 }
 
 // ─── Scalar + category filter application (sync; no thenable trap) ──────
@@ -160,7 +171,12 @@ function applyScalarFilters(
   return q;
 }
 
-function applySingleDimEmbeddedFilter(q: any, themes: string[], formats: string[]): any {
+function applySingleDimEmbeddedFilter(
+  q: any,
+  themes: string[],
+  formats: string[],
+  mediums: string[]
+): any {
   if (themes.length > 0) {
     return q
       .eq("artwork_categories.category.kind", "theme")
@@ -170,6 +186,11 @@ function applySingleDimEmbeddedFilter(q: any, themes: string[], formats: string[
     return q
       .eq("artwork_categories.category.kind", "format")
       .in("artwork_categories.category.slug", formats);
+  }
+  if (mediums.length > 0) {
+    return q
+      .eq("artwork_categories.category.kind", "medium")
+      .in("artwork_categories.category.slug", mediums);
   }
   return q;
 }
@@ -232,12 +253,14 @@ export async function queryArtworks(
   const artistId = await resolveArtistId(supabase, state.artist);
   const themes = state.themes;
   const formats = state.formats;
-  const isOneDim = (themes.length > 0) !== (formats.length > 0);
-  const isTwoDim = themes.length > 0 && formats.length > 0;
+  const mediums = state.mediums;
+  const activeCatDims = [themes.length > 0, formats.length > 0, mediums.length > 0].filter(Boolean).length;
+  const isOneDim = activeCatDims === 1;
+  const isMultiDim = activeCatDims >= 2;
 
   let intersectedIds: string[] | null = null;
-  if (isTwoDim) {
-    intersectedIds = await categoryFilteredIds(supabase, themes, formats);
+  if (isMultiDim) {
+    intersectedIds = await categoryFilteredIds(supabase, themes, formats, mediums);
     if (intersectedIds.length === 0) return { artworks: [], total: 0 };
   }
 
@@ -246,8 +269,8 @@ export async function queryArtworks(
   q = applyScalarFilters(q, state, cohort, artistId, "none");
 
   if (isOneDim) {
-    q = applySingleDimEmbeddedFilter(q, themes, formats);
-  } else if (isTwoDim) {
+    q = applySingleDimEmbeddedFilter(q, themes, formats, mediums);
+  } else if (isMultiDim) {
     q = q.in("id", intersectedIds!);
   }
 
@@ -273,21 +296,23 @@ export async function getFacetCounts(
 ): Promise<FacetCounts> {
   const artistId = await resolveArtistId(supabase, state.artist);
 
-  const [themeIds, formatIds, decadeIds, artistIds] = await Promise.all([
+  const [themeIds, formatIds, mediumIds, decadeIds, artistIds] = await Promise.all([
     candidateIdsExcept(supabase, state, cohort, artistId, "themes"),
     candidateIdsExcept(supabase, state, cohort, artistId, "formats"),
+    candidateIdsExcept(supabase, state, cohort, artistId, "mediums"),
     candidateIdsExcept(supabase, state, cohort, artistId, "decades"),
     candidateIdsExcept(supabase, state, cohort, artistId, "artist"),
   ]);
 
-  const [themes, formats, decades, availableArtistSlugs] = await Promise.all([
+  const [themes, formats, mediums, decades, availableArtistSlugs] = await Promise.all([
     countCategoriesForIds(supabase, themeIds, "theme"),
     countCategoriesForIds(supabase, formatIds, "format"),
+    countCategoriesForIds(supabase, mediumIds, "medium"),
     countDecadesForIds(supabase, decadeIds),
     artistsForIds(supabase, artistIds),
   ]);
 
-  return { themes, formats, decades, availableArtistSlugs };
+  return { themes, formats, mediums, decades, availableArtistSlugs };
 }
 
 async function candidateIdsExcept(
@@ -299,24 +324,39 @@ async function candidateIdsExcept(
 ): Promise<Set<string>> {
   const themes = except === "themes" ? [] : state.themes;
   const formats = except === "formats" ? [] : state.formats;
-  const isOneDim = (themes.length > 0) !== (formats.length > 0);
-  const isTwoDim = themes.length > 0 && formats.length > 0;
+  const mediums = except === "mediums" ? [] : state.mediums;
+  const activeCatDims = [themes.length > 0, formats.length > 0, mediums.length > 0].filter(Boolean).length;
+  const isOneDim = activeCatDims === 1;
+  const isMultiDim = activeCatDims >= 2;
 
   let intersectedIds: string[] | null = null;
-  if (isTwoDim) {
-    intersectedIds = await categoryFilteredIds(supabase, themes, formats);
+  if (isMultiDim) {
+    intersectedIds = await categoryFilteredIds(supabase, themes, formats, mediums);
     if (intersectedIds.length === 0) return new Set();
   }
 
   const selectStr = buildSelect(isOneDim, "id");
 
+  // Multi-dim path: a stripped facet (e.g. formats∩mediums while computing
+  // the themes facet) can produce 700+ intersected IDs. Passing those through
+  // `.in("id", ids)` blows PostgREST's URL length limit, so for multi-dim we
+  // fetch candidates matching the scalar filters and intersect client-side
+  // — the same pattern as countCategoriesForIds / artistsForIds below.
+  if (isMultiDim) {
+    const intersectedSet = new Set(intersectedIds!);
+    const rows = await fetchAllRows<{ id: string }>(() => {
+      let q = supabase.from("artworks").select("id");
+      q = applyScalarFilters(q, state, cohort, artistId, except);
+      return q;
+    });
+    return new Set(rows.filter((r: any) => intersectedSet.has(r.id)).map((r: any) => r.id));
+  }
+
   const rows = await fetchAllRows<{ id: string }>(() => {
     let q = supabase.from("artworks").select(selectStr);
     q = applyScalarFilters(q, state, cohort, artistId, except);
     if (isOneDim) {
-      q = applySingleDimEmbeddedFilter(q, themes, formats);
-    } else if (isTwoDim) {
-      q = q.in("id", intersectedIds!);
+      q = applySingleDimEmbeddedFilter(q, themes, formats, mediums);
     }
     return q;
   });
@@ -333,7 +373,7 @@ async function candidateIdsExcept(
 async function countCategoriesForIds(
   supabase: SupabaseClient,
   candidateIds: Set<string>,
-  kind: "theme" | "format"
+  kind: "theme" | "format" | "medium"
 ): Promise<Record<string, number>> {
   if (candidateIds.size === 0) return {};
   const rows = await fetchAllRows<any>(() =>

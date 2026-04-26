@@ -50,6 +50,7 @@ export default async function EphemeraPage({ searchParams }: EphemeraPageProps) 
         cohort="ephemera"
         themeOptions={[]}
         formatOptions={[]}
+        mediumOptions={[]}
         decadeOptions={[]}
         artistOptions={artistOptions}
       />

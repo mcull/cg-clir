@@ -31,6 +31,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { normalizeThemes, VALID_THEMES } from "../src/lib/themes";
 import { slugify, parseNumeric } from "../src/lib/utils";
 import { dateToDecade } from "../src/lib/decades";
+import { mediumToBuckets, BucketMap } from "./lib/medium-buckets";
 
 // ─── Config ───────────────────────────────────────────────────────────────
 const TMP_DIR = path.join(__dirname, "..", "tmp");
@@ -71,6 +72,19 @@ const r2 = new S3Client({
   },
 });
 const anthropic = new Anthropic({ apiKey: ANTHROPIC_KEY });
+
+// Load the persisted medium bucket map (from the medium normalization workflow).
+const BUCKETS_FILE = path.join(__dirname, "data", "medium-buckets.json");
+let bucketMap: BucketMap = {};
+const bucketIdByName: Record<string, string> = {};
+if (fs.existsSync(BUCKETS_FILE)) {
+  const lookup = JSON.parse(fs.readFileSync(BUCKETS_FILE, "utf-8"));
+  if (!lookup.map || typeof lookup.map !== "object") {
+    console.warn(`WARNING: ${BUCKETS_FILE} is missing a 'map' key — medium attachments disabled.`);
+  } else {
+    bucketMap = lookup.map;
+  }
+}
 
 const CONCURRENCY = parseInt(process.env.CONCURRENCY || "3", 10);
 const PAGE_SIZE = 1000;
@@ -282,6 +296,21 @@ async function attachThemes(artworkId: string, themes: string[]): Promise<void> 
   }
 }
 
+async function attachMediums(artworkId: string, mediumStr: string | null): Promise<void> {
+  const buckets = mediumToBuckets(bucketMap, mediumStr);
+  if (buckets.length === 0) return;
+  const rows: { artwork_id: string; category_id: string }[] = [];
+  for (const b of buckets) {
+    const categoryId = bucketIdByName[b];
+    if (categoryId) rows.push({ artwork_id: artworkId, category_id: categoryId });
+  }
+  if (rows.length === 0) return;
+  const { error } = await supabase
+    .from("artwork_categories")
+    .upsert(rows, { onConflict: "artwork_id,category_id", ignoreDuplicates: true });
+  if (error) throw new Error(`Failed to attach mediums to artwork ${artworkId}: ${error.message}`);
+}
+
 const artistCache = new Map<string, string>(); // slug -> artist id
 const artistInflight = new Map<string, Promise<string>>();
 
@@ -366,6 +395,21 @@ async function main() {
     offset += PAGE_SIZE;
   }
   console.log(`Fetched ${dbSkuToId.size} DB artworks with SKUs`);
+
+  if (Object.keys(bucketMap).length > 0) {
+    const { data: mediumCats } = await supabase
+      .from("categories")
+      .select("id, name")
+      .eq("kind", "medium");
+    for (const c of mediumCats || []) bucketIdByName[c.name] = c.id;
+    console.log(`Loaded ${Object.keys(bucketIdByName).length} medium category IDs.`);
+    if (Object.keys(bucketIdByName).length === 0) {
+      console.warn(
+        "WARNING: bucket map exists but no kind='medium' categories in the DB. " +
+        "Run `npm run medium:apply -- <csv>` first or medium tags will be skipped."
+      );
+    }
+  }
 
   // 3. Load progress checkpoint
   const progress = loadProgress();
@@ -486,6 +530,7 @@ async function main() {
             log.ai_status = "skipped_no_image";
             // Continue to themes anyway — row exists with original URL
             await attachThemes(newId, themes);
+            await attachMediums(newId, insertPayload.medium);
             log.themes_attached = themes.join("; ");
             return;
           }
@@ -500,6 +545,7 @@ async function main() {
             log.image_status = `upload_failed: ${(err as Error).message}`;
             log.ai_status = "skipped_no_image";
             await attachThemes(newId, themes);
+            await attachMediums(newId, insertPayload.medium);
             log.themes_attached = themes.join("; ");
             return;
           }
@@ -528,6 +574,7 @@ async function main() {
         }
 
         await attachThemes(newId, themes);
+        await attachMediums(newId, insertPayload.medium);
         log.themes_attached = themes.join("; ");
       }
 

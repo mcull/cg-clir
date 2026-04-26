@@ -12,6 +12,7 @@ interface FilterBarProps {
   cohort: "artwork" | "ephemera";
   themeOptions: { value: string; label: string; count: number }[];
   formatOptions: { value: string; label: string; count: number }[];
+  mediumOptions: { value: string; label: string; count: number }[];
   decadeOptions: { value: string; label: string; count: number }[];
   artistOptions: { slug: string; name: string; available: boolean }[];
 }
@@ -25,6 +26,7 @@ export default function FilterBar({
   cohort,
   themeOptions,
   formatOptions,
+  mediumOptions,
   decadeOptions,
   artistOptions,
 }: FilterBarProps) {
@@ -56,6 +58,12 @@ export default function FilterBar({
     chips.push({
       label: formatOptions.find((o) => o.value === f)?.label || f,
       onRemove: () => navigate({ ...state, formats: state.formats.filter((x) => x !== f) }),
+    });
+  }
+  for (const m of state.mediums) {
+    chips.push({
+      label: mediumOptions.find((o) => o.value === m)?.label || m,
+      onRemove: () => navigate({ ...state, mediums: state.mediums.filter((x) => x !== m) }),
     });
   }
   for (const d of state.decades) {
@@ -106,6 +114,14 @@ export default function FilterBar({
             onChange={(formats) => navigate({ ...state, formats })}
           />
         )}
+        {isCollection && (
+          <MultiSelectDropdown
+            label="Medium"
+            options={mediumOptions}
+            selected={state.mediums}
+            onChange={(mediums) => navigate({ ...state, mediums })}
+          />
+        )}
         <ArtistTypeaheadDropdown
           artists={artistOptions}
           selected={state.artist}
@@ -131,7 +147,7 @@ export default function FilterBar({
 
       <ActiveFilterChips
         chips={chips}
-        onClearAll={() => navigate({ ...state, themes: [], formats: [], decades: [], artist: null })}
+        onClearAll={() => navigate({ ...state, themes: [], formats: [], mediums: [], decades: [], artist: null })}
       />
     </div>
   );
