@@ -218,8 +218,6 @@ async function main() {
               .from("artworks")
               .select("id, inventory_number, medium")
               .in("inventory_number", inventoryNumbers);
-            const idByInv = new Map<string, string>();
-            for (const a of artRows || []) idByInv.set(a.inventory_number, a.id);
 
             const acRows: { artwork_id: string; category_id: string }[] = [];
             const unknownInThisBatch = new Set<string>();
