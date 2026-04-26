@@ -156,21 +156,32 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Image */}
         <div className="lg:col-span-2">
-          <div className="bg-white aspect-square relative">
-            {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={altText}
-                fill
-                className="object-contain object-top"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
-                No image available
-              </div>
+          <figure>
+            <div className="bg-white aspect-square relative">
+              {imageUrl ? (
+                // When the figcaption is present it describes the image, so
+                // screen readers shouldn't double-announce — set alt="" and let
+                // the figure semantics carry the description. If no figcaption,
+                // fall back to the title+medium alt so SR users still get something.
+                <Image
+                  src={imageUrl}
+                  alt={artwork.alt_text ? "" : altText}
+                  fill
+                  className="object-contain object-top"
+                  priority
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  No image available
+                </div>
+              )}
+            </div>
+            {artwork.alt_text && (
+              <figcaption className="text-sm text-gray-600 italic mt-3">
+                {artwork.alt_text}
+              </figcaption>
             )}
-          </div>
+          </figure>
         </div>
 
         {/* Metadata */}
@@ -237,17 +248,12 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
               </div>
             )}
 
-            {showVisualDescription && (artwork.alt_text || artwork.alt_text_long) && (
+            {showVisualDescription && artwork.alt_text_long && (
               <div>
                 <dt className="text-sm font-semibold text-gray-600">
                   Visual description
                 </dt>
-                {artwork.alt_text && (
-                  <dd className="text-gray-900 italic mb-2">{artwork.alt_text}</dd>
-                )}
-                {artwork.alt_text_long && (
-                  <dd className="text-gray-900 leading-relaxed">{artwork.alt_text_long}</dd>
-                )}
+                <dd className="text-gray-900 leading-relaxed">{artwork.alt_text_long}</dd>
               </div>
             )}
           </div>
