@@ -135,6 +135,8 @@ async function categoryFilteredIds(
   if (mediums.length > 0) sets.push(mediumIds);
   if (sets.length === 0) return []; // shouldn't be called in this case
   if (sets.length === 1) return [...sets[0]];
+  // Iterate the smallest set; cost is O(|smallest| * (sets.length - 1)) lookups.
+  sets.sort((a, b) => a.size - b.size);
   return [...sets[0]].filter((id) => sets.slice(1).every((s) => s.has(id)));
 }
 
