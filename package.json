@@ -17,7 +17,9 @@
     "triage:report": "tsx --env-file=.env.local scripts/catalog-triage-report.ts",
     "backfill:decade": "tsx --env-file=.env.local scripts/backfill-decade.ts",
     "migrate:all": "tsx --env-file=.env.local scripts/migrate-and-describe.ts",
-    "db:migrate": "tsx scripts/run-migration.ts"
+    "db:migrate": "tsx scripts/run-migration.ts",
+    "medium:propose": "tsx --env-file=.env.local scripts/normalize-mediums-propose.ts",
+    "medium:apply": "tsx --env-file=.env.local scripts/normalize-mediums-apply.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1023.0",
