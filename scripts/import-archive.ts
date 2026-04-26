@@ -400,7 +400,8 @@ async function main() {
     const { data: mediumCats } = await supabase
       .from("categories")
       .select("id, name")
-      .eq("kind", "medium");
+      .eq("kind", "medium")
+      .limit(10000);
     for (const c of mediumCats || []) bucketIdByName[c.name] = c.id;
     console.log(`Loaded ${Object.keys(bucketIdByName).length} medium category IDs.`);
     if (Object.keys(bucketIdByName).length === 0) {
