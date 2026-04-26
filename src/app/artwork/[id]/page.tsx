@@ -156,7 +156,7 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
                   src={imageUrl}
                   alt={altText}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   priority
                 />
               ) : (
