@@ -123,6 +123,16 @@ async function main() {
   for (const c of upserted || []) bucketIdByName[c.name] = c.id;
   console.log(`  ${(upserted || []).length} bucket categories ensured`);
 
+  // Surface any bucket name that didn't land in the lookup (e.g. slug collision
+  // collapsed two names into one row, leaving the second name unresolved).
+  const missingBucketNames = bucketList.filter((name) => !bucketIdByName[name]);
+  if (missingBucketNames.length > 0) {
+    console.error(`\nERROR: ${missingBucketNames.length} bucket name(s) did not resolve to a category id:`);
+    missingBucketNames.forEach((n) => console.error(`  ${n} (slug: ${slugify(n)})`));
+    console.error("This usually means two bucket names slugify to the same value. Rename one in the CSV.");
+    process.exit(1);
+  }
+
   // 3. Page through artworks; diff and apply
   console.log("\nFetching all artworks with non-null medium...");
   const allArt: { id: string; medium: string }[] = [];
@@ -141,14 +151,25 @@ async function main() {
   }
   console.log(`Found ${allArt.length} artworks with medium`);
 
-  // Pre-fetch existing medium-category attachments per artwork (one query)
-  const { data: existingAcs, error: acErr } = await supabase
-    .from("artwork_categories")
-    .select("artwork_id, category:categories!inner(id, kind)")
-    .eq("category.kind", "medium");
-  if (acErr) { console.error(acErr); process.exit(1); }
+  // Pre-fetch existing medium-category attachments per artwork. Paginate
+  // through results — PostgREST caps responses at 1000 rows by default,
+  // and re-runs of this script can easily exceed that.
+  const existingAcs: { artwork_id: string; category: { id: string; kind: string } }[] = [];
+  let acOff = 0;
+  while (true) {
+    const { data, error } = await supabase
+      .from("artwork_categories")
+      .select("artwork_id, category:categories!inner(id, kind)")
+      .eq("category.kind", "medium")
+      .range(acOff, acOff + 999);
+    if (error) { console.error(error); process.exit(1); }
+    if (!data || data.length === 0) break;
+    existingAcs.push(...(data as any));
+    if (data.length < 1000) break;
+    acOff += 1000;
+  }
   const existingByArtwork = new Map<string, Set<string>>();
-  for (const ac of (existingAcs || []) as any[]) {
+  for (const ac of existingAcs) {
     if (!existingByArtwork.has(ac.artwork_id)) existingByArtwork.set(ac.artwork_id, new Set());
     existingByArtwork.get(ac.artwork_id)!.add(ac.category.id);
   }
@@ -196,6 +217,7 @@ async function main() {
 
     if (rowError) {
       errors++;
+      console.error(`  ERR ${art.id}: ${rowError}`);
       log.push({
         artwork_id: art.id,
         medium,
