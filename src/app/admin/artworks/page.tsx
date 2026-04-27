@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { formatArtistName } from "@/lib/utils";
+import { formatArtistName, resolveImageUrl } from "@/lib/utils";
 
 async function getArtworks(): Promise<any[]> {
   const supabase = createServerSupabaseClient();
@@ -79,13 +79,15 @@ export default async function AdminArtworksPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {artworks.map((artwork) => (
+              {artworks.map((artwork) => {
+                const imageUrl = resolveImageUrl(artwork);
+                return (
                 <tr key={artwork.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
-                    {artwork.image_url && (
+                    {imageUrl && (
                       <div className="relative w-12 h-12">
                         <Image
-                          src={artwork.image_url}
+                          src={imageUrl}
                           alt={artwork.title}
                           fill
                           className="object-cover rounded"
@@ -135,7 +137,8 @@ export default async function AdminArtworksPage() {
                     </Link>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
