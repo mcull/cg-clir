@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -75,6 +74,7 @@ async function getArtistArtworks(
 
 interface ArtworkPageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ params }: ArtworkPageProps) {
@@ -109,13 +109,19 @@ export async function generateMetadata({ params }: ArtworkPageProps) {
   };
 }
 
-export default async function ArtworkPage({ params }: ArtworkPageProps) {
+export default async function ArtworkPage({ params, searchParams }: ArtworkPageProps) {
   const { id } = await params;
+  const sp = await searchParams;
+  const showAi = sp.ai === "1" || sp.ai === "true";
   const artwork = await getArtwork(id);
 
   if (!artwork) {
     notFound();
   }
+
+  const showVisualDescription =
+    artwork.description_origin === "human" ||
+    (showAi && artwork.description_origin === "ai");
 
   const more = artwork.artist_id
     ? await getArtistArtworks(artwork.artist_id, artwork.id)
@@ -150,23 +156,27 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
         {/* Image */}
         <div className="lg:col-span-2">
           <figure>
-            <div className="bg-gray-100 aspect-square relative mb-3">
-              {imageUrl ? (
-                <Image
-                  src={imageUrl}
-                  alt={altText}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  No image available
-                </div>
-              )}
-            </div>
+            {imageUrl ? (
+              // Plain <img> instead of next/image so we don't need to ship pixel
+              // dimensions for every artwork — the image renders at its intrinsic
+              // size (capped by max-w/max-h), and the figcaption tucks directly
+              // beneath it, regardless of aspect ratio. When the figcaption is
+              // present it describes the image, so screen readers shouldn't
+              // double-announce — set alt="" and let the figure semantics carry
+              // the description. If no figcaption, fall back to title+medium.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imageUrl}
+                alt={artwork.alt_text ? "" : altText}
+                className="block max-w-full max-h-[85vh]"
+              />
+            ) : (
+              <div className="bg-white aspect-square flex items-center justify-center text-gray-400">
+                No image available
+              </div>
+            )}
             {artwork.alt_text && (
-              <figcaption className="text-sm text-gray-600 italic">
+              <figcaption className="text-sm text-gray-600 italic mt-3">
                 {artwork.alt_text}
               </figcaption>
             )}
@@ -237,14 +247,12 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
               </div>
             )}
 
-            {artwork.description_origin === "human" && artwork.alt_text_long && (
+            {showVisualDescription && artwork.alt_text_long && (
               <div>
                 <dt className="text-sm font-semibold text-gray-600">
                   Visual description
                 </dt>
-                <dd className="text-gray-900 leading-relaxed">
-                  {artwork.alt_text_long}
-                </dd>
+                <dd className="text-gray-900 leading-relaxed">{artwork.alt_text_long}</dd>
               </div>
             )}
           </div>
