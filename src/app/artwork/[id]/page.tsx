@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -157,25 +156,25 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
         {/* Image */}
         <div className="lg:col-span-2">
           <figure>
-            <div className="bg-white aspect-square relative">
-              {imageUrl ? (
-                // When the figcaption is present it describes the image, so
-                // screen readers shouldn't double-announce — set alt="" and let
-                // the figure semantics carry the description. If no figcaption,
-                // fall back to the title+medium alt so SR users still get something.
-                <Image
-                  src={imageUrl}
-                  alt={artwork.alt_text ? "" : altText}
-                  fill
-                  className="object-contain object-top"
-                  priority
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  No image available
-                </div>
-              )}
-            </div>
+            {imageUrl ? (
+              // Plain <img> instead of next/image so we don't need to ship pixel
+              // dimensions for every artwork — the image renders at its intrinsic
+              // size (capped by max-w/max-h), and the figcaption tucks directly
+              // beneath it, regardless of aspect ratio. When the figcaption is
+              // present it describes the image, so screen readers shouldn't
+              // double-announce — set alt="" and let the figure semantics carry
+              // the description. If no figcaption, fall back to title+medium.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imageUrl}
+                alt={artwork.alt_text ? "" : altText}
+                className="block max-w-full max-h-[85vh]"
+              />
+            ) : (
+              <div className="bg-white aspect-square flex items-center justify-center text-gray-400">
+                No image available
+              </div>
+            )}
             {artwork.alt_text && (
               <figcaption className="text-sm text-gray-600 italic mt-3">
                 {artwork.alt_text}
