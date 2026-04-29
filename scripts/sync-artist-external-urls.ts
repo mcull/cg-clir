@@ -13,10 +13,16 @@
  * ALTER TABLE artists ADD COLUMN external_url TEXT;).
  */
 
+import fs from "fs";
+import path from "path";
 import { createClient } from "@supabase/supabase-js";
 
 const SITEMAP_URL = "https://creativegrowth.org/sitemap.xml";
 const ARTIST_URL_RE = /<loc>(https:\/\/www\.creativegrowth\.org\/artist\/[^<]+)<\/loc>/g;
+// Snapshot lives under src/ so the admin Edit Artist page can import it
+// directly via the @/ alias. Both this script and the page read/write
+// the same source-controlled file.
+const SNAPSHOT_FILE = path.join(__dirname, "..", "src", "lib", "data", "cg-artist-urls.json");
 
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -61,6 +67,18 @@ async function main() {
     if (slug) urlBySlug.set(slug, url);
   }
   console.log(`Found ${urlBySlug.size} artist URLs in sitemap`);
+
+  // Write source-controlled snapshot consumed by the admin URL picker.
+  // Stored as a sorted slug list for stable diffs.
+  const dataDir = path.dirname(SNAPSHOT_FILE);
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+  const snapshot = {
+    fetched_at: new Date().toISOString(),
+    source: SITEMAP_URL,
+    slugs: [...urlBySlug.keys()].sort(),
+  };
+  fs.writeFileSync(SNAPSHOT_FILE, JSON.stringify(snapshot, null, 2) + "\n");
+  console.log(`Snapshot written: ${SNAPSHOT_FILE}`);
 
   const artists = await fetchAll<{ id: string; first_name: string; last_name: string; slug: string }>(
     () => supabase.from("artists").select("id, first_name, last_name, slug")
