@@ -152,10 +152,16 @@ function applyScalarFilters(
   q = applyCohort(q, cohort);
 
   if (except !== "q" && state.q) {
-    const safe = state.q.replace(/[&|!()<>:*]/g, " ").trim();
+    // Strip tsquery operators and the comma we use as the .or()
+    // clause separator below.
+    const safe = state.q.replace(/[&|!()<>:*,]/g, " ").trim();
     if (safe) {
       const tsq = safe.split(/\s+/).join(" & ");
-      q = q.textSearch("fts", tsq);
+      // Match either the FTS index (title / medium / alt_text /
+      // alt_text_long) OR an SKU substring. SKU isn't in the
+      // tsvector and visitors often paste "NS 399"-style codes
+      // straight into the search box.
+      q = q.or(`fts.fts.${tsq},sku.ilike.%${safe}%`);
     }
   }
   if (except !== "decades" && state.decades.length) {
