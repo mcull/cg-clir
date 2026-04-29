@@ -31,11 +31,6 @@ export default function Footer() {
                   View Collection
                 </a>
               </li>
-              <li>
-                <a href="/artists" className="text-blue-600 hover:text-blue-800">
-                  Browse Artists
-                </a>
-              </li>
             </ul>
           </div>
 

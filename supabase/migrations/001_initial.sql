@@ -11,6 +11,12 @@ CREATE TABLE artists (
   last_name     TEXT NOT NULL,
   slug          TEXT UNIQUE NOT NULL,
   bio           TEXT,
+  -- Optional override URL for the artist's official page on
+  -- creativegrowth.org. Populated by scripts/sync-artist-external-urls.ts
+  -- which matches our slugs against the public sitemap. When set, the
+  -- artwork detail page links here (new tab) instead of the internal
+  -- /artists/{slug} page.
+  external_url  TEXT,
   created_at    TIMESTAMPTZ DEFAULT now(),
   updated_at    TIMESTAMPTZ DEFAULT now()
 );
