@@ -123,15 +123,20 @@ export default function EditArtworkPage() {
         alt_text: formData.alt_text || null,
         alt_text_long: formData.alt_text_long || null,
         on_website: formData.on_website,
-        updated_at: new Date().toISOString(),
       };
 
-      const { error: updateError } = await supabase
-        .from("artworks")
-        .update(updateData)
-        .eq("id", artworkId);
-
-      if (updateError) throw updateError;
+      // Route through the admin API (service-role) so RLS doesn't
+      // silently drop the write — the browser anon-key client lacks
+      // write permission against the artworks table.
+      const resp = await fetch(`/api/admin/artworks/${artworkId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData),
+      });
+      if (!resp.ok) {
+        const json = await resp.json().catch(() => ({}));
+        throw new Error(json.error || `Save failed: ${resp.status}`);
+      }
 
       // Stay on the page; flash a success banner that auto-clears.
       setSavedAt(Date.now());
