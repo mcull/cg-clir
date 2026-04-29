@@ -23,6 +23,7 @@ export default function EditArtworkPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -122,17 +123,26 @@ export default function EditArtworkPage() {
         alt_text: formData.alt_text || null,
         alt_text_long: formData.alt_text_long || null,
         on_website: formData.on_website,
-        updated_at: new Date().toISOString(),
       };
 
-      const { error: updateError } = await supabase
-        .from("artworks")
-        .update(updateData)
-        .eq("id", artworkId);
+      // Route through the admin API (service-role) so RLS doesn't
+      // silently drop the write — the browser anon-key client lacks
+      // write permission against the artworks table.
+      const resp = await fetch(`/api/admin/artworks/${artworkId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData),
+      });
+      if (!resp.ok) {
+        const json = await resp.json().catch(() => ({}));
+        throw new Error(json.error || `Save failed: ${resp.status}`);
+      }
 
-      if (updateError) throw updateError;
-
-      router.push("/admin/artworks");
+      // Stay on the page; flash a success banner that auto-clears.
+      setSavedAt(Date.now());
+      setTimeout(() => {
+        setSavedAt((current) => (current && Date.now() - current >= 3000 ? null : current));
+      }, 3100);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error saving artwork");
     } finally {
@@ -218,6 +228,12 @@ export default function EditArtworkPage() {
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-red-800">
             {error}
+          </div>
+        )}
+
+        {savedAt && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded text-green-800">
+            Saved.
           </div>
         )}
 

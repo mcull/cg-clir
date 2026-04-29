@@ -50,6 +50,7 @@ export default function EditArtistPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -123,20 +124,28 @@ export default function EditArtistPage() {
       setSaving(true);
       setError(null);
 
-      const { error: updateError } = await supabase
-        .from("artists")
-        .update({
+      // Route through the admin API (service-role) so RLS doesn't
+      // silently drop the write.
+      const resp = await fetch(`/api/admin/artists/${artistId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           first_name: formData.first_name,
           last_name: formData.last_name,
           bio: formData.bio || null,
           external_url: formData.external_url || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", artistId);
+        }),
+      });
+      if (!resp.ok) {
+        const json = await resp.json().catch(() => ({}));
+        throw new Error(json.error || `Save failed: ${resp.status}`);
+      }
 
-      if (updateError) throw updateError;
-
-      router.push("/admin/artists");
+      // Stay on the page; flash a success banner that auto-clears.
+      setSavedAt(Date.now());
+      setTimeout(() => {
+        setSavedAt((current) => (current && Date.now() - current >= 3000 ? null : current));
+      }, 3100);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error saving artist");
     } finally {
@@ -162,6 +171,12 @@ export default function EditArtistPage() {
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-red-800">
             {error}
+          </div>
+        )}
+
+        {savedAt && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded text-green-800">
+            Saved.
           </div>
         )}
 

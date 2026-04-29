@@ -272,7 +272,9 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                   </dd>
                 )}
                 {artwork.alt_text_long && (
-                  <dd className="text-gray-900 leading-relaxed">{artwork.alt_text_long}</dd>
+                  <dd className="text-gray-900 leading-relaxed max-h-72 overflow-y-auto pr-2">
+                    {artwork.alt_text_long}
+                  </dd>
                 )}
               </div>
             )}
