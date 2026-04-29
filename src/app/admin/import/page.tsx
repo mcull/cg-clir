@@ -131,28 +131,39 @@ export default function ImportPage() {
           </button>
         </div>
 
-        {/* Import */}
-        <div className="bg-white rounded-lg shadow p-8">
+        {/* Import (disabled) */}
+        <div className="bg-white rounded-lg shadow p-8 opacity-75">
           <h2 className="text-xl font-bold text-gray-900 mb-4">
             Import Collection
           </h2>
           <p className="text-gray-600 mb-6">
-            Use the import script to add artworks in bulk. See documentation for
-            CSV format and usage instructions.
+            Upload a CSV to bulk-create or update artworks. The expected
+            columns mirror the existing Art Cloud export: Title, Artist First
+            Name, Artist Last Name, Date Created, Medium, Height, Width, Depth,
+            Inventory Number, Tags, and On Website.
           </p>
 
-          <p className="text-gray-600 mb-4">
-            Run the import script from your terminal:
-          </p>
+          <div className="border-2 border-dashed border-gray-300 rounded p-6 text-center text-sm text-gray-500 mb-4">
+            <p className="font-semibold mb-1">Browser-based import is disabled.</p>
+            <p>
+              A bulk write through this form would touch every artwork row;
+              we&apos;re holding it until role-based access controls land on
+              the admin so the action is appropriately gated.
+            </p>
+          </div>
 
-          <code className="block bg-gray-100 p-3 rounded text-sm mb-6 text-gray-900">
-            npm run import:csv
-          </code>
+          <button
+            type="button"
+            disabled
+            className="button-primary opacity-50 cursor-not-allowed"
+            title="Disabled until RBAC is in place"
+          >
+            Choose CSV…
+          </button>
 
-          <p className="text-sm text-gray-600">
-            CSV files should include: Title, Artist First Name, Artist Last
-            Name, Date Created, Medium, Height, Width, Depth, Inventory Number,
-            Tags, and On Website columns.
+          <p className="text-xs text-gray-500 mt-4">
+            In the meantime, run the script from a terminal:{" "}
+            <code className="bg-gray-100 px-1 rounded">npm run import:csv</code>
           </p>
         </div>
       </div>
