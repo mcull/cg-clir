@@ -12,7 +12,7 @@ async function getArtwork(
   id: string
 ): Promise<
   (Artwork & {
-    artist?: { id: string; first_name: string; last_name: string; slug: string };
+    artist?: { id: string; first_name: string; last_name: string; slug: string; external_url: string | null };
     categories?: any[];
   })
   | null
@@ -24,7 +24,7 @@ async function getArtwork(
     .select(
       `
       *,
-      artist:artists(id, first_name, last_name, slug),
+      artist:artists(id, first_name, last_name, slug, external_url),
       categories:artwork_categories(category:categories(id, name, slug, kind))
       `
     )
@@ -191,12 +191,23 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
 
           {artwork.artist && (
             <div className="mb-6">
-              <Link
-                href={`/artists/${artwork.artist.slug}`}
-                className="link-primary text-lg"
-              >
-                {artistName}
-              </Link>
+              {artwork.artist.external_url ? (
+                <a
+                  href={artwork.artist.external_url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="link-primary text-lg"
+                >
+                  {artistName}
+                </a>
+              ) : (
+                <Link
+                  href={`/artists/${artwork.artist.slug}`}
+                  className="link-primary text-lg"
+                >
+                  {artistName}
+                </Link>
+              )}
             </div>
           )}
 
