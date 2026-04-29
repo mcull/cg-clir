@@ -1,0 +1,97 @@
+/* CG Footer — minimal styles to match creativegrowth.org */
+
+.cg-footer-wrapper {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Override Tailwind preflight resets inside the CG footer */
+.cg-footer-wrapper a,
+.cg-footer-wrapper span,
+.cg-footer-wrapper div,
+.cg-footer-wrapper p,
+.cg-footer-wrapper h1,
+.cg-footer-wrapper h2,
+.cg-footer-wrapper h3,
+.cg-footer-wrapper h4,
+.cg-footer-wrapper h5,
+.cg-footer-wrapper h6,
+.cg-footer-wrapper button,
+.cg-footer-wrapper input {
+  font-family: inherit;
+}
+
+.cg-footer-wrapper * {
+  box-sizing: border-box;
+}
+
+/* Show desktop footer above 768px, mobile below */
+.cg-footer-wrapper .foot--whitelabel--mobile,
+.cg-footer-wrapper .foot--whitelabel--copyright--mobile {
+  display: none;
+}
+@media (max-width: 768px) {
+  .cg-footer-wrapper .foot--whitelabel--desktop,
+  .cg-footer-wrapper .foot--whitelabel--copyright--desktop {
+    display: none;
+  }
+  .cg-footer-wrapper .foot--whitelabel--mobile,
+  .cg-footer-wrapper .foot--whitelabel--copyright--mobile {
+    display: block;
+  }
+}
+
+/* The mailing-list signup form posts to CG's backend — non-functional
+ * here. Hide the form fields, the SUBSCRIBE button, and the reCAPTCHA
+ * notice so the footer doesn't dangle a broken interaction. Address,
+ * contact, hours, social, and donate stay visible. */
+.cg-footer-wrapper .input--whitelabel,
+.cg-footer-wrapper .form__btn,
+.cg-footer-wrapper .form__captcha,
+.cg-footer-wrapper .form__captcha--text,
+.cg-footer-wrapper [class*="recaptcha"] {
+  display: none !important;
+}
+
+/* Donate / external links — keep clickable, no underline */
+.cg-footer-wrapper a {
+  text-decoration: none;
+  color: inherit;
+}
+.cg-footer-wrapper a:hover {
+  text-decoration: underline;
+}
+
+/* Social icon links — basic spacing */
+.cg-footer-wrapper .cell--social {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.cg-footer-wrapper .social__anch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+/* Make the donate button visually distinguishable when the original
+ * btn--whitelabel styles aren't loaded. */
+.cg-footer-wrapper .btn--whitelabel {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #198639;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  font-size: 14px;
+}
+.cg-footer-wrapper .btn--whitelabel:hover {
+  background-color: #0f6128;
+  text-decoration: none;
+}
