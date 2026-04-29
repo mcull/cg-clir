@@ -4,51 +4,102 @@ import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { formatArtistName, resolveImageUrl } from "@/lib/utils";
 
-async function getArtworks(): Promise<any[]> {
-  const supabase = createServerSupabaseClient();
+const PAGE_LIMIT = 100;
 
-  const { data, error } = await supabase
+async function getArtworks(query: string): Promise<{ rows: any[]; truncated: boolean }> {
+  const supabase = createServerSupabaseClient();
+  const q = query.trim();
+
+  // For artist-name matches we need to pre-resolve artist IDs because
+  // PostgREST can't .ilike across an embedded relation in a single .or().
+  let matchingArtistIds: string[] = [];
+  if (q) {
+    const { data: artistRows } = await supabase
+      .from("artists")
+      .select("id")
+      .or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%`);
+    matchingArtistIds = (artistRows || []).map((a: any) => a.id);
+  }
+
+  let builder = supabase
     .from("artworks")
     .select(
       `
       id,
       title,
+      sku,
       image_url,
       medium,
       on_website,
       artist:artists(id, first_name, last_name),
       categories:artwork_categories(category:categories(id, name))
       `
-    )
+    );
+
+  if (q) {
+    const orClauses = [`title.ilike.%${q}%`, `sku.ilike.%${q}%`];
+    if (matchingArtistIds.length > 0) {
+      orClauses.push(`artist_id.in.(${matchingArtistIds.join(",")})`);
+    }
+    builder = builder.or(orClauses.join(","));
+  }
+
+  // Fetch one extra row to detect whether the result was truncated.
+  const { data, error } = await builder
     .order("sort_order", { ascending: true })
-    .limit(50);
+    .limit(PAGE_LIMIT + 1);
 
   if (error) {
     console.error("Error fetching artworks:", error);
-    return [];
+    return { rows: [], truncated: false };
   }
-
-  return data || [];
+  const all = data || [];
+  return { rows: all.slice(0, PAGE_LIMIT), truncated: all.length > PAGE_LIMIT };
 }
 
 export const metadata = {
   title: "Artworks | Admin | Creative Growth Gallery",
 };
 
-export default async function AdminArtworksPage() {
-  const artworks = await getArtworks();
+interface PageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function AdminArtworksPage({ searchParams }: PageProps) {
+  const { q = "" } = await searchParams;
+  const { rows: artworks, truncated } = await getArtworks(q);
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Artworks</h1>
-        <Link
-          href="/admin/artworks/new"
-          className="button-primary"
-        >
+        <Link href="/admin/artworks/new" className="button-primary">
           Add Artwork
         </Link>
       </div>
+
+      <form method="get" className="mb-6 flex items-center gap-3">
+        <input
+          type="text"
+          name="q"
+          defaultValue={q}
+          placeholder="Search by SKU, title, or artist name…"
+          className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button type="submit" className="button-secondary">Search</button>
+        {q && (
+          <Link href="/admin/artworks" className="text-sm text-gray-600 hover:text-gray-900">
+            Clear
+          </Link>
+        )}
+      </form>
+
+      {q && (
+        <p className="text-sm text-gray-600 mb-4">
+          {artworks.length} {artworks.length === 1 ? "match" : "matches"} for &ldquo;{q}&rdquo;
+          {truncated && ` (showing first ${PAGE_LIMIT} — refine your search to narrow further)`}
+        </p>
+      )}
 
       {artworks.length > 0 ? (
         <div className="bg-white rounded-lg shadow overflow-x-auto">
@@ -57,6 +108,9 @@ export default async function AdminArtworksPage() {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                   Image
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                  SKU
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                   Title
@@ -95,6 +149,9 @@ export default async function AdminArtworksPage() {
                         />
                       </div>
                     )}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600 font-mono">
+                    {artwork.sku || "—"}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">
                     {artwork.title}
@@ -144,10 +201,14 @@ export default async function AdminArtworksPage() {
         </div>
       ) : (
         <div className="text-center py-12 bg-white rounded-lg">
-          <p className="text-gray-600 mb-4">No artworks yet.</p>
-          <Link href="/admin/artworks/new" className="text-blue-600">
-            Create the first artwork
-          </Link>
+          <p className="text-gray-600 mb-4">
+            {q ? `No artworks match “${q}”.` : "No artworks yet."}
+          </p>
+          {!q && (
+            <Link href="/admin/artworks/new" className="text-blue-600">
+              Create the first artwork
+            </Link>
+          )}
         </div>
       )}
     </div>

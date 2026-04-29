@@ -23,6 +23,7 @@ export default function EditArtworkPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -132,7 +133,11 @@ export default function EditArtworkPage() {
 
       if (updateError) throw updateError;
 
-      router.push("/admin/artworks");
+      // Stay on the page; flash a success banner that auto-clears.
+      setSavedAt(Date.now());
+      setTimeout(() => {
+        setSavedAt((current) => (current && Date.now() - current >= 3000 ? null : current));
+      }, 3100);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error saving artwork");
     } finally {
@@ -218,6 +223,12 @@ export default function EditArtworkPage() {
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-red-800">
             {error}
+          </div>
+        )}
+
+        {savedAt && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded text-green-800">
+            Saved.
           </div>
         )}
 
