@@ -57,6 +57,12 @@ CREATE TABLE artworks (
   alt_text          TEXT,
   alt_text_long     TEXT,
   description_origin TEXT CHECK (description_origin IN ('human', 'ai')),
+
+  -- Audio description. audio_url is an R2-hosted MP3 of someone reading
+  -- alt_text_long aloud. audio_origin tracks whether the recording is
+  -- human-narrated or TTS-generated from the text.
+  audio_url         TEXT,
+  audio_origin      TEXT CHECK (audio_origin IN ('human', 'tts')),
   sku               TEXT,
   decade            TEXT,
 
