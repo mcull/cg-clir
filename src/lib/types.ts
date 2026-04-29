@@ -38,6 +38,8 @@ export interface Artwork {
   alt_text: string | null;
   alt_text_long: string | null;
   description_origin: "human" | "ai" | null;
+  audio_url: string | null;
+  audio_origin: "human" | "tts" | null;
   tags: string[] | null;
   genre: string | null;
   notes: string | null;

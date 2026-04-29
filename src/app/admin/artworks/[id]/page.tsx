@@ -38,6 +38,13 @@ export default function EditArtworkPage() {
     on_website: true,
   });
 
+  // Audio state lives outside formData because the upload/transcribe/TTS
+  // actions persist immediately (no Save Changes round-trip needed). We
+  // mirror the latest values onto the artwork object so the player and
+  // status text re-render.
+  const [audioBusy, setAudioBusy] = useState<null | "upload" | "transcribe" | "tts">(null);
+  const [audioMessage, setAudioMessage] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -132,6 +139,66 @@ export default function EditArtworkPage() {
       setSaving(false);
     }
   };
+
+  async function handleAudioUpload(file: File) {
+    setAudioBusy("upload");
+    setAudioMessage(null);
+    try {
+      const fd = new FormData();
+      fd.append("artworkId", artworkId);
+      fd.append("file", file);
+      const resp = await fetch("/api/admin/audio/upload", { method: "POST", body: fd });
+      const json = await resp.json();
+      if (!resp.ok) throw new Error(json.error || `Upload failed: ${resp.status}`);
+      setArtwork((a) => (a ? { ...a, audio_url: json.audio_url, audio_origin: json.audio_origin } : a));
+      setAudioMessage("Audio uploaded.");
+    } catch (err) {
+      setAudioMessage(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setAudioBusy(null);
+    }
+  }
+
+  async function handleTranscribe() {
+    setAudioBusy("transcribe");
+    setAudioMessage(null);
+    try {
+      const resp = await fetch("/api/admin/audio/transcribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artworkId }),
+      });
+      const json = await resp.json();
+      if (!resp.ok) throw new Error(json.error || `Transcribe failed: ${resp.status}`);
+      setFormData((p) => ({ ...p, alt_text_long: json.alt_text_long }));
+      setArtwork((a) => (a ? { ...a, alt_text_long: json.alt_text_long, description_origin: "human" } : a));
+      setAudioMessage("Transcript saved to long alt text.");
+    } catch (err) {
+      setAudioMessage(err instanceof Error ? err.message : "Transcription failed");
+    } finally {
+      setAudioBusy(null);
+    }
+  }
+
+  async function handleGenerateTts() {
+    setAudioBusy("tts");
+    setAudioMessage(null);
+    try {
+      const resp = await fetch("/api/admin/audio/generate-tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artworkId }),
+      });
+      const json = await resp.json();
+      if (!resp.ok) throw new Error(json.error || `TTS failed: ${resp.status}`);
+      setArtwork((a) => (a ? { ...a, audio_url: json.audio_url, audio_origin: json.audio_origin } : a));
+      setAudioMessage("Generated audio with ElevenLabs.");
+    } catch (err) {
+      setAudioMessage(err instanceof Error ? err.message : "TTS failed");
+    } finally {
+      setAudioBusy(null);
+    }
+  }
 
   if (loading) {
     return <div className="text-center py-12">Loading...</div>;
@@ -319,6 +386,79 @@ export default function EditArtworkPage() {
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+        </div>
+
+        {/* Audio description */}
+        <div className="mb-6 p-4 border border-gray-200 rounded bg-gray-50">
+          <label className="block text-sm font-bold text-gray-700 mb-2">
+            Audio description
+          </label>
+          <p className="text-xs text-gray-600 mb-3">
+            Audio is the read-aloud version of the long alt text. The two
+            stay in sync via the Transcribe and Generate buttons below.
+          </p>
+
+          {artwork.audio_url ? (
+            <div className="mb-3">
+              <audio controls preload="metadata" className="w-full" src={artwork.audio_url} />
+              <p className="text-xs text-gray-600 mt-1">
+                Source:{" "}
+                <span className="font-mono">
+                  {artwork.audio_origin || "(no origin recorded)"}
+                </span>
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 italic mb-3">No audio uploaded.</p>
+          )}
+
+          <div className="space-y-3">
+            <div>
+              <label htmlFor="audio_file" className="block text-xs font-semibold text-gray-700 mb-1">
+                Upload MP3 (replaces existing audio, marks as human-recorded)
+              </label>
+              <input
+                id="audio_file"
+                type="file"
+                accept="audio/*"
+                disabled={audioBusy !== null}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleAudioUpload(f);
+                  e.target.value = ""; // allow re-uploading the same filename
+                }}
+                className="block text-sm"
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={audioBusy !== null || !artwork.audio_url}
+                onClick={handleTranscribe}
+                className="button-secondary text-sm disabled:opacity-50"
+                title={!artwork.audio_url ? "Upload audio first" : "Transcribe audio → long alt text"}
+              >
+                {audioBusy === "transcribe" ? "Transcribing…" : "Transcribe audio → text"}
+              </button>
+              <button
+                type="button"
+                disabled={audioBusy !== null || !formData.alt_text_long}
+                onClick={handleGenerateTts}
+                className="button-secondary text-sm disabled:opacity-50"
+                title={!formData.alt_text_long ? "Long alt text is empty" : "Generate audio from long alt text via ElevenLabs"}
+              >
+                {audioBusy === "tts" ? "Generating…" : "Generate audio from text (ElevenLabs)"}
+              </button>
+            </div>
+
+            {audioBusy === "upload" && (
+              <p className="text-sm text-gray-600">Uploading…</p>
+            )}
+            {audioMessage && (
+              <p className="text-sm text-gray-700">{audioMessage}</p>
+            )}
+          </div>
         </div>
 
         {/* Short alt text - grid page */}
