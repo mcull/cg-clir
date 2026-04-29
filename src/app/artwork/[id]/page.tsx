@@ -258,26 +258,22 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
               </div>
             )}
 
-            {artwork.audio_url && (
+            {showVisualDescription && (artwork.audio_url || artwork.alt_text_long) && (
               <div>
                 <dt className="text-sm font-semibold text-gray-600 mb-2">
-                  Audio description
-                </dt>
-                <dd>
-                  <audio controls preload="metadata" className="w-full">
-                    <source src={artwork.audio_url} type="audio/mpeg" />
-                    Your browser does not support the audio element.
-                  </audio>
-                </dd>
-              </div>
-            )}
-
-            {showVisualDescription && artwork.alt_text_long && (
-              <div>
-                <dt className="text-sm font-semibold text-gray-600">
                   Visual description
                 </dt>
-                <dd className="text-gray-900 leading-relaxed">{artwork.alt_text_long}</dd>
+                {artwork.audio_url && (
+                  <dd className="mb-3">
+                    <audio controls preload="metadata" className="w-full">
+                      <source src={artwork.audio_url} type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </dd>
+                )}
+                {artwork.alt_text_long && (
+                  <dd className="text-gray-900 leading-relaxed">{artwork.alt_text_long}</dd>
+                )}
               </div>
             )}
           </div>
