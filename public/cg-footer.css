@@ -3,6 +3,11 @@
 .cg-footer-wrapper {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   -webkit-font-smoothing: antialiased;
+  color: #000;
+}
+
+.cg-footer-wrapper * {
+  box-sizing: border-box;
 }
 
 /* Override Tailwind preflight resets inside the CG footer */
@@ -21,8 +26,16 @@
   font-family: inherit;
 }
 
-.cg-footer-wrapper * {
-  box-sizing: border-box;
+.cg-footer-wrapper button,
+.cg-footer-wrapper input {
+  font-size: inherit;
+  color: inherit;
+}
+
+.cg-footer-wrapper img {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
 }
 
 /* Show desktop footer above 768px, mobile below */
@@ -41,49 +54,18 @@
   }
 }
 
-/* The mailing-list signup form posts to CG's backend — non-functional
- * here. Hide the form fields, the SUBSCRIBE button, and the reCAPTCHA
- * notice so the footer doesn't dangle a broken interaction. Address,
- * contact, hours, social, and donate stay visible. */
-.cg-footer-wrapper .input--whitelabel,
-.cg-footer-wrapper .form__btn,
-.cg-footer-wrapper .form__captcha,
-.cg-footer-wrapper .form__captcha--text,
-.cg-footer-wrapper [class*="recaptcha"] {
-  display: none !important;
-}
-
-/* Donate / external links — keep clickable, no underline */
+/* Generic links: keep the green CG accent for inline contact links */
 .cg-footer-wrapper a {
   text-decoration: none;
   color: inherit;
 }
-.cg-footer-wrapper a:hover {
-  text-decoration: underline;
-}
 
-/* Social icon links — basic spacing */
-.cg-footer-wrapper .cell--social {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.cg-footer-wrapper .social__anch {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-}
-
-/* Make the donate button visually distinguishable when the original
- * btn--whitelabel styles aren't loaded. */
+/* Donate button — solid green pill, matches CG */
 .cg-footer-wrapper .btn--whitelabel {
   display: inline-block;
-  padding: 12px 24px;
-  background-color: #198639;
-  color: #fff;
+  padding: 18px 32px;
+  background-color: #2c8b3d;
+  color: #fff !important;
   border: none;
   cursor: pointer;
   text-transform: uppercase;
@@ -92,6 +74,126 @@
   font-size: 14px;
 }
 .cg-footer-wrapper .btn--whitelabel:hover {
-  background-color: #0f6128;
+  background-color: #1f6c2c;
   text-decoration: none;
+}
+
+/* Mailing list form — visual parity with CG (submit is a no-op since
+ * the form posts to CG's backend). The CG markup actually emits a
+ * .input__placeholder div ABOVE each <input> as a label-like overlay
+ * (their site uses JS to float it over the input on focus). Without
+ * that JS we'd render two boxes per field, so hide the actual inputs
+ * and let the placeholder divs serve as the visible "fields". */
+.cg-footer-wrapper .input--whitelabel {
+  display: block;
+}
+.cg-footer-wrapper .input--whitelabel input {
+  display: none !important;
+}
+.cg-footer-wrapper .input__placeholder {
+  display: block;
+  padding: 14px 18px;
+  border: 2px solid #000;
+  font-size: 14px;
+  color: #000;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  pointer-events: none;
+  background: transparent;
+}
+
+/* SUBSCRIBE button — black bar matching CG */
+.cg-footer-wrapper .form__btn,
+.cg-footer-wrapper .input--whitelabel button[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 18px;
+  background: #000;
+  color: #fff;
+  border: none;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+.cg-footer-wrapper .form__btn:hover {
+  background: #222;
+}
+
+/* reCAPTCHA legal notice — keep hidden, the form doesn't actually post. */
+.cg-footer-wrapper .form__captcha,
+.cg-footer-wrapper .form__captcha--text,
+.cg-footer-wrapper [class*="recaptcha"] {
+  display: none !important;
+}
+
+/* ─── Social icons ──────────────────────────────────────────────────
+ * The CG markup uses an icon-font glyph (<span class="i i-inst-2">),
+ * but the font itself isn't loaded here. Substitute with brand-color
+ * SVG backgrounds at the same 25×25 size the inline style targets. */
+.cg-footer-wrapper .cell--social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.cg-footer-wrapper .cell--social > a {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 28px !important;
+  height: 28px !important;
+}
+.cg-footer-wrapper .cell--social .i {
+  display: block;
+  width: 25px;
+  height: 25px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+.cg-footer-wrapper .i-inst-2 {
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2328b04d'%3E%3Cpath d='M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1.1.4 2.2.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1.1.4-2.2.4-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1.1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1.1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 5.4a4.4 4.4 0 100 8.8 4.4 4.4 0 000-8.8zm0 7.2a2.8 2.8 0 110-5.6 2.8 2.8 0 010 5.6zm5.6-7.4a1 1 0 11-2 0 1 1 0 012 0z'/%3E%3C/svg%3E");
+}
+.cg-footer-wrapper .i-fcbk-2 {
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2328b04d'%3E%3Cpath d='M22 12a10 10 0 10-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0022 12z'/%3E%3C/svg%3E");
+}
+.cg-footer-wrapper .i-twit-2 {
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2328b04d'%3E%3Cpath d='M18.244 2H21.5l-7.5 8.57L23 22h-6.563l-5.143-6.71L5.4 22H2.146l8.02-9.16L1.5 2h6.7l4.65 6.144L18.244 2zm-1.149 18h1.83L7.045 4H5.084L17.095 20z'/%3E%3C/svg%3E");
+}
+.cg-footer-wrapper .i-youtube-2 {
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2328b04d'%3E%3Cpath d='M23.5 6.5a3 3 0 00-2.1-2.1C19.5 4 12 4 12 4s-7.5 0-9.4.4A3 3 0 00.5 6.5C.1 8.4.1 12 .1 12s0 3.6.4 5.5a3 3 0 002.1 2.1c1.9.4 9.4.4 9.4.4s7.5 0 9.4-.4a3 3 0 002.1-2.1c.4-1.9.4-5.5.4-5.5s0-3.6-.4-5.5zM9.6 15.6V8.4l6.4 3.6-6.4 3.6z'/%3E%3C/svg%3E");
+}
+.cg-footer-wrapper .i-linkedin-2 {
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2328b04d'%3E%3Cpath d='M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5V8h3v11zM6.5 6.7A1.7 1.7 0 116.5 3.3a1.7 1.7 0 010 3.4zM19 19h-3v-5.3c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9V19h-3V8h2.9v1.5h.1A3.2 3.2 0 0115 8c3 0 4 2 4 4.6V19z'/%3E%3C/svg%3E");
+}
+
+/* Copyright row — center across the page. Mobile/desktop variants
+ * are gated by viewport so only one renders at a time. */
+.cg-footer-wrapper .foot--whitelabel--copyright {
+  text-align: center;
+  padding: 20px 16px 30px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: capitalize;
+  color: #000;
+}
+.cg-footer-wrapper .foot--whitelabel--copyright--desktop {
+  display: block;
+}
+.cg-footer-wrapper .foot--whitelabel--copyright--mobile {
+  display: none;
+}
+@media (max-width: 768px) {
+  .cg-footer-wrapper .foot--whitelabel--copyright--desktop {
+    display: none;
+  }
+  .cg-footer-wrapper .foot--whitelabel--copyright--mobile {
+    display: block;
+  }
 }
