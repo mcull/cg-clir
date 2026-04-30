@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SkipLink from "@/components/SkipLink";
 import PostHogProvider from "@/components/PostHogProvider";
+import GivebutterWidget from "@/components/GivebutterWidget";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -49,6 +50,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <GivebutterWidget />
       </body>
     </html>
   );
