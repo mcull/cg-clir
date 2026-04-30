@@ -1,6 +1,6 @@
 /* CG Header — minimal styles to match creativegrowth.org nav */
 .cg-header-wrapper {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-family: "Borna", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -107,7 +107,7 @@
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-family: "Borna", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   font-size: 15px !important;
   font-weight: 700 !important;
 }
@@ -116,7 +116,7 @@
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-family: "Borna", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   font-size: 15px !important;
   font-weight: 700 !important;
 }
@@ -135,14 +135,15 @@
   margin-left: 2px;
 }
 
-/* Search icon */
+/* Search icon — black, slightly thicker stroke to match CG's bolder look */
 .cg-header-wrapper .i-search::before {
   content: "";
   display: inline-block;
-  width: 20px;
-  height: 20px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23198639' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E");
+  width: 24px;
+  height: 24px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23000' stroke-width='2.25'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E");
   background-size: contain;
+  background-repeat: no-repeat;
 }
 
 /* Skip link — only visible on focus */
@@ -163,14 +164,177 @@
   position: relative;
 }
 
-/* Search button */
-.cg-header-wrapper .search__btn {
-  text-decoration: none;
-  display: flex;
-  align-items: center;
+/* Search is intentionally hidden — our public site uses the dedicated
+ * /search page launched from the gallery itself, not a header icon. */
+.cg-header-wrapper .search__holder,
+.cg-header-wrapper .search__holder--desktop {
+  display: none !important;
 }
 
 /* Cart counter hidden */
 .cg-header-wrapper .cart__counter {
   display: none;
+}
+
+/* ─── Hamburger button (mobile only) ─────────────────────────────
+ * Three bars by default; when the menu is open, the top and bottom
+ * bars rotate to form an X and the middle bar fades out — matches
+ * the close affordance creativegrowth.org shows in the open state. */
+.cg-header-hamburger {
+  display: none;
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 0;
+  padding: 8px;
+  cursor: pointer;
+  z-index: 1001; /* sits above the open menu overlay */
+}
+.cg-header-hamburger__bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  margin: 5px 0;
+  background: #000;
+  transition: transform 0.2s ease, opacity 0.15s ease;
+  transform-origin: center;
+}
+/* Hamburger sits as a sibling of the wrapper inside <header>, so the
+ * open-state class on the wrapper reaches the bars via the general
+ * sibling combinator (~), not descendant. */
+.cg-header-wrapper--mobile-open ~ .cg-header-hamburger .cg-header-hamburger__bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.cg-header-wrapper--mobile-open ~ .cg-header-hamburger .cg-header-hamburger__bar:nth-child(2) {
+  opacity: 0;
+}
+.cg-header-wrapper--mobile-open ~ .cg-header-hamburger .cg-header-hamburger__bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ─── Mobile breakpoint: collapse the nav into the hamburger ──── */
+@media (max-width: 900px) {
+  /* Show the hamburger button. */
+  .cg-header-hamburger {
+    display: block;
+  }
+
+  /* Tighten the top bar padding so the logo + hamburger fit on one
+   * row without stacking. The CG inline styles set 50px padding
+   * which leaves no horizontal room on phones. Vertical padding is
+   * minimal so the 75px logo dominates the bar. */
+  .cg-header-wrapper .columns__cont.cont--kit__content {
+    padding: 4px 56px 4px 8px !important;
+  }
+
+  /* Logo column — keep at its intrinsic width on the left so it
+   * doesn't fight the rest of the bar. */
+  .cg-header-wrapper .columns__col:first-child {
+    max-width: none !important;
+    flex: 0 0 auto !important;
+  }
+  /* CG's mobile logo sits inside a fixed-height bar and uses 100%/100%
+   * caps rather than a pixel ceiling, so the logo scales to whatever
+   * the bar gives it. Mirror that. The pointer-events:none comes from
+   * the existing inline style on the <img>. */
+  .cg-header-wrapper .nav__logo--desktop {
+    height: 75px;
+    display: flex !important;
+    align-items: center;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .cg-header-wrapper .nav__logo--desktop a {
+    display: flex !important;
+    align-items: center;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .cg-header-wrapper .nav__logo--desktop img {
+    max-height: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  /* Drop the columns__flex spacers that frame the logo on CG's
+   * inline markup — they add ~10–15px each side. */
+  .cg-header-wrapper .columns__col:first-child .columns__flex {
+    flex: 0 0 0 !important;
+  }
+
+  /* Mobile menu = full-screen white overlay with centered links,
+   * matching creativegrowth.org's open state. Hidden by default;
+   * .cg-header-wrapper--mobile-open promotes it to a fixed overlay. */
+  .cg-header-wrapper .nav__menu {
+    display: none;
+  }
+  .cg-header-wrapper--mobile-open .nav__menu {
+    display: flex !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: #fff;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 56px 24px 24px;
+    margin: 0 !important;
+    overflow-y: auto;
+  }
+
+  /* Inside the mobile menu, center each item and give it generous
+   * vertical breathing room — CG uses ~28px gaps between rows. */
+  .cg-header-wrapper--mobile-open .nav__menu .drop,
+  .cg-header-wrapper--mobile-open .nav__menu .nav__menu__anch {
+    display: block !important;
+    width: auto;
+    margin: 0 0 28px 0 !important;
+    text-align: center;
+  }
+  .cg-header-wrapper--mobile-open .nav__menu .drop__anch,
+  .cg-header-wrapper--mobile-open .nav__menu .nav__menu__anch {
+    font-size: 16px !important;
+    letter-spacing: 3px !important;
+  }
+
+  /* Mobile dropdown panel: render inline below its trigger, centered. */
+  .cg-header-wrapper .nav__menu .drop__inn {
+    position: static !important;
+    transform: none !important;
+    display: none;
+    padding-top: 12px;
+    text-align: center;
+  }
+  .cg-header-wrapper--mobile-open .nav__menu .drop__inn[style*="display: block"] {
+    display: block !important;
+  }
+  .cg-header-wrapper .drop__inn::before {
+    display: none; /* drop the dropdown triangle on mobile */
+  }
+  .cg-header-wrapper .drop__inn__holder {
+    box-shadow: none;
+    padding: 4px 0;
+    min-width: 0;
+  }
+
+  /* Force the second column (nav menu) to take full width below the logo. */
+  .cg-header-wrapper .columns__col:nth-child(2) {
+    max-width: 100% !important;
+    flex-basis: 100% !important;
+  }
+
+
+  /* Lock body scroll while the overlay is open so it feels like a
+   * full-screen takeover, not a long page. */
+  body:has(.cg-header-wrapper--mobile-open) {
+    overflow: hidden;
+  }
 }

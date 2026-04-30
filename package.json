@@ -34,6 +34,7 @@
     "posthog-js": "^1.364.6",
     "react": "^18",
     "react-dom": "^18",
+    "resend": "^6.12.2",
     "sharp": "^0.34.5",
     "slugify": "^1.6.9"
   },
