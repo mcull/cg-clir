@@ -36,32 +36,38 @@ export async function POST(request: NextRequest) {
   const ua = request.headers.get("user-agent") || null;
 
   const supabase = createAdminClient();
-  // Upsert on email (case-insensitive index handles dedup at the DB
-  // layer). Re-subscribing refreshes name + ip + ua.
+  // Insert; rely on the case-insensitive unique index (LOWER(email))
+  // for dedup. PostgREST upsert can't target an expression index, so
+  // we catch the unique-violation (23505) and treat it as a success
+  // — re-subscribing is a no-op rather than an error to the user.
   const { error: dbError } = await supabase
     .from("mailing_list_signups")
-    .upsert(
-      { name, email, source: "footer", ip_address: ip, user_agent: ua },
-      { onConflict: "email" },
-    );
-  if (dbError) {
+    .insert({ name, email, source: "footer", ip_address: ip, user_agent: ua });
+  if (dbError && dbError.code !== "23505") {
     console.error("[/api/subscribe] db error:", dbError);
     return NextResponse.json(
       { error: "Could not save signup" },
       { status: 500 },
     );
   }
+  const isDuplicate = dbError?.code === "23505";
 
-  // Email is best-effort — we already saved the row, so a failure
-  // here shouldn't punish the user with an error response.
-  try {
-    await sendMailingListNotification({ name, email });
-    await supabase
-      .from("mailing_list_signups")
-      .update({ notified_at: new Date().toISOString() })
-      .eq("email", email);
-  } catch (err) {
-    console.error("[/api/subscribe] email error:", err);
+  // Email is best-effort — and only fires for genuinely new signups
+  // so re-submits don't spam Quinn. notified_at is only stamped when
+  // we actually delivered (skipped: false), so the column truly
+  // reflects "Quinn was notified".
+  if (!isDuplicate) {
+    try {
+      const result = await sendMailingListNotification({ name, email });
+      if (!result.skipped) {
+        await supabase
+          .from("mailing_list_signups")
+          .update({ notified_at: new Date().toISOString() })
+          .eq("email", email);
+      }
+    } catch (err) {
+      console.error("[/api/subscribe] email error:", err);
+    }
   }
 
   return NextResponse.json({ ok: true });
