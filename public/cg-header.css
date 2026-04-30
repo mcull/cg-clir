@@ -164,11 +164,11 @@
   position: relative;
 }
 
-/* Search button */
-.cg-header-wrapper .search__btn {
-  text-decoration: none;
-  display: flex;
-  align-items: center;
+/* Search is intentionally hidden — our public site uses the dedicated
+ * /search page launched from the gallery itself, not a header icon. */
+.cg-header-wrapper .search__holder,
+.cg-header-wrapper .search__holder--desktop {
+  display: none !important;
 }
 
 /* Cart counter hidden */
@@ -331,18 +331,6 @@
     flex-basis: 100% !important;
   }
 
-  /* Pull the search icon out of the wrapping second column and pin it
-   * to the right of the hamburger so the two icons sit side-by-side
-   * the way CG renders them. The hamburger occupies right:16px through
-   * right:56px (16+40), so place the search at right:56px+a small gap. */
-  .cg-header-wrapper .search__holder--desktop {
-    position: absolute !important;
-    top: 50%;
-    right: 64px !important;
-    transform: translateY(-50%);
-    margin: 0 !important;
-    z-index: 6;
-  }
 
   /* Lock body scroll while the overlay is open so it feels like a
    * full-screen takeover, not a long page. */
