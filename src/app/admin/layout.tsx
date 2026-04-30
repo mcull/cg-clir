@@ -51,6 +51,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
           <NavLink href="/admin" label="Dashboard" />
           <NavLink href="/admin/artworks" label="Artworks" />
           <NavLink href="/admin/artists" label="Artists" />
+          <NavLink href="/admin/subscribers" label="Subscribers" />
           <NavLink href="/admin/import" label="Import/Export" />
         </nav>
 
