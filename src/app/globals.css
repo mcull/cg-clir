@@ -15,6 +15,14 @@
   font-display: swap;
 }
 
+/* Default the whole site to Borna, mirroring creativegrowth.org's
+ * sitewide rule. !important wins against the Geist variable applied
+ * by Tailwind/layout — keep that variable defined for explicit
+ * monospace use cases but let Borna cascade through everything else. */
+body {
+  font-family: "Borna", sans-serif !important;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;
