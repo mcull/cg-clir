@@ -4,6 +4,11 @@ export const metadata = {
   title: "Subscribers | Admin | Creative Growth Gallery",
 };
 
+// Always render fresh — the table changes on every public signup,
+// and Next would otherwise cache the build-time snapshot (which is
+// empty because the build env can't reach prod data).
+export const dynamic = "force-dynamic";
+
 interface SignupRow {
   id: string;
   name: string;
