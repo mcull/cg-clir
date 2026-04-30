@@ -1,6 +1,6 @@
 /* CG Header — minimal styles to match creativegrowth.org nav */
 .cg-header-wrapper {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-family: "Borna", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -107,7 +107,7 @@
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-family: "Borna", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   font-size: 15px !important;
   font-weight: 700 !important;
 }
@@ -116,7 +116,7 @@
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-family: "Borna", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   font-size: 15px !important;
   font-weight: 700 !important;
 }

@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Borna — Creative Growth's brand font, hosted on our domain with
+ * permission from CG. Self-served from /public/fonts so we control
+ * CORS and caching; no cross-origin font-load issues. Only the
+ * regular weight is available; bold/italic fall back to the system
+ * stack until/unless we get the additional weight files. */
+@font-face {
+  font-family: "Borna";
+  src: url("/fonts/borna-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;
