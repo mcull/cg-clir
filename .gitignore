@@ -50,3 +50,6 @@ tmp/
 
 # Visual brainstorm session files (mockups + state, regenerated per session)
 .superpowers/
+
+# Stray clipboard captures from `... > pbcopy` typos — never commit
+/pbcopy
