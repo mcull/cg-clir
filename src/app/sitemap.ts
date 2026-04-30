@@ -13,9 +13,21 @@ import { createAdminClient } from "@/lib/supabase/admin";
 // doesn't widen the public surface.
 export const dynamic = "force-dynamic";
 
+// Resolve in priority order:
+//   1. NEXT_PUBLIC_APP_URL — set this in Vercel env to override
+//      everything else; also pins layout.tsx metadataBase
+//   2. VERCEL_URL — auto-populated per deploy; covers preview URLs
+//   3. cg-clir.vercel.app — known prod fallback
+//   4. http://localhost:3000 — dev only, when none of the above set
+function resolveBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  if (process.env.NODE_ENV === "production") return "https://cg-clir.vercel.app";
+  return "http://localhost:3000";
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = resolveBaseUrl();
   const supabase = createAdminClient();
 
   const now = new Date();
