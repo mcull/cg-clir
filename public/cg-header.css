@@ -235,8 +235,23 @@
     max-width: none !important;
     flex: 0 0 auto !important;
   }
+  /* CG's mobile logo sits inside a fixed-height bar and uses 100%/100%
+   * caps rather than a pixel ceiling, so the logo scales to whatever
+   * the bar gives it. Mirror that. The pointer-events:none comes from
+   * the existing inline style on the <img>. */
+  .cg-header-wrapper .nav__logo--desktop {
+    height: 56px;
+    display: flex !important;
+    align-items: center;
+  }
+  .cg-header-wrapper .nav__logo--desktop a {
+    display: flex !important;
+    align-items: center;
+    height: 100%;
+  }
   .cg-header-wrapper .nav__logo--desktop img {
-    max-height: 40px !important;
+    max-height: 100% !important;
+    max-width: 100% !important;
   }
 
   /* Mobile menu = full-screen white overlay with centered links,
