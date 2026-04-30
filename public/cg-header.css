@@ -224,9 +224,10 @@
 
   /* Tighten the top bar padding so the logo + hamburger fit on one
    * row without stacking. The CG inline styles set 50px padding
-   * which leaves no horizontal room on phones. */
+   * which leaves no horizontal room on phones. Vertical padding is
+   * minimal so the 75px logo dominates the bar. */
   .cg-header-wrapper .columns__cont.cont--kit__content {
-    padding: 16px 64px 16px 16px !important;
+    padding: 4px 56px 4px 8px !important;
   }
 
   /* Logo column — keep at its intrinsic width on the left so it
@@ -240,18 +241,29 @@
    * the bar gives it. Mirror that. The pointer-events:none comes from
    * the existing inline style on the <img>. */
   .cg-header-wrapper .nav__logo--desktop {
-    height: 56px;
+    height: 75px;
     display: flex !important;
     align-items: center;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   .cg-header-wrapper .nav__logo--desktop a {
     display: flex !important;
     align-items: center;
     height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   .cg-header-wrapper .nav__logo--desktop img {
     max-height: 100% !important;
     max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  /* Drop the columns__flex spacers that frame the logo on CG's
+   * inline markup — they add ~10–15px each side. */
+  .cg-header-wrapper .columns__col:first-child .columns__flex {
+    flex: 0 0 0 !important;
   }
 
   /* Mobile menu = full-screen white overlay with centered links,
