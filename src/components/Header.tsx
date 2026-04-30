@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 // Raw CG header HTML extracted from creativegrowth.org via Playwright
@@ -10,6 +10,7 @@ import cgHeaderHtml from "./cg-header.html";
 export default function Header() {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   // Wire up dropdown toggle behavior for the injected CG nav
   useEffect(() => {
@@ -49,6 +50,11 @@ export default function Header() {
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
+  // Close mobile menu when navigating
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
   if (isAdmin) return null;
 
   return (
@@ -56,11 +62,27 @@ export default function Header() {
       {/* eslint-disable-next-line @next/next/no-css-tags */}
       <link rel="stylesheet" href="/cg-header.css" />
 
-      {/* Injected CG header */}
+      {/* Injected CG header. We toggle the `cg-header-wrapper--mobile-open`
+       * class via the hamburger to reveal the nav menu on small screens;
+       * desktop behavior is unchanged because the mobile-collapse rules
+       * only kick in below the breakpoint. */}
       <div
-        className="cg-header-wrapper"
+        className={`cg-header-wrapper${mobileOpen ? " cg-header-wrapper--mobile-open" : ""}`}
         dangerouslySetInnerHTML={{ __html: cgHeaderHtml }}
       />
+
+      {/* Mobile hamburger — only visible below the breakpoint via CSS */}
+      <button
+        type="button"
+        aria-label={mobileOpen ? "Close menu" : "Open menu"}
+        aria-expanded={mobileOpen}
+        onClick={() => setMobileOpen((o) => !o)}
+        className="cg-header-hamburger"
+      >
+        <span className="cg-header-hamburger__bar" />
+        <span className="cg-header-hamburger__bar" />
+        <span className="cg-header-hamburger__bar" />
+      </button>
     </header>
   );
 }
