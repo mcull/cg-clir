@@ -175,7 +175,10 @@
   display: none;
 }
 
-/* ─── Hamburger button (mobile only) ────────────────────────────── */
+/* ─── Hamburger button (mobile only) ─────────────────────────────
+ * Three bars by default; when the menu is open, the top and bottom
+ * bars rotate to form an X and the middle bar fades out — matches
+ * the close affordance creativegrowth.org shows in the open state. */
 .cg-header-hamburger {
   display: none;
   position: absolute;
@@ -188,7 +191,7 @@
   border: 0;
   padding: 8px;
   cursor: pointer;
-  z-index: 5;
+  z-index: 1001; /* sits above the open menu overlay */
 }
 .cg-header-hamburger__bar {
   display: block;
@@ -196,6 +199,20 @@
   height: 2px;
   margin: 5px 0;
   background: #000;
+  transition: transform 0.2s ease, opacity 0.15s ease;
+  transform-origin: center;
+}
+/* Hamburger sits as a sibling of the wrapper inside <header>, so the
+ * open-state class on the wrapper reaches the bars via the general
+ * sibling combinator (~), not descendant. */
+.cg-header-wrapper--mobile-open ~ .cg-header-hamburger .cg-header-hamburger__bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.cg-header-wrapper--mobile-open ~ .cg-header-hamburger .cg-header-hamburger__bar:nth-child(2) {
+  opacity: 0;
+}
+.cg-header-wrapper--mobile-open ~ .cg-header-hamburger .cg-header-hamburger__bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
 }
 
 /* ─── Mobile breakpoint: collapse the nav into the hamburger ──── */
@@ -222,39 +239,51 @@
     max-height: 40px !important;
   }
 
-  /* Hide the nav menu by default; show it stacked when the
-   * .cg-header-wrapper--mobile-open class is applied via the hamburger. */
+  /* Mobile menu = full-screen white overlay with centered links,
+   * matching creativegrowth.org's open state. Hidden by default;
+   * .cg-header-wrapper--mobile-open promotes it to a fixed overlay. */
   .cg-header-wrapper .nav__menu {
     display: none;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-    margin-left: 0 !important;
-    margin-top: 16px;
-    border-top: 1px solid #eee;
-    padding-top: 16px;
   }
   .cg-header-wrapper--mobile-open .nav__menu {
     display: flex !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: #fff;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 56px 24px 24px;
+    margin: 0 !important;
+    overflow-y: auto;
   }
 
-  /* Inside the mobile menu, lay each top-level item out as a full-width
-   * row stacked vertically. */
-  .cg-header-wrapper .nav__menu .drop,
-  .cg-header-wrapper .nav__menu .nav__menu__anch {
+  /* Inside the mobile menu, center each item and give it generous
+   * vertical breathing room — CG uses ~28px gaps between rows. */
+  .cg-header-wrapper--mobile-open .nav__menu .drop,
+  .cg-header-wrapper--mobile-open .nav__menu .nav__menu__anch {
     display: block !important;
-    width: 100%;
-    margin: 0 0 16px 0 !important;
+    width: auto;
+    margin: 0 0 28px 0 !important;
+    text-align: center;
+  }
+  .cg-header-wrapper--mobile-open .nav__menu .drop__anch,
+  .cg-header-wrapper--mobile-open .nav__menu .nav__menu__anch {
+    font-size: 16px !important;
+    letter-spacing: 3px !important;
   }
 
-  /* Mobile dropdown panel: render inline below its trigger, not as
-   * an absolute popover. */
+  /* Mobile dropdown panel: render inline below its trigger, centered. */
   .cg-header-wrapper .nav__menu .drop__inn {
     position: static !important;
     transform: none !important;
     display: none;
-    padding-top: 8px;
-    padding-left: 16px;
+    padding-top: 12px;
+    text-align: center;
   }
   .cg-header-wrapper--mobile-open .nav__menu .drop__inn[style*="display: block"] {
     display: block !important;
@@ -265,11 +294,18 @@
   .cg-header-wrapper .drop__inn__holder {
     box-shadow: none;
     padding: 4px 0;
+    min-width: 0;
   }
 
   /* Force the second column (nav menu) to take full width below the logo. */
   .cg-header-wrapper .columns__col:nth-child(2) {
     max-width: 100% !important;
     flex-basis: 100% !important;
+  }
+
+  /* Lock body scroll while the overlay is open so it feels like a
+   * full-screen takeover, not a long page. */
+  body:has(.cg-header-wrapper--mobile-open) {
+    overflow: hidden;
   }
 }
