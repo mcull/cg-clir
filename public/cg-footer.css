@@ -96,29 +96,20 @@
   text-decoration: none;
 }
 
-/* Mailing list form — visual parity with CG (submit is a no-op since
- * the form posts to CG's backend). The CG markup actually emits a
- * .input__placeholder div ABOVE each <input> as a label-like overlay
- * (their site uses JS to float it over the input on focus). Without
- * that JS we'd render two boxes per field, so hide the actual inputs
- * and let the placeholder divs serve as the visible "fields". */
+/* Mailing list form — show the real <input> elements (CG's inline
+ * styles already give them the right border/padding/font). The
+ * .input__placeholder divs are CG's floating-label overlay driven
+ * by their JS; without that JS they'd duplicate the field, so hide
+ * them and let the inputs' native `placeholder` text do the work. */
 .cg-footer-wrapper .input--whitelabel {
   display: block;
 }
-.cg-footer-wrapper .input--whitelabel input {
+.cg-footer-wrapper .input__placeholder {
   display: none !important;
 }
-.cg-footer-wrapper .input__placeholder {
-  display: block;
-  padding: 14px 18px;
-  border: 2px solid #000;
-  font-size: 14px;
+.cg-footer-wrapper .input--whitelabel input::placeholder {
   color: #000;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  pointer-events: none;
-  background: transparent;
+  opacity: 0.6;
 }
 
 /* SUBSCRIBE button — black bar matching CG */
