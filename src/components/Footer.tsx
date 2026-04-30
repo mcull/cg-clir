@@ -14,7 +14,7 @@ export default function Footer() {
   if (pathname?.startsWith("/admin")) return null;
 
   return (
-    <footer className="bg-white border-t border-gray-200 mt-16">
+    <footer className="cg-footer-bg border-t border-gray-200 mt-16">
       {/* eslint-disable-next-line @next/next/no-css-tags */}
       <link rel="stylesheet" href="/cg-footer.css" />
 
@@ -24,7 +24,7 @@ export default function Footer() {
       />
 
       {/* CLIR archive credit — local addition below the CG footer. */}
-      <div className="border-t border-gray-200 py-6 text-center text-xs text-gray-600">
+      <div className="border-t border-gray-300 py-6 text-center text-xs text-gray-600">
         <p>
           This digital archive is supported by a grant from the Council on
           Library and Information Resources (CLIR).

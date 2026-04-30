@@ -1,5 +1,23 @@
 /* CG Footer — minimal styles to match creativegrowth.org */
 
+/* Single gray background applied to the entire <footer> element ONLY.
+ * The injected markup has rgba() bg colors set inline on
+ * foot--whitelabel and the copyright spans, which would multiply with
+ * the parent and produce a darker mid-section. Override those to
+ * transparent so only the footer carries the color. */
+.cg-footer-bg {
+  background-color: rgba(0, 0, 0, 0.057);
+}
+.cg-footer-wrapper,
+.cg-footer-wrapper .foot--whitelabel,
+.cg-footer-wrapper .foot--whitelabel--desktop,
+.cg-footer-wrapper .foot--whitelabel--mobile,
+.cg-footer-wrapper .foot--whitelabel--copyright,
+.cg-footer-wrapper .foot--whitelabel--copyright--desktop,
+.cg-footer-wrapper .foot--whitelabel--copyright--mobile {
+  background-color: transparent !important;
+}
+
 .cg-footer-wrapper {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   -webkit-font-smoothing: antialiased;
