@@ -13,8 +13,8 @@ export default function Footer() {
 
   // Wire each footer subscribe form (desktop + mobile variants both
   // exist in the injected markup) to POST to our /api/subscribe route.
-  // The CG buttons are type="button" with no native submit behavior,
-  // so we listen on click directly.
+  // Listen on the form's submit event so Enter-in-input works for
+  // keyboard-only users (the CG button is now type="submit").
   useEffect(() => {
     const forms = document.querySelectorAll<HTMLFormElement>(
       ".cg-footer-wrapper form.form--whitelabel",
@@ -26,7 +26,6 @@ export default function Footer() {
         "button.btn--whitelabel.btn--form",
       );
       const status = form.querySelector<HTMLElement>(".submission-status");
-      if (!button) return;
 
       // Drop a honeypot field humans never see — bots fill every input.
       if (!form.querySelector<HTMLInputElement>('input[name="hp"]')) {
@@ -41,7 +40,7 @@ export default function Footer() {
         form.appendChild(hp);
       }
 
-      const onClick = async (e: MouseEvent) => {
+      const onSubmit = async (e: SubmitEvent) => {
         e.preventDefault();
         const nameInput = form.querySelector<HTMLInputElement>(
           'input[name="Name"]',
@@ -57,8 +56,8 @@ export default function Footer() {
           if (status) status.textContent = "Please enter your name and email. ";
           return;
         }
-        if (button.disabled) return;
-        button.disabled = true;
+        if (button?.disabled) return;
+        if (button) button.disabled = true;
         if (status) status.textContent = "Subscribing… ";
 
         try {
@@ -72,7 +71,7 @@ export default function Footer() {
               error?: string;
             };
             if (status) status.textContent = `${data.error || "Failed"}. `;
-            button.disabled = false;
+            if (button) button.disabled = false;
             return;
           }
           if (status) status.textContent = "Thanks — you're subscribed. ";
@@ -80,12 +79,12 @@ export default function Footer() {
           if (emailInput) emailInput.value = "";
         } catch {
           if (status) status.textContent = "Network error, please retry. ";
-          button.disabled = false;
+          if (button) button.disabled = false;
         }
       };
 
-      button.addEventListener("click", onClick);
-      cleanups.push(() => button.removeEventListener("click", onClick));
+      form.addEventListener("submit", onSubmit);
+      cleanups.push(() => form.removeEventListener("submit", onSubmit));
     });
 
     return () => cleanups.forEach((fn) => fn());
