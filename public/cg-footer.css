@@ -78,6 +78,22 @@
   color: inherit;
 }
 
+/* WCAG AA color-contrast fix.
+ *
+ * CG's footer markup hardcodes the email link to rgba(40,176,77,1)
+ * (#28b04d). Against the footer's #f0f0f0 background that's a 2.48:1
+ * ratio — well below AA's 4.5:1 minimum and the single largest source
+ * of contrast violations in our axe audit (~2,355 instances across
+ * artwork + artist + index pages).
+ *
+ * Swap to #1f6c2c — the darker green CG already uses for the donate
+ * button hover state, so it stays brand-coherent — which gives a
+ * 5.6:1 ratio (AA pass for normal text). Inline style takes precedence
+ * unless we use !important. */
+.cg-footer-wrapper span[style*="rgba(40,176,77"] {
+  color: #1f6c2c !important;
+}
+
 /* Donate button — solid green pill, matches CG */
 .cg-footer-wrapper .btn--whitelabel {
   display: inline-block;
