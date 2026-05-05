@@ -211,8 +211,10 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
             </div>
           )}
 
-          {/* Details */}
-          <div className="space-y-4 mb-6 pb-6 border-b border-gray-200">
+          {/* Details — wrapper is <dl> so each <dt>/<dd> pair has a
+           * proper definition-list ancestor (required by axe's
+           * `dlitem` rule). Inner <div> grouping is legal per HTML5. */}
+          <dl className="space-y-4 mb-6 pb-6 border-b border-gray-200">
             {artwork.date_created && (
               <div>
                 <dt className="text-sm font-semibold text-gray-600">Date</dt>
@@ -278,7 +280,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                 )}
               </div>
             )}
-          </div>
+          </dl>
 
           {/* Download Button */}
           <DownloadButton artworkId={artwork.id} title={artwork.title} />
