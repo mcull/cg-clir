@@ -274,15 +274,17 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                   </dd>
                 )}
                 {artwork.alt_text_long && (
-                  // Scrollable region needs tabindex=0 so keyboard
-                  // users can focus it and use arrow keys to scroll
-                  // (axe `scrollable-region-focusable`). role+label
-                  // give screen readers a name for the region.
+                  // tabindex=0 makes the scrollable region keyboard
+                  // focusable (axe `scrollable-region-focusable`).
+                  // Don't add role="region" / aria-label here — <dd>
+                  // doesn't accept arbitrary roles (axe
+                  // `aria-allowed-role`) and an explicit role would
+                  // also break the parent <dl>'s valid-child contract
+                  // (axe `definition-list`). The dd is already named
+                  // by its sibling <dt> "Visual description" above.
                   <dd
                     className="text-gray-900 leading-relaxed max-h-72 overflow-y-auto pr-2"
                     tabIndex={0}
-                    role="region"
-                    aria-label="Visual description"
                   >
                     {artwork.alt_text_long}
                   </dd>
