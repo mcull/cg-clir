@@ -113,7 +113,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
           {works.total > works.items.length && (
             <p className="mt-8 text-center">
               <Link
-                href={`/?artist=${artist.slug}`}
+                href={`/collection?artist=${artist.slug}`}
                 className="text-blue-600 hover:text-blue-800 font-medium"
               >
                 …and {works.total - works.items.length} more works by {artistName} →

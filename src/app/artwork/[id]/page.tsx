@@ -145,8 +145,8 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
         aria-label="Breadcrumb"
         className="text-sm text-gray-600 mb-8 flex gap-2 flex-wrap"
       >
-        <Link href="/" className="hover:text-blue-600">
-          CGPA Archive
+        <Link href="/collection" className="hover:text-blue-600">
+          Collection
         </Link>
         <span>/</span>
         <span className="text-gray-900 font-semibold">{artwork.title}</span>
@@ -249,7 +249,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                     return (
                       <Link
                         key={cat.category.id}
-                        href={`/?${param}=${cat.category.slug}`}
+                        href={`/collection?${param}=${cat.category.slug}`}
                         className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
                       >
                         {cat.category.name}
@@ -312,7 +312,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
           {more.total > more.items.length && artwork.artist?.slug && (
             <p className="mt-8 text-center">
               <Link
-                href={`/?artist=${artwork.artist.slug}`}
+                href={`/collection?artist=${artwork.artist.slug}`}
                 className="text-blue-600 hover:text-blue-800 font-medium"
               >
                 …and {more.total - more.items.length} more by {artistName} →
