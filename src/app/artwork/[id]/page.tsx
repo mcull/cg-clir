@@ -274,7 +274,16 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                   </dd>
                 )}
                 {artwork.alt_text_long && (
-                  <dd className="text-gray-900 leading-relaxed max-h-72 overflow-y-auto pr-2">
+                  // Scrollable region needs tabindex=0 so keyboard
+                  // users can focus it and use arrow keys to scroll
+                  // (axe `scrollable-region-focusable`). role+label
+                  // give screen readers a name for the region.
+                  <dd
+                    className="text-gray-900 leading-relaxed max-h-72 overflow-y-auto pr-2"
+                    tabIndex={0}
+                    role="region"
+                    aria-label="Visual description"
+                  >
                     {artwork.alt_text_long}
                   </dd>
                 )}
