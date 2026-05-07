@@ -17,7 +17,14 @@ const FEATURED_IMAGE_URL =
 export default function HomePage() {
   return (
     <div className="container-max py-12">
-      <h1 className="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-10 tracking-tight uppercase">
+      {/* Borna inline-style override — globals.css has a tag-level
+       * `h1,h2,...{font-family:Georgia,...}` rule that wins by being
+       * more specific than the body's Borna default. The inline style
+       * sits at the top of the cascade and pins the brand font here. */}
+      <h1
+        className="text-4xl md:text-5xl font-bold text-gray-900 mb-10 tracking-tight uppercase"
+        style={{ fontFamily: '"Borna", sans-serif' }}
+      >
         Creative Growth Public Archive
       </h1>
 
@@ -71,7 +78,8 @@ export default function HomePage() {
 
       <Link
         href="/collection"
-        className="block bg-black text-white text-center font-serif italic text-4xl md:text-6xl py-10 md:py-14 mb-12 hover:bg-gray-800 transition-colors"
+        className="block bg-black text-white text-center text-4xl md:text-6xl py-10 md:py-14 mb-12 hover:bg-gray-800 transition-colors"
+        style={{ fontFamily: '"Borna", sans-serif' }}
       >
         Explore the Archive Here
       </Link>
