@@ -33,9 +33,13 @@ export default function ArtworkCard({ artwork }: ArtworkCardProps) {
           )}
         </div>
 
-        <h3 className="font-serif font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+        {/* h2 (was h3) so the page heading hierarchy doesn't skip levels
+         * on Home + Ephemera, which only have an <h1> above the grid.
+         * On detail pages where this card sits under another <h2>, the
+         * h2→h2 sequence is fine — axe `heading-order` only flags jumps. */}
+        <h2 className="font-serif font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
           {artwork.title}
-        </h3>
+        </h2>
         <p className="text-sm text-gray-600 mt-1">{artistName}</p>
       </article>
     </Link>
