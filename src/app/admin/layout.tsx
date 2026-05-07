@@ -57,7 +57,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
 
         <div className="absolute bottom-6 left-6 right-6 pt-6 border-t border-gray-700">
           <a
-            href="/"
+            href="/collection"
             className="block text-sm text-gray-400 hover:text-white transition-colors"
           >
             ← View Gallery

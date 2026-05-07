@@ -1,111 +1,85 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import ArtworkGrid from "@/components/ArtworkGrid";
-import ArtworkCard from "@/components/ArtworkCard";
-import Pagination from "@/components/Pagination";
-import FilterBar from "@/components/FilterBar";
-import CohortNav from "@/components/CohortNav";
-import { parseSearchParams } from "@/lib/filter-state";
-import { queryArtworks, getFacetCounts } from "@/lib/collection-query";
+import Link from "next/link";
 
-const ITEMS_PER_PAGE = 24;
-
-interface HomePageProps {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}
-
+// Welcome page mirroring https://www.creativegrowth.org/creative-growth-public-archive
+// Two-column intro (text left, featured artwork right) → wide black
+// "Explore the Archive Here" CTA → acknowledgements. The "Selected
+// Works" and "Audio Described Works" tiles from CG's version are
+// intentionally omitted.
 export const metadata = {
-  title: "CGPA Archive | Creative Growth Gallery",
-  description: "Browse the complete collection of artworks",
+  title: "Creative Growth Public Archive",
+  description:
+    "A digital collection of over 2,500 images of art and artifacts from Creative Growth, made open and free for educational and scholarly use.",
 };
 
-export default async function HomePage({ searchParams }: HomePageProps) {
-  const raw = await searchParams;
-  const state = parseSearchParams(raw);
-  const supabase = createServerSupabaseClient();
+const FEATURED_IMAGE_URL =
+  "https://cdn.artcld.com/img/w_1200,h_1200,c_fit/qh5o5zssrz23vb01tmdh.jpg";
 
-  const [{ artworks, total }, facets, formatCats, themeCats, mediumCats, allArtists] = await Promise.all([
-    queryArtworks(supabase, state, "artwork"),
-    getFacetCounts(supabase, state, "artwork"),
-    supabase.from("categories").select("name, slug").eq("kind", "format").order("name"),
-    supabase.from("categories").select("name, slug").eq("kind", "theme").order("name"),
-    supabase.from("categories").select("name, slug").eq("kind", "medium").order("name"),
-    supabase.from("artists").select("slug, first_name, last_name").order("last_name").order("first_name"),
-  ]);
-
-  const themeOptions = (themeCats.data || []).map((c) => ({
-    value: c.slug,
-    label: c.name,
-    count: facets.themes[c.slug] || 0,
-  }));
-  const formatOptions = (formatCats.data || []).map((c) => ({
-    value: c.slug,
-    label: c.name,
-    count: facets.formats[c.slug] || 0,
-  }));
-  const mediumOptions = (mediumCats.data || []).map((c) => ({
-    value: c.slug,
-    label: c.name,
-    count: facets.mediums[c.slug] || 0,
-  }));
-  const decadeOptions = Object.keys(facets.decades).sort().map((d) => ({
-    value: d,
-    label: d,
-    count: facets.decades[d],
-  }));
-  const artistOptions = (allArtists.data || []).map((a) => ({
-    slug: a.slug,
-    name: `${a.first_name} ${a.last_name}`.trim(),
-    available: facets.availableArtistSlugs.has(a.slug),
-  }));
-
-  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-
+export default function HomePage() {
   return (
     <div className="container-max py-12">
-      <div className="flex items-baseline justify-between gap-6 mb-6 flex-wrap">
-        <h1 className="font-sans text-5xl font-bold text-gray-900 tracking-tight">CGPA ARCHIVE</h1>
-        <CohortNav active="artwork" />
+      <h1 className="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-10 tracking-tight uppercase">
+        Creative Growth Public Archive
+      </h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
+        <div className="space-y-5 text-gray-900 leading-relaxed">
+          <p>
+            Welcome to the Creative Growth Public Archive! This digital
+            collection includes over 2,500 images of art and artifacts. This
+            archive aims to preserve and share Creative Growth history.
+          </p>
+          <p>
+            The images in this archive are{" "}
+            <strong>open source and a part of the public domain</strong>.
+            Anyone can use these images for educational, scholarly, or
+            charitable purposes.
+          </p>
+          <p>
+            This archive was made possible by the Council on Library and
+            Information Resources, which also helped launch the Judith Scott
+            Study Center. Learn more about the life and art of Judith Scott{" "}
+            <a
+              href="https://www.creativegrowth.org/judith-scott-study-center"
+              className="link-primary"
+            >
+              here
+            </a>
+            .
+          </p>
+          <p>
+            Browse artwork by past and current Creative Growth artists. Learn
+            about our organization through vintage flyers, posters,
+            photographs, and slides. Search by artist, medium, decade,
+            ephemera type, and other key categories.
+          </p>
+        </div>
+
+        <figure className="md:pl-4">
+          {/* Plain <img> so we don't have to ship pixel dimensions for a
+           * remote URL. Aspect ratio is intrinsic to the source. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={FEATURED_IMAGE_URL}
+            alt="Painting by Annika Miller — colorful abstract composition with stacked geometric forms."
+            className="block w-full h-auto"
+          />
+          <figcaption className="text-sm text-gray-600 italic mt-3">
+            Artwork by Annika Miller.
+          </figcaption>
+        </figure>
       </div>
 
-      <FilterBar
-        state={state}
-        cohort="artwork"
-        themeOptions={themeOptions}
-        formatOptions={formatOptions}
-        mediumOptions={mediumOptions}
-        decadeOptions={decadeOptions}
-        artistOptions={artistOptions}
-      />
+      <Link
+        href="/collection"
+        className="block bg-black text-white text-center font-serif italic text-4xl md:text-6xl py-10 md:py-14 mb-12 hover:bg-gray-800 transition-colors"
+      >
+        Explore the Archive Here
+      </Link>
 
-      {artworks.length > 0 ? (
-        <>
-          <p className="text-gray-600 mb-6 text-sm">
-            {total} {total === 1 ? "work" : "works"}
-            {state.q && <> for &ldquo;{state.q}&rdquo;</>}
-          </p>
-
-          <ArtworkGrid>
-            {artworks.map((artwork) => (
-              <ArtworkCard key={artwork.id} artwork={artwork as any} />
-            ))}
-          </ArtworkGrid>
-
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={state.page}
-              totalPages={totalPages}
-              baseUrl="/"
-              preserveParams={["q", "theme", "format", "medium", "decade", "artist", "sort"]}
-            />
-          )}
-        </>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-gray-600 text-lg mb-4">No artworks match your filters.</p>
-          <a href="/" className="text-blue-600 underline">Clear filters</a>
-        </div>
-      )}
+      <p className="text-gray-700 leading-relaxed mb-4">
+        Thank you to our friends Farley Gwazda, Katherine Sherwood, and Tara
+        Tucker for your help with this important project.
+      </p>
     </div>
   );
 }

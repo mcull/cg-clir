@@ -10,7 +10,7 @@ export default function CohortNav({ active }: CohortNavProps) {
   return (
     <div className="flex items-center text-sm">
       <Link
-        href="/"
+        href="/collection"
         className={
           "pr-3 " +
           (active === "artwork"
