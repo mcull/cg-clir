@@ -5,9 +5,14 @@ import { getAltText, formatArtistName, resolveImageUrl } from "@/lib/utils";
 
 interface ArtworkCardProps {
   artwork: Artwork & { artist?: { first_name: string; last_name: string } };
+  // Hide the title + artist line. Used on the ephemera grid where
+  // items don't have meaningful titles or artists, so showing them
+  // adds noise. The image's alt text still carries the accessible
+  // name for screen readers.
+  imageOnly?: boolean;
 }
 
-export default function ArtworkCard({ artwork }: ArtworkCardProps) {
+export default function ArtworkCard({ artwork, imageOnly = false }: ArtworkCardProps) {
   const altText = getAltText(artwork);
   const imageUrl = resolveImageUrl(artwork);
   const artistName = artwork.artist
@@ -15,9 +20,9 @@ export default function ArtworkCard({ artwork }: ArtworkCardProps) {
     : "Unknown Artist";
 
   return (
-    <Link href={`/artwork/${artwork.id}`}>
+    <Link href={`/artwork/${artwork.id}`} aria-label={imageOnly ? altText : undefined}>
       <article className="group cursor-pointer">
-        <div className="aspect-square relative bg-white overflow-hidden rounded-sm mb-3">
+        <div className={`aspect-square relative bg-white overflow-hidden rounded-sm${imageOnly ? "" : " mb-3"}`}>
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -33,14 +38,18 @@ export default function ArtworkCard({ artwork }: ArtworkCardProps) {
           )}
         </div>
 
-        {/* h2 (was h3) so the page heading hierarchy doesn't skip levels
-         * on Home + Ephemera, which only have an <h1> above the grid.
-         * On detail pages where this card sits under another <h2>, the
-         * h2→h2 sequence is fine — axe `heading-order` only flags jumps. */}
-        <h2 className="font-serif font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-          {artwork.title}
-        </h2>
-        <p className="text-sm text-gray-600 mt-1">{artistName}</p>
+        {!imageOnly && (
+          <>
+            {/* h2 (was h3) so the page heading hierarchy doesn't skip levels
+             * on Home + Ephemera, which only have an <h1> above the grid.
+             * On detail pages where this card sits under another <h2>, the
+             * h2→h2 sequence is fine — axe `heading-order` only flags jumps. */}
+            <h2 className="font-serif font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+              {artwork.title}
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">{artistName}</p>
+          </>
+        )}
       </article>
     </Link>
   );

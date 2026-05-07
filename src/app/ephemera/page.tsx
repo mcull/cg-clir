@@ -64,7 +64,7 @@ export default async function EphemeraPage({ searchParams }: EphemeraPageProps) 
 
           <ArtworkGrid>
             {artworks.map((artwork) => (
-              <ArtworkCard key={artwork.id} artwork={artwork as any} />
+              <ArtworkCard key={artwork.id} artwork={artwork as any} imageOnly />
             ))}
           </ArtworkGrid>
 
