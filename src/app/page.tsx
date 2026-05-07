@@ -78,7 +78,7 @@ export default function HomePage() {
 
       <Link
         href="/collection"
-        className="block bg-black text-white text-center text-4xl md:text-6xl py-10 md:py-14 mb-12 hover:bg-gray-800 transition-colors"
+        className="block bg-black text-white text-center italic text-4xl md:text-6xl py-10 md:py-14 mb-12 rounded-2xl hover:bg-gray-800 transition-colors"
         style={{ fontFamily: '"Borna", sans-serif' }}
       >
         Explore the Archive Here
