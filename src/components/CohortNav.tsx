@@ -5,18 +5,29 @@ interface CohortNavProps {
 }
 
 export default function CohortNav({ active }: CohortNavProps) {
+  // Separator is a CSS border (no text node) so there's no character
+  // to fail color-contrast checks. Decorative-only by construction.
   return (
-    <div className="flex items-center gap-2 text-sm">
+    <div className="flex items-center text-sm">
       <Link
         href="/"
-        className={active === "artwork" ? "text-green-700 font-semibold" : "text-gray-500 hover:text-gray-900"}
+        className={
+          "pr-3 " +
+          (active === "artwork"
+            ? "text-green-700 font-semibold"
+            : "text-gray-500 hover:text-gray-900")
+        }
       >
         Artwork
       </Link>
-      <span className="text-gray-300">|</span>
       <Link
         href="/ephemera"
-        className={active === "ephemera" ? "text-green-700 font-semibold" : "text-gray-500 hover:text-gray-900"}
+        className={
+          "pl-3 border-l border-gray-300 " +
+          (active === "ephemera"
+            ? "text-green-700 font-semibold"
+            : "text-gray-500 hover:text-gray-900")
+        }
       >
         Ephemera
       </Link>
