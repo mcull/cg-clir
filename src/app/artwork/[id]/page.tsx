@@ -195,7 +195,10 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
 
         {/* Metadata */}
         <div>
-          <h1 className="font-serif text-3xl font-bold text-gray-900 mb-4">
+          <h1
+            className="text-3xl font-bold text-gray-900 mb-4"
+            style={{ fontFamily: '"Borna", sans-serif' }}
+          >
             {artwork.title}
           </h1>
 
