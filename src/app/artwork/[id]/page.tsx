@@ -308,6 +308,11 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
 
           {/* Download Button */}
           <DownloadButton artworkId={artwork.id} title={artwork.title} />
+          <p className="text-xs italic text-gray-600 mt-3 leading-relaxed">
+            The images in this archive are open source and a part of the
+            public domain. Anyone can use these images for educational,
+            scholarly, or charitable purposes.
+          </p>
         </div>
       </div>
 
