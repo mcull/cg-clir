@@ -99,8 +99,10 @@ h1, h2, h3, h4, h5, h6 {
     @apply text-blue-600 hover:text-blue-800 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600;
   }
 
+  /* CG brand green — same #2c8b3d / #1f6c2c pair the donate button
+   * uses, so primary CTAs across the site feel like one family. */
   .button-primary {
-    @apply inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors;
+    @apply inline-flex items-center justify-center px-4 py-2 bg-[#2c8b3d] text-white rounded hover:bg-[#1f6c2c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2c8b3d] transition-colors;
   }
 
   .button-secondary {

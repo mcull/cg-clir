@@ -76,13 +76,11 @@ export default function HomePage() {
         </figure>
       </div>
 
-      <Link
-        href="/collection"
-        className="block bg-black text-white text-center italic text-4xl md:text-6xl py-10 md:py-14 mb-12 rounded-2xl hover:bg-gray-800 transition-colors"
-        style={{ fontFamily: '"Borna", sans-serif' }}
-      >
-        Explore the Archive Here
-      </Link>
+      <div className="mb-12">
+        <Link href="/collection" className="button-primary">
+          Explore
+        </Link>
+      </div>
 
       <p className="text-gray-700 leading-relaxed mb-4">
         Thank you to our friends Farley Gwazda, Katherine Sherwood, and Tara

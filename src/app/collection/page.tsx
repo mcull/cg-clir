@@ -64,7 +64,12 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
   return (
     <div className="container-max py-12">
       <div className="flex items-baseline justify-between gap-6 mb-6 flex-wrap">
-        <h1 className="font-sans text-5xl font-bold text-gray-900 tracking-tight">CGPA ARCHIVE</h1>
+        <h1
+          className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight uppercase"
+          style={{ fontFamily: '"Borna", sans-serif' }}
+        >
+          Creative Growth Public Archive
+        </h1>
         <CohortNav active="artwork" />
       </div>
 
