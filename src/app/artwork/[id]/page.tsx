@@ -140,21 +140,32 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
 
   return (
     <div className="container-max py-12">
-      {/* Site title — links to the welcome page. Not an <h1> because
-       * the artwork's own title owns that role on this page. */}
-      <Link
-        href="/"
-        className="block text-4xl md:text-5xl font-bold text-gray-900 tracking-tight uppercase mb-6 hover:text-blue-600 transition-colors"
+      {/* Site title — plain text on this page; navigation lives in
+       * the breadcrumb below. Not an <h1> because the artwork's own
+       * title owns that role. */}
+      <div
+        className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight uppercase mb-6"
         style={{ fontFamily: '"Borna", sans-serif' }}
       >
         Creative Growth Public Archive
-      </Link>
+      </div>
 
       {/* Breadcrumb */}
       <nav
         aria-label="Breadcrumb"
         className="text-sm text-gray-600 mb-8 flex gap-2 flex-wrap"
       >
+        <a
+          href="https://www.creativegrowth.org"
+          className="hover:text-blue-600"
+        >
+          Home
+        </a>
+        <span>/</span>
+        <Link href="/" className="hover:text-blue-600">
+          Archive
+        </Link>
+        <span>/</span>
         <Link href="/collection" className="hover:text-blue-600">
           Collection
         </Link>
