@@ -59,6 +59,17 @@ export default function HomePage() {
             photographs, and slides. Search by artist, medium, decade,
             ephemera type, and other key categories.
           </p>
+
+          {/* Full-width primary CTA, scoped to the left column so it
+           * sits directly under the closing paragraph above. Same
+           * .button-primary green family as the download button; we
+           * just stretch it edge-to-edge and bump the type. */}
+          <Link
+            href="/collection"
+            className="button-primary w-full text-base md:text-lg tracking-widest py-3 mt-2"
+          >
+            EXPLORE THE ARCHIVE
+          </Link>
         </div>
 
         <figure className="md:pl-4">
@@ -74,12 +85,6 @@ export default function HomePage() {
             Artwork by Annika Miller.
           </figcaption>
         </figure>
-      </div>
-
-      <div className="mb-12">
-        <Link href="/collection" className="button-primary">
-          Explore
-        </Link>
       </div>
 
       <p className="text-gray-700 leading-relaxed mb-4">

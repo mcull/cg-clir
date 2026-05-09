@@ -144,7 +144,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
        * the artwork's own title owns that role on this page. */}
       <Link
         href="/"
-        className="block text-2xl md:text-4xl font-bold text-gray-900 tracking-tight uppercase mb-6 hover:text-blue-600 transition-colors"
+        className="block text-4xl md:text-5xl font-bold text-gray-900 tracking-tight uppercase mb-6 hover:text-blue-600 transition-colors"
         style={{ fontFamily: '"Borna", sans-serif' }}
       >
         Creative Growth Public Archive
