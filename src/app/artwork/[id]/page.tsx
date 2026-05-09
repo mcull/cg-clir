@@ -315,7 +315,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
       {more.items.length > 0 && (
         <section className="mt-16 pt-16 border-t border-gray-200">
           <h2 className="font-serif text-2xl font-bold text-gray-900 mb-8">
-            More by {artistName}
+            More works by {artistName} in the archive
           </h2>
           <ArtworkGrid columns="3">
             {more.items.map((art) => (
