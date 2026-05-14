@@ -5,6 +5,7 @@ import MultiSelectDropdown from "./MultiSelectDropdown";
 import ArtistTypeaheadDropdown from "./ArtistTypeaheadDropdown";
 import SortDropdown from "./SortDropdown";
 import ActiveFilterChips from "./ActiveFilterChips";
+import AudioFilterToggle from "./AudioFilterToggle";
 import { FilterState, toQueryString } from "@/lib/filter-state";
 
 interface FilterBarProps {
@@ -15,6 +16,7 @@ interface FilterBarProps {
   mediumOptions: { value: string; label: string; count: number }[];
   decadeOptions: { value: string; label: string; count: number }[];
   artistOptions: { slug: string; name: string; available: boolean }[];
+  audioCount: number;
 }
 
 /**
@@ -29,6 +31,7 @@ export default function FilterBar({
   mediumOptions,
   decadeOptions,
   artistOptions,
+  audioCount,
 }: FilterBarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -137,11 +140,16 @@ export default function FilterBar({
           />
         )}
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-3">
           <SortDropdown
             current={state.sort}
             searchActive={!!state.q}
             onChange={(sort) => navigate({ ...state, sort })}
+          />
+          <AudioFilterToggle
+            value={state.audio}
+            count={audioCount}
+            onChange={(audio) => navigate({ ...state, audio })}
           />
         </div>
       </div>

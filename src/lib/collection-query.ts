@@ -48,12 +48,13 @@ export interface FacetCounts {
   mediums: Record<string, number>;
   decades: Record<string, number>;
   availableArtistSlugs: Set<string>;
+  audio: number;
 }
 
 const PAGE_SIZE = 24;
 const FETCH_PAGE = 1000;
 
-type ExceptDim = "themes" | "formats" | "mediums" | "decades" | "artist" | "q" | "none";
+type ExceptDim = "themes" | "formats" | "mediums" | "decades" | "artist" | "q" | "audio" | "none";
 
 /**
  * Page through all matching rows. PostgREST has a default `max-rows`
@@ -173,6 +174,9 @@ function applyScalarFilters(
     } else {
       q = q.eq("id", "00000000-0000-0000-0000-000000000000");
     }
+  }
+  if (except !== "audio" && state.audio) {
+    q = q.not("audio_url", "is", null);
   }
   return q;
 }
@@ -302,23 +306,25 @@ export async function getFacetCounts(
 ): Promise<FacetCounts> {
   const artistId = await resolveArtistId(supabase, state.artist);
 
-  const [themeIds, formatIds, mediumIds, decadeIds, artistIds] = await Promise.all([
+  const [themeIds, formatIds, mediumIds, decadeIds, artistIds, audioIds] = await Promise.all([
     candidateIdsExcept(supabase, state, cohort, artistId, "themes"),
     candidateIdsExcept(supabase, state, cohort, artistId, "formats"),
     candidateIdsExcept(supabase, state, cohort, artistId, "mediums"),
     candidateIdsExcept(supabase, state, cohort, artistId, "decades"),
     candidateIdsExcept(supabase, state, cohort, artistId, "artist"),
+    candidateIdsExcept(supabase, state, cohort, artistId, "audio"),
   ]);
 
-  const [themes, formats, mediums, decades, availableArtistSlugs] = await Promise.all([
+  const [themes, formats, mediums, decades, availableArtistSlugs, audio] = await Promise.all([
     countCategoriesForIds(supabase, themeIds, "theme"),
     countCategoriesForIds(supabase, formatIds, "format"),
     countCategoriesForIds(supabase, mediumIds, "medium"),
     countDecadesForIds(supabase, decadeIds),
     artistsForIds(supabase, artistIds),
+    countAudioForIds(supabase, audioIds),
   ]);
 
-  return { themes, formats, mediums, decades, availableArtistSlugs };
+  return { themes, formats, mediums, decades, availableArtistSlugs, audio };
 }
 
 async function candidateIdsExcept(
@@ -413,6 +419,21 @@ async function countDecadesForIds(
     if (row.decade) counts[row.decade] = (counts[row.decade] || 0) + 1;
   }
   return counts;
+}
+
+async function countAudioForIds(
+  supabase: SupabaseClient,
+  candidateIds: Set<string>
+): Promise<number> {
+  if (candidateIds.size === 0) return 0;
+  const rows = await fetchAllRows<{ id: string }>(() =>
+    supabase.from("artworks").select("id").not("audio_url", "is", null)
+  );
+  let n = 0;
+  for (const row of rows) {
+    if (candidateIds.has(row.id)) n++;
+  }
+  return n;
 }
 
 async function artistsForIds(

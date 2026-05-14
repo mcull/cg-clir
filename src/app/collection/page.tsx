@@ -96,6 +96,7 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
         mediumOptions={mediumOptions}
         decadeOptions={decadeOptions}
         artistOptions={artistOptions}
+        audioCount={facets.audio}
       />
 
       {artworks.length > 0 ? (
@@ -116,7 +117,7 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
               currentPage={state.page}
               totalPages={totalPages}
               baseUrl="/collection"
-              preserveParams={["q", "theme", "format", "medium", "decade", "artist", "sort"]}
+              preserveParams={["q", "theme", "format", "medium", "decade", "artist", "sort", "audio"]}
             />
           )}
         </>

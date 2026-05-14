@@ -73,6 +73,7 @@ export default async function EphemeraPage({ searchParams }: EphemeraPageProps) 
         mediumOptions={[]}
         decadeOptions={[]}
         artistOptions={artistOptions}
+        audioCount={facets.audio}
       />
 
       {artworks.length > 0 ? (
@@ -93,7 +94,7 @@ export default async function EphemeraPage({ searchParams }: EphemeraPageProps) 
               currentPage={state.page}
               totalPages={totalPages}
               baseUrl="/ephemera"
-              preserveParams={["q", "artist", "sort"]}
+              preserveParams={["q", "artist", "sort", "audio"]}
             />
           )}
         </>
