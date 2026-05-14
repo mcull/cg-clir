@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import ArtworkGrid from "@/components/ArtworkGrid";
 import ArtworkCard from "@/components/ArtworkCard";
@@ -63,8 +64,27 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
 
   return (
     <div className="container-max py-12">
+      <nav
+        aria-label="Breadcrumb"
+        className="text-sm text-gray-600 mb-6 flex gap-2 flex-wrap"
+      >
+        <a href="https://www.creativegrowth.org" className="hover:text-blue-600">
+          Home
+        </a>
+        <span>/</span>
+        <Link href="/" className="hover:text-blue-600">
+          Archive
+        </Link>
+        <span>/</span>
+        <span className="text-gray-900 font-semibold">Collection</span>
+      </nav>
       <div className="flex items-baseline justify-between gap-6 mb-6 flex-wrap">
-        <h1 className="font-sans text-5xl font-bold text-gray-900 tracking-tight">CGPA ARCHIVE</h1>
+        <h1
+          className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight uppercase"
+          style={{ fontFamily: '"Borna", sans-serif' }}
+        >
+          Creative Growth Public Archive
+        </h1>
         <CohortNav active="artwork" />
       </div>
 

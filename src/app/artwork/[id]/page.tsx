@@ -140,11 +140,32 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
 
   return (
     <div className="container-max py-12">
+      {/* Site title — plain text on this page; navigation lives in
+       * the breadcrumb below. Not an <h1> because the artwork's own
+       * title owns that role. */}
+      <div
+        className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight uppercase mb-6"
+        style={{ fontFamily: '"Borna", sans-serif' }}
+      >
+        Creative Growth Public Archive
+      </div>
+
       {/* Breadcrumb */}
       <nav
         aria-label="Breadcrumb"
         className="text-sm text-gray-600 mb-8 flex gap-2 flex-wrap"
       >
+        <a
+          href="https://www.creativegrowth.org"
+          className="hover:text-blue-600"
+        >
+          Home
+        </a>
+        <span>/</span>
+        <Link href="/" className="hover:text-blue-600">
+          Archive
+        </Link>
+        <span>/</span>
         <Link href="/collection" className="hover:text-blue-600">
           Collection
         </Link>
@@ -185,7 +206,10 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
 
         {/* Metadata */}
         <div>
-          <h1 className="font-serif text-3xl font-bold text-gray-900 mb-4">
+          <h1
+            className="text-3xl font-bold text-gray-900 mb-4"
+            style={{ fontFamily: '"Borna", sans-serif' }}
+          >
             {artwork.title}
           </h1>
 
@@ -295,6 +319,11 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
 
           {/* Download Button */}
           <DownloadButton artworkId={artwork.id} title={artwork.title} />
+          <p className="text-xs italic text-gray-600 mt-3 leading-relaxed">
+            The images in this archive are open source and a part of the
+            public domain. Anyone can use these images for educational,
+            scholarly, or charitable purposes.
+          </p>
         </div>
       </div>
 
@@ -302,7 +331,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
       {more.items.length > 0 && (
         <section className="mt-16 pt-16 border-t border-gray-200">
           <h2 className="font-serif text-2xl font-bold text-gray-900 mb-8">
-            More by {artistName}
+            More works by {artistName} in the archive
           </h2>
           <ArtworkGrid columns="3">
             {more.items.map((art) => (

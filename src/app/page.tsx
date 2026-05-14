@@ -59,6 +59,17 @@ export default function HomePage() {
             photographs, and slides. Search by artist, medium, decade,
             ephemera type, and other key categories.
           </p>
+
+          {/* Full-width primary CTA, scoped to the left column so it
+           * sits directly under the closing paragraph above. Same
+           * .button-primary green family as the download button; we
+           * just stretch it edge-to-edge and bump the type. */}
+          <Link
+            href="/collection"
+            className="button-primary w-full text-base md:text-lg tracking-widest py-3 mt-2"
+          >
+            EXPLORE THE ARCHIVE
+          </Link>
         </div>
 
         <figure className="md:pl-4">
@@ -75,14 +86,6 @@ export default function HomePage() {
           </figcaption>
         </figure>
       </div>
-
-      <Link
-        href="/collection"
-        className="block bg-black text-white text-center italic text-4xl md:text-6xl py-10 md:py-14 mb-12 rounded-2xl hover:bg-gray-800 transition-colors"
-        style={{ fontFamily: '"Borna", sans-serif' }}
-      >
-        Explore the Archive Here
-      </Link>
 
       <p className="text-gray-700 leading-relaxed mb-4">
         Thank you to our friends Farley Gwazda, Katherine Sherwood, and Tara
