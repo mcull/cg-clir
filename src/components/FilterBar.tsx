@@ -139,17 +139,17 @@ export default function FilterBar({
             onChange={(decades) => navigate({ ...state, decades })}
           />
         )}
+        <AudioFilterToggle
+          value={state.audio}
+          count={audioCount}
+          onChange={(audio) => navigate({ ...state, audio })}
+        />
 
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto">
           <SortDropdown
             current={state.sort}
             searchActive={!!state.q}
             onChange={(sort) => navigate({ ...state, sort })}
-          />
-          <AudioFilterToggle
-            value={state.audio}
-            count={audioCount}
-            onChange={(audio) => navigate({ ...state, audio })}
           />
         </div>
       </div>

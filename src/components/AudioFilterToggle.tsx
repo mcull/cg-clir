@@ -31,15 +31,23 @@ export default function AudioFilterToggle({ value, count, onChange }: AudioFilte
     >
       <Headphones size={16} aria-hidden="true" />
       <span
-        className={`relative inline-block h-[18px] w-[32px] rounded-full transition-colors ${
-          value ? "bg-emerald-600" : disabled ? "bg-gray-200" : "bg-gray-300"
-        }`}
         aria-hidden="true"
+        className="relative inline-block rounded-full transition-colors flex-shrink-0"
+        style={{
+          width: 32,
+          height: 18,
+          backgroundColor: value ? "#059669" : disabled ? "#e5e7eb" : "#d1d5db",
+        }}
       >
         <span
-          className={`absolute top-[2px] h-[14px] w-[14px] rounded-full bg-white shadow transition-transform ${
-            value ? "translate-x-[16px]" : "translate-x-[2px]"
-          }`}
+          className="absolute rounded-full bg-white shadow"
+          style={{
+            top: 2,
+            left: value ? 16 : 2,
+            width: 14,
+            height: 14,
+            transition: "left 150ms ease",
+          }}
         />
       </span>
       <span className="text-xs text-gray-500 tabular-nums">{count}</span>
