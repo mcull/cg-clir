@@ -14,6 +14,7 @@ export interface FilterState {
   decades: string[];
   artist: string | null;
   sort: SortKey | null;
+  audio: boolean;
   page: number;
 }
 
@@ -43,6 +44,11 @@ function parsePage(p: RawParam): number {
   return isNaN(v) || v < 1 ? 1 : v;
 }
 
+function parseBool(p: RawParam): boolean {
+  const v = pickFirst(p).toLowerCase();
+  return v === "1" || v === "true" || v === "yes";
+}
+
 export function parseSearchParams(params: Record<string, RawParam>): FilterState {
   return {
     q: pickFirst(params.q),
@@ -52,6 +58,7 @@ export function parseSearchParams(params: Record<string, RawParam>): FilterState
     decades: parseList(params.decade),
     artist: pickFirst(params.artist) || null,
     sort: parseSort(params.sort),
+    audio: parseBool(params.audio),
     page: parsePage(params.page),
   };
 }
@@ -65,6 +72,7 @@ export function toQueryString(state: FilterState): string {
   if (state.decades.length) out.set("decade", state.decades.join(","));
   if (state.artist) out.set("artist", state.artist);
   if (state.sort) out.set("sort", state.sort);
+  if (state.audio) out.set("audio", "1");
   if (state.page > 1) out.set("page", String(state.page));
   return out.toString();
 }

@@ -70,6 +70,19 @@ export default function HomePage() {
           >
             EXPLORE THE ARCHIVE
           </Link>
+
+          <p className="text-sm text-gray-700 leading-relaxed pt-2">
+            A growing selection of works in the archive includes audio
+            descriptions — short narrations of each image for blind and
+            low-vision visitors, so the artwork can be experienced through
+            listening.
+          </p>
+          <Link
+            href="/collection?audio=1"
+            className="button-secondary w-full text-base md:text-lg tracking-widest py-3"
+          >
+            BROWSE WORKS WITH AUDIO DESCRIPTIONS
+          </Link>
         </div>
 
         <figure className="md:pl-4">
