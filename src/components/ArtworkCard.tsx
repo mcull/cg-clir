@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Headphones } from "lucide-react";
 import { Artwork } from "@/lib/types";
 import { getAltText, formatArtistName, resolveImageUrl } from "@/lib/utils";
 
@@ -48,6 +49,12 @@ export default function ArtworkCard({ artwork, imageOnly = false }: ArtworkCardP
               {artwork.title}
             </h2>
             <p className="text-sm text-gray-600 mt-1">{artistName}</p>
+            {artwork.audio_url && (
+              <p className="mt-1 text-gray-500" title="Includes audio description">
+                <Headphones size={14} aria-hidden="true" className="inline-block align-text-bottom" />
+                <span className="sr-only">Includes audio description</span>
+              </p>
+            )}
           </>
         )}
       </article>

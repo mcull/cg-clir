@@ -39,6 +39,7 @@ export interface ArtworkResult {
   alt_text: string | null;
   alt_text_long: string | null;
   description_origin: "human" | "ai" | null;
+  audio_url: string | null;
   artist: { id: string; first_name: string; last_name: string; slug: string } | null;
 }
 
@@ -206,7 +207,7 @@ function applySingleDimEmbeddedFilter(
 }
 
 function buildSelect(hasCategoryEmbed: boolean, fields: "rich" | "id"): string {
-  const richFields = `id, sku, title, medium, date_created, decade, image_url, image_original, alt_text, alt_text_long, description_origin, sort_order, artist:artists(id, first_name, last_name, slug)`;
+  const richFields = `id, sku, title, medium, date_created, decade, image_url, image_original, alt_text, alt_text_long, description_origin, audio_url, sort_order, artist:artists(id, first_name, last_name, slug)`;
   const base = fields === "rich" ? richFields : "id";
   if (!hasCategoryEmbed) return base;
   return `${base}, artwork_categories!inner(category:categories!inner(slug, kind))`;
