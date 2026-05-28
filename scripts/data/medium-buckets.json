@@ -1043,6 +1043,32 @@
       "Oil pastel",
       "Acrylic",
       "Watercolor"
+    ],
+    "Acrylic and wood sculpture": [
+      "Acrylic",
+      "Wood"
+    ],
+    "Book": [
+      "Other"
+    ],
+    "Colored pencil and silkscreen on paper": [
+      "Colored pencil",
+      "Other"
+    ],
+    "Colored pencil, ink, and silkscreen on paper": [
+      "Colored pencil",
+      "Ink",
+      "Other"
+    ],
+    "Showcard": [
+      "Other"
+    ],
+    "Signed poster": [
+      "Other"
+    ],
+    "Textile and wood sculpture": [
+      "Fiber/Yarn",
+      "Wood"
     ]
   }
 }
