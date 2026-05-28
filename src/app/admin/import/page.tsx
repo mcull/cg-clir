@@ -4,6 +4,21 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+// Prefer R2 over CDN — image_url is the canonical R2 path post-migration.
+// This inverts resolveImageUrl()'s priority, which falls back to CDN for
+// display continuity on rows still in mid-migration.
+function exportImageUrl(
+  image_url: string | null,
+  image_original: string | null
+): string {
+  if (!image_url) return image_original || "";
+  if (image_url.startsWith("http://") || image_url.startsWith("https://")) {
+    return image_url;
+  }
+  const base = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+  return base ? `${base}/${image_url}` : image_url;
+}
+
 export default function ImportPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
@@ -39,6 +54,7 @@ export default function ImportPage() {
         "Width",
         "Depth",
         "Inventory Number",
+        "Filename",
         "Categories",
         "Tags",
         "On Website",
@@ -56,6 +72,7 @@ export default function ImportPage() {
         artwork.width || "",
         artwork.depth || "",
         artwork.inventory_number || "",
+        exportImageUrl(artwork.image_url, artwork.image_original),
         artwork.categories?.map((c: any) => c.category.name).join("; ") || "",
         artwork.tags?.join("; ") || "",
         artwork.on_website ? "Yes" : "No",
