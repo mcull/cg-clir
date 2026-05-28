@@ -63,6 +63,17 @@ if (fs.existsSync(BUCKETS_FILE)) {
   // bucketIdByName is populated below after we resolve category IDs from the DB.
 }
 
+// Tags that the site uses as filter keys are stored lowercase in the DB;
+// Postgres array @> is case-sensitive, so a CSV tag of "Ephemera" wouldn't
+// match `tags @> '{ephemera}'`. Canonicalize at import to keep the data clean.
+const FILTER_MAGIC_TAGS = new Set(["ephemera"]);
+
+function normalizeFilterTags(tags: string[]): string[] {
+  return tags.map((t) =>
+    FILTER_MAGIC_TAGS.has(t.toLowerCase()) ? t.toLowerCase() : t
+  );
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────
 interface CsvRow {
   Image: string;
@@ -166,7 +177,7 @@ async function main() {
   // Process in batches of 100 for Supabase limits
   const BATCH_SIZE = 100;
   let artworkCount = 0;
-  let skippedCount = 0;
+  let placeholderTitleCount = 0;
   const unknownMediums = new Set<string>();
 
   for (let i = 0; i < rows.length; i += BATCH_SIZE) {
@@ -174,10 +185,10 @@ async function main() {
     const artworkRecords = [];
 
     for (const row of batch) {
-      const title = row.Title?.trim();
+      let title = row.Title?.trim();
       if (!title) {
-        skippedCount++;
-        continue;
+        title = "Untitled";
+        placeholderTitleCount++;
       }
 
       const first = row["Artist First Name"]?.trim() || "";
@@ -200,7 +211,7 @@ async function main() {
         sku: row.SKU?.trim() || null,
         image_original: row.Image?.trim() || null,
         image_url: row.Image?.trim() || null,
-        tags: parseTags(row.Tags),
+        tags: normalizeFilterTags(parseTags(row.Tags)),
         genre:
           row.Genre?.trim() && row.Genre.trim() !== "Unselected"
             ? row.Genre.trim()
@@ -333,7 +344,7 @@ async function main() {
   }
 
   console.log(
-    `\n\nDone! Imported ${artworkCount} artworks, skipped ${skippedCount} (no title).`
+    `\n\nDone! Imported ${artworkCount} artworks (${placeholderTitleCount} given "Untitled" placeholder for blank CSV title).`
   );
 
   if (unknownMediums.size > 0) {
