@@ -215,7 +215,7 @@ function buildSelect(hasCategoryEmbed: boolean, fields: "rich" | "id"): string {
 
 // ─── Sort ───────────────────────────────────────────────────────────────
 function applySort(query: any, state: FilterState): any {
-  const effective: string = state.sort ?? (state.q ? "relevance" : "featured");
+  const effective: string = state.sort ?? "oldest";
 
   switch (effective) {
     case "featured":
