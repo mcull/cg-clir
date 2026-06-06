@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Artwork } from "@/lib/types";
 import { getAltText, formatArtistName, formatDimensions, resolveImageUrl } from "@/lib/utils";
 import DownloadButton from "@/components/DownloadButton";
+import ImageLightbox from "@/components/ImageLightbox";
 import ArtworkGrid from "@/components/ArtworkGrid";
 import ArtworkCard from "@/components/ArtworkCard";
 
@@ -129,6 +130,8 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
 
   const altText = getAltText(artwork);
   const imageUrl = resolveImageUrl(artwork);
+  // Lightbox loads the highest-resolution source available for close-up viewing.
+  const zoomUrl = artwork.image_original || imageUrl;
   const artistName = artwork.artist
     ? formatArtistName(artwork.artist.first_name, artwork.artist.last_name)
     : "Unknown Artist";
@@ -185,11 +188,11 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
               // present it describes the image, so screen readers shouldn't
               // double-announce — set alt="" and let the figure semantics carry
               // the description. If no figcaption, fall back to title+medium.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <ImageLightbox
                 src={imageUrl}
+                zoomSrc={zoomUrl || imageUrl}
                 alt={artwork.alt_text ? "" : altText}
-                className="block max-w-full max-h-[85vh]"
+                inlineClassName="block max-w-full max-h-[85vh]"
               />
             ) : (
               <div className="bg-white aspect-square flex items-center justify-center text-gray-400">
@@ -318,12 +321,14 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
           </dl>
 
           {/* Download Button */}
-          <DownloadButton artworkId={artwork.id} title={artwork.title} />
-          <p className="text-xs italic text-gray-600 mt-3 leading-relaxed">
+          <p className="text-xs italic text-gray-600 leading-relaxed">
             The images in this archive are open source and a part of the
             public domain. Anyone can use these images for educational,
             scholarly, or charitable purposes.
           </p>
+          <div className="mt-3">
+            <DownloadButton artworkId={artwork.id} title={artwork.title} />
+          </div>
         </div>
       </div>
 

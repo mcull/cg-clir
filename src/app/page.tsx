@@ -71,7 +71,7 @@ export default function HomePage() {
             EXPLORE THE ARCHIVE
           </Link>
 
-          <p className="text-sm text-gray-700 leading-relaxed pt-2">
+          <p className="text-gray-700 leading-relaxed pt-2">
             A growing selection of works in the archive includes audio
             descriptions — short narrations of each image for blind and
             low-vision visitors, so the artwork can be experienced through

@@ -4,10 +4,9 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import ArtworkGrid from "@/components/ArtworkGrid";
 import ArtworkCard from "@/components/ArtworkCard";
 import Pagination from "@/components/Pagination";
-import FilterBar from "@/components/FilterBar";
 import CohortNav from "@/components/CohortNav";
 import { parseSearchParams } from "@/lib/filter-state";
-import { queryArtworks, getFacetCounts } from "@/lib/collection-query";
+import { queryArtworks } from "@/lib/collection-query";
 
 const ITEMS_PER_PAGE = 24;
 
@@ -25,17 +24,7 @@ export default async function EphemeraPage({ searchParams }: EphemeraPageProps) 
   const state = parseSearchParams(raw);
   const supabase = createServerSupabaseClient();
 
-  const [{ artworks, total }, facets, allArtists] = await Promise.all([
-    queryArtworks(supabase, state, "ephemera"),
-    getFacetCounts(supabase, state, "ephemera"),
-    supabase.from("artists").select("slug, first_name, last_name").order("last_name").order("first_name"),
-  ]);
-
-  const artistOptions = (allArtists.data || []).map((a) => ({
-    slug: a.slug,
-    name: `${a.first_name} ${a.last_name}`.trim(),
-    available: facets.availableArtistSlugs.has(a.slug),
-  }));
+  const { artworks, total } = await queryArtworks(supabase, state, "ephemera");
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
@@ -65,17 +54,6 @@ export default async function EphemeraPage({ searchParams }: EphemeraPageProps) 
         <CohortNav active="ephemera" />
       </div>
 
-      <FilterBar
-        state={state}
-        cohort="ephemera"
-        themeOptions={[]}
-        formatOptions={[]}
-        mediumOptions={[]}
-        decadeOptions={[]}
-        artistOptions={artistOptions}
-        audioCount={facets.audio}
-      />
-
       {artworks.length > 0 ? (
         <>
           <p className="text-gray-600 mb-6 text-sm">
@@ -100,8 +78,7 @@ export default async function EphemeraPage({ searchParams }: EphemeraPageProps) 
         </>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-600 text-lg mb-4">No ephemera match your filters.</p>
-          <a href="/ephemera" className="text-blue-600 underline">Clear filters</a>
+          <p className="text-gray-600 text-lg">No ephemera found.</p>
         </div>
       )}
     </div>
