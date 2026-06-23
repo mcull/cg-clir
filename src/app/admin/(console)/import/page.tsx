@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { fetchAllPages } from "@/lib/paginate";
 
 // Prefer R2 over CDN — image_url is the canonical R2 path post-migration.
 // This inverts resolveImageUrl()'s priority, which falls back to CDN for
@@ -30,18 +31,25 @@ export default function ImportPage() {
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
-        .from("artworks")
-        .select(
-          `
-          *,
-          artist:artists(first_name, last_name),
-          categories:artwork_categories(category:categories(name))
-          `
-        )
-        .order("sort_order", { ascending: true });
-
-      if (fetchError) throw fetchError;
+      // Paginate past PostgREST's 1000-row cap so the export covers the
+      // whole catalog (2,500+ rows), not just the first page. The id
+      // tiebreaker keeps ordering stable across page boundaries.
+      const data = await fetchAllPages<any>(async (from, to) => {
+        const { data, error: fetchError } = await supabase
+          .from("artworks")
+          .select(
+            `
+            *,
+            artist:artists(first_name, last_name),
+            categories:artwork_categories(category:categories(name))
+            `
+          )
+          .order("sort_order", { ascending: true })
+          .order("id", { ascending: true })
+          .range(from, to);
+        if (fetchError) throw fetchError;
+        return data || [];
+      });
 
       // Create CSV
       const headers = [
