@@ -1,18 +1,32 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { isAllowedAdmin } from "@/lib/admin-allowlist";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
 /**
- * Gate admin API routes behind the same auth check the admin layout uses
- * (Supabase session, with a NEXT_PUBLIC_AUTH_BYPASS dev escape hatch).
- * Returns null on success; returns a 401 NextResponse to throw early on
- * failure.
+ * Dev-only escape hatch. The bypass is honored ONLY outside production, so
+ * a stray NEXT_PUBLIC_AUTH_BYPASS=true in a prod environment can never open
+ * the admin again.
+ */
+export function isDevAuthBypass(): boolean {
+  return (
+    process.env.NODE_ENV !== "production" &&
+    process.env.NEXT_PUBLIC_AUTH_BYPASS === "true"
+  );
+}
+
+/**
+ * Gate admin API routes: requires a verified Supabase user whose email is
+ * allowed (domain or allowlist). Uses getUser() — which validates the JWT
+ * against the auth server — rather than getSession(), which only decodes
+ * the cookie. Returns null on success; a 401 NextResponse to return early
+ * on failure.
  */
 export async function requireAdmin(): Promise<NextResponse | null> {
-  if (process.env.NEXT_PUBLIC_AUTH_BYPASS === "true") return null;
+  if (isDevAuthBypass()) return null;
   const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase.auth.getSession();
-  if (error || !data?.session) {
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user || !isAllowedAdmin(data.user.email)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   return null;

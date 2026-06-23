@@ -1,24 +1,28 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { isDevAuthBypass } from "@/lib/admin-auth";
+import { isAllowedAdmin } from "@/lib/admin-allowlist";
 import { redirect } from "next/navigation";
 
-async function checkAuth() {
-  // Check env var first for dev mode
-  if (process.env.NEXT_PUBLIC_AUTH_BYPASS === "true") {
-    return true;
-  }
+/**
+ * Server-side gate (defense-in-depth alongside middleware). Verifies the
+ * user via getUser() and checks the admin allowlist. Unauthenticated →
+ * login; authenticated-but-not-allowed → login with a forbidden flag so
+ * the login page shows a clear message instead of looping.
+ */
+async function requireAdminPage() {
+  if (isDevAuthBypass()) return;
 
-  // Check Supabase session
   const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase.auth.getSession();
+  const { data, error } = await supabase.auth.getUser();
 
-  if (error) {
-    console.error("Auth error:", error);
-    return false;
+  if (error || !data?.user) {
+    redirect("/admin/login");
   }
-
-  return !!data?.session;
+  if (!isAllowedAdmin(data.user.email)) {
+    redirect("/admin/login?error=forbidden");
+  }
 }
 
 interface AdminLayoutProps {
@@ -30,11 +34,7 @@ export const metadata = {
 };
 
 export default async function AdminLayout({ children }: AdminLayoutProps) {
-  const isAuthenticated = await checkAuth();
-
-  if (!isAuthenticated) {
-    redirect("/admin/login");
-  }
+  await requireAdminPage();
 
   return (
     <div className="flex min-h-screen bg-gray-100">
