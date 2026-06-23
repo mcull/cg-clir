@@ -21,7 +21,7 @@ import Anthropic from "@anthropic-ai/sdk";
 // ─── Config ───────────────────────────────────────────────────────────────
 const CONCURRENCY = parseInt(process.env.DESCRIPTION_CONCURRENCY || "3", 10);
 const PROGRESS_FILE = path.join(__dirname, ".description-progress.json");
-const MODEL = "claude-sonnet-4-20250514";
+const MODEL = "claude-sonnet-4-6";
 
 // ─── Clients ──────────────────────────────────────────────────────────────
 const supabase = createClient(

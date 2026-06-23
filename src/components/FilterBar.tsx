@@ -3,7 +3,6 @@ import { useState, FormEvent } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import MultiSelectDropdown from "./MultiSelectDropdown";
 import ArtistTypeaheadDropdown from "./ArtistTypeaheadDropdown";
-import SortDropdown from "./SortDropdown";
 import ActiveFilterChips from "./ActiveFilterChips";
 import AudioFilterToggle from "./AudioFilterToggle";
 import { FilterState, toQueryString } from "@/lib/filter-state";
@@ -144,14 +143,6 @@ export default function FilterBar({
           count={audioCount}
           onChange={(audio) => navigate({ ...state, audio })}
         />
-
-        <div className="ml-auto">
-          <SortDropdown
-            current={state.sort}
-            searchActive={!!state.q}
-            onChange={(sort) => navigate({ ...state, sort })}
-          />
-        </div>
       </div>
 
       <ActiveFilterChips
