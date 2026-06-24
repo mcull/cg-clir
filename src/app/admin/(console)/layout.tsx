@@ -62,17 +62,24 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
           >
             ← View Gallery
           </a>
-          <button
-            onClick={async () => {
+          {/* Logout must be a form-bound server action — onClick handlers
+           * don't work in a Server Component, so the old button was inert.
+           * signOut() clears the auth cookies, then we redirect to login. */}
+          <form
+            action={async () => {
               "use server";
               const supabase = createServerSupabaseClient();
               await supabase.auth.signOut();
-              redirect("/");
+              redirect("/admin/login");
             }}
-            className="mt-3 block text-sm text-gray-400 hover:text-white transition-colors"
           >
-            Logout
-          </button>
+            <button
+              type="submit"
+              className="mt-3 block text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              Logout
+            </button>
+          </form>
         </div>
       </aside>
 
