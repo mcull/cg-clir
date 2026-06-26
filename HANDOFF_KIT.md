@@ -30,11 +30,13 @@ Anything created under a personal account should be re-issued under CG and rotat
 - [x] **Remove `NEXT_PUBLIC_AUTH_BYPASS`** from Vercel production *(confirmed by Marc)*
 
 ## 3. Auth & admin access
-- [ ] **Update the SMTP** — configure custom SMTP in Supabase (Auth → Emails → SMTP Settings) so magic-link emails send reliably. Supabase's built-in email sender is rate-limited (~a few/hour) and not meant for production; magic-link sign-in will be flaky until a real SMTP provider (e.g., Resend/SendGrid/Postmark) is wired up. Also review the magic-link email template/branding.
+- [x] **Custom SMTP configured (INTERIM)** — Supabase custom SMTP via Resend. Magic-link sends verified working in prod (2026-06-25). ⚠️ **Interim arrangement:** emails send from `no-reply@nexthorizoncollective.org` using **Marc's personal Resend account**. This is a personal dependency — if that account/domain goes away, staff get locked out.
+- [ ] **Move email sending off Marc's personal accounts** — replace the interim SMTP with a CG-owned setup: a `creativegrowth.org` (or `archive.creativegrowth.org`) sender domain verified under a CG-owned Resend (or other provider) account. **Requires CG DNS access** (add SPF/DKIM records) — the blocker that's currently weeks out. Until then, login email is riding on Marc's domain.
 - [x] **Supabase redirect URLs** — Site URL + `/auth/callback` for localhost and `https://archive.creativegrowth.org` *(confirmed by Marc)*
-- [ ] **Onboard CG admin(s)** — confirm the people who need access have `@creativegrowth.org` Google/email accounts and can sign in via magic link
+- [x] **Verify the live magic-link round-trip** — OTP send confirmed against prod; magic-link → `/auth/callback` → `/admin` working (2026-06-25). First emails from the new domain may land in spam until reputation builds — tell staff to check spam / mark "not spam."
+- [ ] **Onboard CG admin(s)** — confirm the people who need access have `@creativegrowth.org` accounts and can sign in via magic link
 - [ ] **Tighten the allowlist** — once CG admins are confirmed working, remove the personal fallback `marc.cull@gmail.com` from `ADMIN_EMAIL_ALLOWLIST` (or keep intentionally for break-glass — decide with CG)
-- [ ] **Verify the live magic-link round-trip** — request link → email arrives → click → lands in `/admin` (not yet tested end-to-end; needs SMTP above)
+- [ ] **Raise Supabase Auth email rate limit** if multiple admins sign in around the same time (Auth → Rate Limits)
 
 ## 4. Operational runbooks (write these for CG)
 - [ ] **Import new inventory** — how to run `npm run import:csv -- <file>` against a fresh Art Cloud export (note the `on_website` / cohort / ephemera-tag behavior)
