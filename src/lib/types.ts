@@ -22,6 +22,18 @@ export interface Category {
   created_at: string;
 }
 
+export interface ArtworkImage {
+  id: string;
+  artwork_id: string;
+  image_url: string | null;
+  image_original: string | null;
+  is_primary: boolean;
+  sort_order: number;
+  short_description: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Artwork {
   id: string;
   artist_id: string | null;
@@ -50,6 +62,7 @@ export interface Artwork {
   // Joined fields
   artist?: Artist;
   categories?: Category[];
+  images?: ArtworkImage[];
 }
 
 export interface DownloadEvent {
