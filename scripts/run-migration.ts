@@ -17,7 +17,7 @@ const MIGRATION_FILE = path.join(
   "..",
   "supabase",
   "migrations",
-  "001_initial.sql"
+  process.argv[2] || "001_initial.sql"
 );
 
 async function main() {
