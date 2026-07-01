@@ -44,17 +44,23 @@ BEGIN
     WHERE artwork_id = target_artwork AND is_primary
     LIMIT 1;
 
-  -- No primary left (e.g. primary was deleted): promote lowest sort_order.
+  -- No primary left (e.g. primary was deleted). Promote the lowest sort_order
+  -- survivor if one exists; otherwise the artwork has no images — null its cache.
   IF NOT FOUND AND TG_OP = 'DELETE' THEN
-    UPDATE artwork_images
-      SET is_primary = true
-      WHERE id = (
-        SELECT id FROM artwork_images
-          WHERE artwork_id = target_artwork
-          ORDER BY sort_order ASC, created_at ASC
-          LIMIT 1
-      );
-    -- The UPDATE above re-fires this trigger and sets the cache; we're done.
+    IF EXISTS (SELECT 1 FROM artwork_images WHERE artwork_id = target_artwork) THEN
+      UPDATE artwork_images
+        SET is_primary = true
+        WHERE id = (
+          SELECT id FROM artwork_images
+            WHERE artwork_id = target_artwork
+            ORDER BY sort_order ASC, created_at ASC
+            LIMIT 1
+        );
+      -- The UPDATE above re-fires this trigger and sets the cache; we're done.
+    ELSE
+      UPDATE artworks SET image_url = NULL, image_original = NULL
+        WHERE id = target_artwork;
+    END IF;
     RETURN NULL;
   END IF;
 
