@@ -2,11 +2,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Artist, Artwork } from "@/lib/types";
-import { formatArtistName, parseTags, resolveImageUrl } from "@/lib/utils";
+import { formatArtistName, parseTags } from "@/lib/utils";
+import ImageManager from "@/components/admin/ImageManager";
 
 export default function EditArtworkPage() {
   const router = useRouter();
@@ -237,26 +237,8 @@ export default function EditArtworkPage() {
           </div>
         )}
 
-        {/* Image Preview */}
-        {(() => {
-          const imageUrl = resolveImageUrl(artwork);
-          if (!imageUrl) return null;
-          return (
-            <div className="mb-6">
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                Image Preview
-              </label>
-              <div className="relative w-48 h-48 rounded bg-gray-100">
-                <Image
-                  src={imageUrl}
-                  alt={artwork.title}
-                  fill
-                  className="object-cover rounded"
-                />
-              </div>
-            </div>
-          );
-        })()}
+        {/* Images */}
+        <ImageManager artworkId={artworkId} />
 
         {/* Title */}
         <div className="mb-6">

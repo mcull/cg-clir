@@ -106,3 +106,15 @@ export function artworkImageUrl(
   const base = process.env.R2_PUBLIC_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL || "";
   return `${base}/artworks/${encodeURIComponent(inventoryNumber)}/${variant}.jpg`;
 }
+
+/**
+ * R2 object key for one variant of one artwork image.
+ * `folder` is the artwork's inventory_number (or id when no inventory number).
+ */
+export function artworkImageKey(
+  folder: string,
+  imageId: string,
+  variant: string
+): string {
+  return `artworks/${encodeURIComponent(folder)}/${imageId}/${variant}.jpg`;
+}
