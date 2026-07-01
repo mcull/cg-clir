@@ -86,12 +86,18 @@ async function importRow(row: ManifestRow): Promise<"ok" | "unmatched"> {
   });
 
   if (row.is_primary) {
-    // Set this row primary, clear the rest (one-at-a-time keeps the unique index happy).
-    const { data: rows } = await supabase
-      .from("artwork_images").select("id").eq("artwork_id", art.id);
-    for (const r of rows ?? []) {
-      await supabase.from("artwork_images").update({ is_primary: r.id === imageId }).eq("id", r.id);
-    }
+    // Clear the old primary FIRST, then set the new one. The partial unique
+    // index is checked per-statement, so setting this row primary while another
+    // is still primary would fail — order matters.
+    await supabase
+      .from("artwork_images")
+      .update({ is_primary: false })
+      .eq("artwork_id", art.id)
+      .neq("id", imageId);
+    await supabase
+      .from("artwork_images")
+      .update({ is_primary: true })
+      .eq("id", imageId);
   }
   return "ok";
 }

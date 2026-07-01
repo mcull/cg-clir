@@ -52,6 +52,9 @@ export async function POST(
     if (file instanceof Blob) {
       input = Buffer.from(await file.arrayBuffer());
     } else if (typeof url === "string" && url) {
+      // Admin-supplied URL fetched server-side (trusted: route is requireAdmin
+      // gated). If this ever becomes non-admin, add a host allowlist to prevent
+      // SSRF to internal/metadata endpoints.
       const resp = await fetch(url);
       if (!resp.ok) throw new Error(`Fetch failed: ${resp.status}`);
       input = Buffer.from(await resp.arrayBuffer());

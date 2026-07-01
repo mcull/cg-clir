@@ -27,25 +27,28 @@ export async function PATCH(
       const { error } = await db
         .from("artwork_images")
         .update({ short_description: body.short_description })
-        .eq("id", imageId);
+        .eq("id", imageId)
+        .eq("artwork_id", artworkId);
       if (error) throw error;
     }
 
     if (body.make_primary) {
-      // Per-row update keeps exactly one primary, never violating the partial
-      // unique index: every row is set to (id = target).
-      const { data: rows, error: selErr } = await db
+      // Clear the old primary FIRST, then set the new one. The partial unique
+      // index (one is_primary per artwork) is checked per-statement, so setting
+      // the target true while another row is still true would fail — order
+      // matters. Zero primaries momentarily is allowed.
+      const { error: clearErr } = await db
         .from("artwork_images")
-        .select("id")
+        .update({ is_primary: false })
+        .eq("artwork_id", artworkId)
+        .neq("id", imageId);
+      if (clearErr) throw clearErr;
+      const { error: setErr } = await db
+        .from("artwork_images")
+        .update({ is_primary: true })
+        .eq("id", imageId)
         .eq("artwork_id", artworkId);
-      if (selErr) throw selErr;
-      for (const r of rows ?? []) {
-        const { error } = await db
-          .from("artwork_images")
-          .update({ is_primary: r.id === imageId })
-          .eq("id", r.id);
-        if (error) throw error;
-      }
+      if (setErr) throw setErr;
     }
 
     return NextResponse.json({ ok: true });
@@ -58,7 +61,12 @@ export async function PATCH(
   }
 }
 
-/** DELETE — remove an image. If it was primary, the DB trigger promotes the next. */
+/**
+ * DELETE — remove an image. If it was primary, the DB trigger promotes the next.
+ * Note: this intentionally deletes only the DB row, not the image's R2 objects
+ * (the 4 variants). Orphaned R2 objects are an accepted tradeoff for now; add an
+ * R2 delete here if storage cleanup becomes necessary.
+ */
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string; imageId: string }> }
@@ -80,7 +88,11 @@ export async function DELETE(
         { status: 400 }
       );
     }
-    const { error } = await db.from("artwork_images").delete().eq("id", imageId);
+    const { error } = await db
+      .from("artwork_images")
+      .delete()
+      .eq("id", imageId)
+      .eq("artwork_id", artworkId);
     if (error) throw error;
     return NextResponse.json({ ok: true });
   } catch (err) {
