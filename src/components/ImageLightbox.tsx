@@ -4,13 +4,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X, ZoomIn, ZoomOut, Maximize } from "lucide-react";
 
-interface ImageLightboxProps {
-  /** URL shown inline on the page (page-resolution). */
+interface Slide {
   src: string;
-  /** Highest-resolution URL loaded inside the lightbox for close-up viewing. */
   zoomSrc: string;
   alt: string;
-  /** Classes applied to the inline <img> so it matches the page layout. */
+}
+
+interface ImageLightboxProps {
+  /** Ordered slides. */
+  images: Slide[];
+  /** Currently shown index (controlled by the parent gallery). */
+  index: number;
+  /** Notify parent when the carousel advances. */
+  onIndexChange: (i: number) => void;
+  /** Classes applied to the inline hero <img>. */
   inlineClassName?: string;
 }
 
@@ -38,10 +45,23 @@ function clamp(n: number, lo: number, hi: number): number {
  * without downloading it. Wheel/buttons zoom toward the cursor, drag pans
  * when zoomed, double-click toggles zoom, Esc/backdrop/✕ close.
  */
-export default function ImageLightbox({ src, zoomSrc, alt, inlineClassName }: ImageLightboxProps) {
+export default function ImageLightbox({ images, index, onIndexChange, inlineClassName }: ImageLightboxProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [view, setView] = useState<View>(RESET);
+
+  const count = images.length;
+  const current = images[index] ?? images[0];
+
+  const go = useCallback(
+    (delta: number) => {
+      if (count <= 1) return;
+      const next = (index + delta + count) % count;
+      onIndexChange(next);
+      setView(RESET);
+    },
+    [count, index, onIndexChange]
+  );
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const drag = useRef({ active: false, startX: 0, startY: 0, baseX: 0, baseY: 0 });
@@ -86,13 +106,15 @@ export default function ImageLightbox({ src, zoomSrc, alt, inlineClassName }: Im
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") go(-1);
+      else if (e.key === "ArrowRight") go(1);
     };
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", onKey);
     };
-  }, [open, close]);
+  }, [open, close, go]);
 
   // Native wheel listener so we can preventDefault (React's onWheel is passive).
   useEffect(() => {
@@ -145,8 +167,8 @@ export default function ImageLightbox({ src, zoomSrc, alt, inlineClassName }: Im
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={zoomSrc}
-        alt={alt}
+        src={current.zoomSrc}
+        alt={current.alt}
         draggable={false}
         onDoubleClick={onDoubleClick}
         onPointerDown={onPointerDown}
@@ -161,6 +183,18 @@ export default function ImageLightbox({ src, zoomSrc, alt, inlineClassName }: Im
         }}
         className="max-h-[95vh] max-w-[95vw] select-none object-contain"
       />
+
+      {count > 1 && (
+        <>
+          <button type="button" className={`${ctrlBtn} absolute left-4 top-1/2 -translate-y-1/2`}
+            onClick={() => go(-1)} aria-label="Previous image">‹</button>
+          <button type="button" className={`${ctrlBtn} absolute right-4 top-1/2 -translate-y-1/2`}
+            onClick={() => go(1)} aria-label="Next image">›</button>
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded bg-black/60 px-3 py-1 text-xs text-white">
+            {index + 1} / {count}
+          </div>
+        </>
+      )}
 
       <div className="absolute right-4 top-4 flex gap-2">
         <button type="button" className={ctrlBtn} onClick={() => zoomFromCenter(1 / BUTTON_STEP)} aria-label="Zoom out">
@@ -185,7 +219,7 @@ export default function ImageLightbox({ src, zoomSrc, alt, inlineClassName }: Im
         aria-label="Enlarge image"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={alt} className={inlineClassName} />
+        <img src={current.src} alt={current.alt} className={inlineClassName} />
         <span className="pointer-events-none absolute bottom-3 right-3 flex items-center gap-1 rounded-md bg-black/60 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
           <Maximize size={14} aria-hidden="true" /> Click to enlarge
         </span>
