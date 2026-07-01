@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Artwork } from "@/lib/types";
 import { getAltText, formatArtistName, formatDimensions, resolveImageUrl } from "@/lib/utils";
 import DownloadButton from "@/components/DownloadButton";
-import ImageLightbox from "@/components/ImageLightbox";
+import ArtworkGallery from "@/components/ArtworkGallery";
 import ArtworkGrid from "@/components/ArtworkGrid";
 import ArtworkCard from "@/components/ArtworkCard";
 
@@ -26,7 +26,8 @@ async function getArtwork(
       `
       *,
       artist:artists(id, first_name, last_name, slug, external_url),
-      categories:artwork_categories(category:categories(id, name, slug, kind))
+      categories:artwork_categories(category:categories(id, name, slug, kind)),
+      images:artwork_images(*)
       `
     )
     .eq("id", id)
@@ -128,10 +129,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
     ? await getArtistArtworks(artwork.artist_id, artwork.id)
     : { items: [], total: 0 };
 
-  const altText = getAltText(artwork);
   const imageUrl = resolveImageUrl(artwork);
-  // Lightbox loads the highest-resolution source available for close-up viewing.
-  const zoomUrl = artwork.image_original || imageUrl;
   const artistName = artwork.artist
     ? formatArtistName(artwork.artist.first_name, artwork.artist.last_name)
     : "Unknown Artist";
@@ -179,32 +177,35 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Image */}
         <div className="lg:col-span-2">
-          <figure>
-            {imageUrl ? (
-              // Plain <img> instead of next/image so we don't need to ship pixel
-              // dimensions for every artwork — the image renders at its intrinsic
-              // size (capped by max-w/max-h), and the figcaption tucks directly
-              // beneath it, regardless of aspect ratio. When the figcaption is
-              // present it describes the image, so screen readers shouldn't
-              // double-announce — set alt="" and let the figure semantics carry
-              // the description. If no figcaption, fall back to title+medium.
-              <ImageLightbox
-                src={imageUrl}
-                zoomSrc={zoomUrl || imageUrl}
-                alt={artwork.alt_text ? "" : altText}
-                inlineClassName="block max-w-full max-h-[85vh]"
-              />
-            ) : (
+          {imageUrl ? (
+            <ArtworkGallery
+              images={
+                artwork.images && artwork.images.length > 0
+                  ? artwork.images
+                  : [
+                      {
+                        id: "primary",
+                        artwork_id: artwork.id,
+                        image_url: artwork.image_url,
+                        image_original: artwork.image_original,
+                        is_primary: true,
+                        sort_order: 0,
+                        short_description: artwork.alt_text,
+                        created_at: artwork.created_at,
+                        updated_at: artwork.updated_at,
+                      },
+                    ]
+              }
+              title={artwork.title}
+              medium={artwork.medium}
+            />
+          ) : (
+            <figure>
               <div className="bg-white aspect-square flex items-center justify-center text-gray-400">
                 No image available
               </div>
-            )}
-            {artwork.alt_text && (
-              <figcaption className="text-sm text-gray-600 italic mt-3">
-                {artwork.alt_text}
-              </figcaption>
-            )}
-          </figure>
+            </figure>
+          )}
         </div>
 
         {/* Metadata */}
