@@ -22,7 +22,8 @@
     "db:migrate": "tsx --env-file=.env.local scripts/run-migration.ts",
     "medium:propose": "tsx --env-file=.env.local scripts/normalize-mediums-propose.ts",
     "medium:apply": "tsx --env-file=.env.local scripts/normalize-mediums-apply.ts",
-    "sync:artist-urls": "tsx --env-file=.env.local scripts/sync-artist-external-urls.ts"
+    "sync:artist-urls": "tsx --env-file=.env.local scripts/sync-artist-external-urls.ts",
+    "import:artwork-images": "tsx --env-file=.env.local scripts/import-artwork-images.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1023.0",
