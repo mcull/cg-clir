@@ -353,6 +353,45 @@ async function main() {
     console.warn("Re-run `npm run medium:propose` to absorb these into the vocabulary.");
   }
 
+  // Import any extra Art Cloud image columns (Image 2, Image 3, …) as
+  // additional non-primary artwork_images rows. The standard export has only
+  // `Image` (handled as the primary above), so this is a no-op unless a custom
+  // export includes numbered image columns. Idempotent on (artwork_id, image_original).
+  for (const row of rows) {
+    const inv = row["Inventory Number"]?.trim();
+    if (!inv) continue;
+    const extraKeys = Object.keys(row)
+      .filter((k) => /^Image\s+\d+$/i.test(k))
+      .sort();
+    if (extraKeys.length === 0) continue;
+    const { data: art } = await supabase
+      .from("artworks")
+      .select("id")
+      .eq("inventory_number", inv)
+      .maybeSingle();
+    if (!art) continue;
+    let order = 1;
+    for (const k of extraKeys) {
+      const url = (row[k] || "").trim();
+      if (!url) continue;
+      const { data: existing } = await supabase
+        .from("artwork_images")
+        .select("id")
+        .eq("artwork_id", art.id)
+        .eq("image_original", url)
+        .maybeSingle();
+      if (existing) continue;
+      await supabase.from("artwork_images").insert({
+        artwork_id: art.id,
+        image_url: url,
+        image_original: url,
+        is_primary: false,
+        sort_order: order++,
+        short_description: null,
+      });
+    }
+  }
+
   // ── Step 3: Unpublish rows not in CSV (opt-in) ─────────────────────────
   if (UNPUBLISH_MISSING) {
     console.log(
