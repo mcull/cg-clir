@@ -27,6 +27,7 @@ export default function EditArtworkPage() {
 
   const [formData, setFormData] = useState({
     title: "",
+    sku: "",
     artist_id: "",
     date_created: "",
     medium: "",
@@ -66,6 +67,7 @@ export default function EditArtworkPage() {
           setArtwork(artData);
           setFormData({
             title: artData.title || "",
+            sku: artData.sku || "",
             artist_id: artData.artist_id || "",
             date_created: artData.date_created || "",
             medium: artData.medium || "",
@@ -113,6 +115,7 @@ export default function EditArtworkPage() {
 
       const updateData = {
         title: formData.title,
+        sku: formData.sku.trim() || null,
         artist_id: formData.artist_id || null,
         date_created: formData.date_created || null,
         medium: formData.medium || null,
@@ -254,6 +257,26 @@ export default function EditArtworkPage() {
             required
             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+        </div>
+
+        {/* SKU */}
+        <div className="mb-6">
+          <label htmlFor="sku" className="block text-sm font-bold text-gray-700 mb-2">
+            SKU
+          </label>
+          <input
+            type="text"
+            id="sku"
+            name="sku"
+            value={formData.sku}
+            onChange={handleChange}
+            placeholder="e.g., JCF 2"
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p className="text-xs text-gray-600 mt-1">
+            The gallery&rsquo;s catalog code for this piece. Used to match bulk
+            image uploads to the right artwork, so it should be unique per piece.
+          </p>
         </div>
 
         {/* Artist */}
