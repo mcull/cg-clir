@@ -53,13 +53,24 @@ async function uploadVariant(key: string, body: Buffer) {
   return PUBLIC_URL ? `${PUBLIC_URL}/${key}` : key;
 }
 
-async function importRow(row: ManifestRow): Promise<"ok" | "unmatched"> {
+async function importRow(row: ManifestRow): Promise<"ok" | "unmatched" | "skipped"> {
   const { data: art } = await supabase
     .from("artworks")
     .select("id, inventory_number")
     .eq("inventory_number", row.inventory_number)
     .maybeSingle();
   if (!art) return "unmatched";
+
+  // Idempotency / dedup: if this source URL is already recorded as an image's
+  // image_original for this artwork (e.g. the backfilled primary, whose
+  // image_original is the source CDN URL), skip it rather than duplicate.
+  const { data: dup } = await supabase
+    .from("artwork_images")
+    .select("id")
+    .eq("artwork_id", art.id)
+    .eq("image_original", row.image_url)
+    .maybeSingle();
+  if (dup) return "skipped";
 
   const resp = await fetch(row.image_url);
   if (!resp.ok) throw new Error(`fetch ${row.image_url} → ${resp.status}`);
@@ -119,16 +130,18 @@ async function main() {
   const missingDesc: string[] = [];
   const parseErrors: string[] = [];
   let ok = 0;
+  let skipped = 0;
 
   for (let i = 0; i < records.length; i++) {
     const { row, error } = parseManifestRow(records[i], i + 2);
     if (error) { parseErrors.push(error); continue; }
     const key = `${row!.inventory_number}::${row!.image_url}`;
     if (done.has(key)) continue;
-    if (!row!.short_description) missingDesc.push(key);
     try {
       const result = await importRow(row!);
       if (result === "unmatched") { unmatched.push(row!.inventory_number); continue; }
+      if (result === "skipped") { skipped++; done.add(key); saveDone(done); continue; }
+      if (!row!.short_description) missingDesc.push(key);
       ok++;
       done.add(key);
       saveDone(done);
@@ -138,9 +151,10 @@ async function main() {
   }
 
   console.log(`\nImported: ${ok}`);
+  console.log(`Skipped (already present): ${skipped}`);
   if (parseErrors.length) console.log(`Parse errors:\n  ${parseErrors.join("\n  ")}`);
   if (unmatched.length) console.log(`Unmatched inventory numbers (${unmatched.length}):\n  ${unmatched.join(", ")}`);
-  if (missingDesc.length) console.log(`⚠ Imported without a short_description (${missingDesc.length}):\n  ${missingDesc.join("\n  ")}`);
+  if (missingDesc.length) console.log(`⚠ Imported without a short_description (${missingDesc.length})`);
 }
 
 main().then(() => process.exit(0));

@@ -23,7 +23,9 @@
     "medium:propose": "tsx --env-file=.env.local scripts/normalize-mediums-propose.ts",
     "medium:apply": "tsx --env-file=.env.local scripts/normalize-mediums-apply.ts",
     "sync:artist-urls": "tsx --env-file=.env.local scripts/sync-artist-external-urls.ts",
-    "import:artwork-images": "tsx --env-file=.env.local scripts/import-artwork-images.ts"
+    "import:artwork-images": "tsx --env-file=.env.local scripts/import-artwork-images.ts",
+    "convert:gallery-images": "tsx --env-file=.env.local scripts/convert-gallery-multi-images.ts",
+    "describe:artwork-images": "tsx --env-file=.env.local scripts/describe-artwork-images.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1023.0",
