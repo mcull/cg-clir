@@ -109,3 +109,75 @@ h1, h2, h3, h4, h5, h6 {
     @apply inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-900 rounded hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors;
   }
 }
+
+/* ============================================================
+ * Admin console redesign — scoped styles.
+ * Everything here is gated on `.admin-shell` or an `admin-*` class,
+ * so the public gallery is entirely unaffected.
+ * ============================================================ */
+
+/* Headings inside the admin render in Borna (weight 400). This overrides
+ * the global Georgia heading rule by specificity; the public site keeps
+ * its serif headings. */
+.admin-shell :is(h1, h2, h3, h4, h5, h6) {
+  font-family: "Borna", sans-serif;
+  font-weight: 400;
+}
+
+/* Hard offset "poster" shadow on hover for stat / list cards. */
+.admin-card-hover {
+  transition: box-shadow 120ms ease, background 120ms ease, color 120ms ease;
+}
+.admin-card-hover:hover {
+  box-shadow: 4px 4px 0 #2c8b3d;
+}
+
+/* Admin text inputs / selects / textareas. The green offset shadow on
+ * focus is additive — the global :focus-visible outline still applies for
+ * keyboard nav. */
+.admin-field {
+  transition: box-shadow 120ms ease, border-color 120ms ease;
+}
+.admin-field:focus {
+  outline: none;
+  border-color: #171512;
+  box-shadow: 3px 3px 0 #2c8b3d;
+}
+
+/* Buttons: green primary / white secondary, both with an ink offset
+ * shadow on hover. Hard-edged (no radius). */
+/* Base handles the shared look (ink border, uppercase, hard hover shadow);
+ * callers set padding / font-size / letter-spacing via Tailwind so the same
+ * button works at CTA, save, and compact-audio sizes. */
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #171512;
+  text-transform: uppercase;
+  line-height: 1;
+  transition: box-shadow 120ms ease, background 120ms ease, color 120ms ease;
+  cursor: pointer;
+}
+.admin-btn-primary {
+  background: #2c8b3d;
+  color: #f7f5f0;
+}
+.admin-btn-primary:hover {
+  background: #1f6c2c;
+  box-shadow: 3px 3px 0 #171512;
+}
+.admin-btn-secondary {
+  background: #ffffff;
+  color: #171512;
+}
+.admin-btn-secondary:hover {
+  box-shadow: 3px 3px 0 #171512;
+}
+.admin-btn:disabled {
+  color: #a39c8c;
+  border-color: #c9c2b4;
+  background: #ffffff;
+  cursor: not-allowed;
+  box-shadow: none;
+}
