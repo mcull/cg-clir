@@ -50,10 +50,12 @@ export default async function AdminSubscribersPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Email Subscribers</h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <h1 className="text-[44px] leading-none tracking-[-0.5px]">
+            Email Subscribers
+          </h1>
+          <p className="mt-3 text-sm text-muted">
             {signups.length.toLocaleString()} signups from the digital archive
             footer form.
           </p>
@@ -61,38 +63,54 @@ export default async function AdminSubscribersPage() {
         <a
           href="/api/admin/subscribers/export"
           download
-          className="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded hover:bg-gray-700 transition-colors"
+          className="admin-btn admin-btn-secondary px-[22px] py-3 text-xs tracking-[2px]"
         >
           Download CSV (Artcloud format)
         </a>
       </div>
 
       {signups.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded p-8 text-center text-gray-500">
-          No signups yet.
+        <div className="mt-8 border border-ink bg-card py-12 text-center">
+          <p className="text-sm text-muted">No signups yet.</p>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+        <div className="mt-8 border border-ink bg-card">
+          <table className="w-full">
+            <thead className="bg-ink text-paper">
               <tr>
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Source</th>
-                <th className="px-4 py-3 font-medium">Signed up</th>
-                <th className="px-4 py-3 font-medium">Notified</th>
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
+                  Name
+                </th>
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
+                  Email
+                </th>
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
+                  Source
+                </th>
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
+                  Signed up
+                </th>
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
+                  Notified
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody>
               {signups.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-gray-900">{row.name}</td>
-                  <td className="px-4 py-3 text-gray-700">{row.email}</td>
-                  <td className="px-4 py-3 text-gray-500">{row.source}</td>
-                  <td className="px-4 py-3 text-gray-500">
+                <tr key={row.id} className="hover:bg-row-hover">
+                  <td className="px-5 py-3 border-b border-hairline text-sm text-ink">
+                    {row.name}
+                  </td>
+                  <td className="px-5 py-3 border-b border-hairline text-sm text-ink">
+                    {row.email}
+                  </td>
+                  <td className="px-5 py-3 border-b border-hairline text-[13px] text-muted">
+                    {row.source}
+                  </td>
+                  <td className="px-5 py-3 border-b border-hairline text-[13px] text-muted">
                     {fmtDate(row.created_at)}
                   </td>
-                  <td className="px-4 py-3 text-gray-500">
+                  <td className="px-5 py-3 border-b border-hairline text-[13px] text-muted">
                     {row.notified_at ? fmtDate(row.notified_at) : "—"}
                   </td>
                 </tr>

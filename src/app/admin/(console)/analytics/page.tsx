@@ -2,6 +2,8 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { formatArtistName } from "@/lib/utils";
 import { Artwork } from "@/lib/types";
+import StatCard from "@/components/admin/StatCard";
+import SectionHeader from "@/components/admin/SectionHeader";
 
 interface DownloadCount extends Artwork {
   count: number;
@@ -79,98 +81,102 @@ export default async function AnalyticsPage() {
     .sort(([a], [b]) => b.localeCompare(a))
     .slice(0, 30);
 
+  const maxRecentCount = Math.max(...recentDays.map(([, c]) => c), 1);
+
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Analytics</h1>
+      <h1 className="text-[44px] leading-none tracking-[-0.5px]">
+        Analytics
+      </h1>
+      <p className="mt-3 text-sm text-muted">
+        Download activity across the digital archive.
+      </p>
 
       {/* Overview */}
-      <div className="bg-white rounded-lg shadow p-8 mb-8">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Overview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <p className="text-sm text-gray-600">Total Downloads</p>
-            <p className="text-3xl font-bold text-gray-900">{totalDownloads}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600">Days with Activity</p>
-            <p className="text-3xl font-bold text-gray-900">
-              {Object.keys(downloadsByDay).length}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600">Top Artwork Downloads</p>
-            <p className="text-3xl font-bold text-gray-900">
-              {topArtworks[0]?.count || 0}
-            </p>
-          </div>
+      <div className="mt-12 space-y-3.5">
+        <SectionHeader title="OVERVIEW" />
+        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
+          <StatCard label="Total downloads" value={totalDownloads} />
+          <StatCard
+            label="Days with activity"
+            value={Object.keys(downloadsByDay).length}
+          />
+          <StatCard
+            label="Top artwork downloads"
+            value={topArtworks[0]?.count || 0}
+          />
         </div>
       </div>
 
       {/* Top Artworks */}
       {topArtworks.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-8 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">
-            Most Downloaded Artworks
-          </h2>
-          <div className="space-y-4">
-            {topArtworks.map((artwork: DownloadCount, idx) => (
-              <div
-                key={artwork.id}
-                className="flex items-center justify-between p-4 border border-gray-200 rounded"
-              >
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">
-                    {idx + 1}. {artwork.title}
-                  </p>
-                  {artwork.artist && (
-                    <p className="text-sm text-gray-600">
-                      {formatArtistName(
-                        artwork.artist.first_name,
-                        artwork.artist.last_name
-                      )}
+        <div className="mt-12 space-y-3.5">
+          <SectionHeader title="MOST DOWNLOADED ARTWORKS" />
+          <div className="border border-ink bg-card">
+            <ol>
+              {topArtworks.map((artwork: DownloadCount, idx) => (
+                <li
+                  key={artwork.id}
+                  className="flex items-center gap-4 border-b border-hairline px-6 py-4 last:border-0"
+                >
+                  <span className="min-w-[26px] text-[34px] leading-none text-[#D9D3C5]">
+                    {idx + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm text-ink">
+                      {artwork.title}
                     </p>
-                  )}
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-blue-600">
-                    {artwork.count}
-                  </p>
-                  <p className="text-xs text-gray-600">downloads</p>
-                </div>
-              </div>
-            ))}
+                    {artwork.artist && (
+                      <p className="text-xs text-muted">
+                        {formatArtistName(
+                          artwork.artist.first_name,
+                          artwork.artist.last_name
+                        )}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl tabular-nums text-green">
+                      {artwork.count}
+                    </p>
+                    <p className="text-[11px] uppercase tracking-[1px] text-faint">
+                      downloads
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
       )}
 
       {/* Download Trend */}
       {recentDays.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">
-            Downloads Last 30 Days
-          </h2>
-          <div className="space-y-2">
-            {recentDays.map(([day, count]) => (
-              <div key={day} className="flex items-center gap-4">
-                <span className="w-24 text-sm text-gray-600">{day}</span>
-                <div className="flex-1 bg-gray-200 rounded h-8 flex items-center">
-                  <div
-                    className="bg-blue-600 h-full rounded flex items-center justify-end pr-2"
-                    style={{
-                      width: `${Math.max(
-                        (count / (Math.max(...recentDays.map(([, c]) => c)) || 1)) *
-                          100,
-                        3
-                      )}%`,
-                    }}
-                  >
-                    {count > 0 && (
-                      <span className="text-xs font-bold text-white">{count}</span>
-                    )}
+        <div className="mt-12 space-y-3.5">
+          <SectionHeader title="DOWNLOADS" qualifier="LAST 30 DAYS" />
+          <div className="border border-ink bg-card px-6 py-5">
+            <div className="space-y-2.5">
+              {recentDays.map(([day, count]) => (
+                <div key={day} className="flex items-center gap-4">
+                  <span className="w-24 text-xs text-muted">{day}</span>
+                  <div className="flex h-8 flex-1 items-center bg-hairline">
+                    <div
+                      className="flex h-full items-center justify-end bg-green pr-2"
+                      style={{
+                        width: `${Math.max(
+                          (count / maxRecentCount) * 100,
+                          3
+                        )}%`,
+                      }}
+                    >
+                      {count > 0 && (
+                        <span className="text-xs text-paper">{count}</span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}

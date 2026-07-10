@@ -122,23 +122,28 @@ export default function CategoriesPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Categories</h1>
+      <h1 className="text-[44px] leading-none tracking-[-0.5px]">Categories</h1>
+      <p className="mt-3 text-sm text-muted">
+        {categories.length.toLocaleString()}{" "}
+        {categories.length === 1 ? "category" : "categories"} keeping the catalog organized.
+      </p>
 
       {/* Create Form */}
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">
-          Create New Category
-        </h2>
+      <div className="mt-8 border border-ink bg-card p-6">
+        <h2 className="mb-4 text-base">Create new category</h2>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
+          <div className="mb-4 border border-ink bg-card px-3.5 py-2.5 text-sm text-ink">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-2">
+            <label
+              htmlFor="name"
+              className="mb-2 block text-[11px] uppercase tracking-[1.5px] text-muted"
+            >
               Name *
             </label>
             <input
@@ -148,12 +153,15 @@ export default function CategoriesPage() {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="admin-field w-full border border-line bg-card px-3.5 py-2.5 text-sm"
             />
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-bold text-gray-700 mb-2">
+            <label
+              htmlFor="description"
+              className="mb-2 block text-[11px] uppercase tracking-[1.5px] text-muted"
+            >
               Description
             </label>
             <textarea
@@ -162,63 +170,65 @@ export default function CategoriesPage() {
               value={formData.description}
               onChange={handleChange}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="admin-field w-full border border-line bg-card px-3.5 py-2.5 text-sm"
             />
           </div>
 
           <button
             type="submit"
             disabled={isCreating || !formData.name}
-            className="button-primary disabled:opacity-50"
+            className="admin-btn admin-btn-primary px-[22px] py-3 text-xs tracking-[2px] disabled:opacity-50"
           >
-            {isCreating ? "Creating..." : "Create Category"}
+            {isCreating ? "Creating…" : "Create Category"}
           </button>
         </form>
       </div>
 
       {/* Categories List */}
       {loading ? (
-        <div className="text-center py-12">Loading...</div>
+        <div className="mt-8 border border-ink bg-card py-12 text-center text-sm text-muted">
+          Loading…
+        </div>
       ) : categories.length > 0 ? (
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <div className="mt-8 border border-ink bg-card overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-ink text-paper">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
                   Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
                   Description
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
                   Artworks
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  Actions
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
+                  <span className="sr-only">Actions</span>
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody>
               {categories.map((cat) => (
-                <tr key={cat.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                <tr key={cat.id} className="hover:bg-row-hover">
+                  <td className="border-b border-hairline px-5 py-3 text-sm text-ink">
                     {cat.name}
                     {cat.ai_suggested && (
-                      <span className="ml-2 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
-                        AI Suggested
+                      <span className="ml-2 border border-line px-2 py-1 text-xs uppercase tracking-[1px] text-muted">
+                        AI suggested
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="border-b border-hairline px-5 py-3 text-[13px] text-muted">
                     {cat.description || "—"}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="border-b border-hairline px-5 py-3 text-[13px] text-muted">
                     {cat.artwork_count || 0}
                   </td>
-                  <td className="px-6 py-4 text-sm">
+                  <td className="border-b border-hairline px-5 py-3 text-right">
                     <button
                       onClick={() => handleDelete(cat.id)}
-                      className="text-red-600 hover:text-red-800 font-medium"
+                      className="text-xs uppercase tracking-[1.5px] text-red-700 hover:text-red-900"
                     >
                       Delete
                     </button>
@@ -229,8 +239,8 @@ export default function CategoriesPage() {
           </table>
         </div>
       ) : (
-        <div className="text-center py-12 bg-white rounded-lg">
-          <p className="text-gray-600">No categories yet.</p>
+        <div className="mt-8 border border-ink bg-card py-12 text-center">
+          <p className="text-sm text-muted">No categories yet.</p>
         </div>
       )}
     </div>

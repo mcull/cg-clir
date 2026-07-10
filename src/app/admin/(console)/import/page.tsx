@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { fetchAllPages } from "@/lib/paginate";
+import SectionHeader from "@/components/admin/SectionHeader";
 
 // Prefer R2 over CDN — image_url is the canonical R2 path post-migration.
 // This inverts resolveImageUrl()'s priority, which falls back to CDN for
@@ -120,29 +121,30 @@ export default function ImportPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">
+      <h1 className="text-[44px] leading-none tracking-[-0.5px]">
         Import / Export
       </h1>
+      <p className="mt-3 text-sm text-muted">
+        Bring the catalog data in and out as CSV.
+      </p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Export */}
-        <div className="bg-white rounded-lg shadow p-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            Export Collection
-          </h2>
-          <p className="text-gray-600 mb-6">
+        <div className="border border-ink bg-card p-8">
+          <SectionHeader title="Export" rule="hairline" />
+          <p className="mt-4 mb-6 text-sm text-muted">
             Download the current catalog as a CSV file. This includes all
             artwork metadata, artist information, and categories.
           </p>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
+            <div className="mb-4 border border-[#b3261e] px-3 py-2.5 text-sm text-[#b3261e]">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded text-green-800 text-sm">
+            <div className="mb-4 border border-green px-3 py-2.5 text-sm text-green">
               {success}
             </div>
           )}
@@ -150,26 +152,24 @@ export default function ImportPage() {
           <button
             onClick={handleExport}
             disabled={loading}
-            className="button-primary disabled:opacity-50"
+            className="admin-btn admin-btn-primary px-[22px] py-3 text-xs tracking-[2px] disabled:opacity-50"
           >
             {loading ? "Exporting..." : "Export as CSV"}
           </button>
         </div>
 
         {/* Import (disabled) */}
-        <div className="bg-white rounded-lg shadow p-8 opacity-75">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            Import Collection
-          </h2>
-          <p className="text-gray-600 mb-6">
+        <div className="border border-ink bg-card p-8 opacity-75">
+          <SectionHeader title="Import" rule="hairline" />
+          <p className="mt-4 mb-6 text-sm text-muted">
             Upload a CSV to bulk-create or update artworks. The expected
             columns mirror the existing Art Cloud export: Title, Artist First
             Name, Artist Last Name, Date Created, Medium, Height, Width, Depth,
             Inventory Number, Tags, and On Website.
           </p>
 
-          <div className="border-2 border-dashed border-gray-300 rounded p-6 text-center text-sm text-gray-500 mb-4">
-            <p className="font-semibold mb-1">Browser-based import is disabled.</p>
+          <div className="border border-dashed border-line bg-[#FBFAF7] p-6 text-center text-sm text-muted mb-4">
+            <p className="mb-1 text-ink">Browser-based import is disabled.</p>
             <p>
               A bulk write through this form would touch every artwork row;
               we&apos;re holding it until role-based access controls land on
@@ -180,15 +180,17 @@ export default function ImportPage() {
           <button
             type="button"
             disabled
-            className="button-primary opacity-50 cursor-not-allowed"
+            className="admin-btn admin-btn-primary px-[22px] py-3 text-xs tracking-[2px] cursor-not-allowed"
             title="Disabled until RBAC is in place"
           >
             Choose CSV…
           </button>
 
-          <p className="text-xs text-gray-500 mt-4">
+          <p className="mt-4 text-xs text-muted">
             In the meantime, run the script from a terminal:{" "}
-            <code className="bg-gray-100 px-1 rounded">npm run import:csv</code>
+            <code className="border border-line px-1 text-ink">
+              npm run import:csv
+            </code>
           </p>
         </div>
       </div>

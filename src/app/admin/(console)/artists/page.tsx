@@ -44,51 +44,56 @@ export default async function AdminArtistsPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Artists</h1>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-[44px] leading-none tracking-[-0.5px]">Artists</h1>
+          <p className="mt-3 text-sm text-muted">
+            {artists.length.toLocaleString()} artist{artists.length === 1 ? "" : "s"} in the archive.
+          </p>
+        </div>
         <Link
           href="/admin/artists/new"
-          className="button-primary"
+          className="admin-btn admin-btn-primary px-[22px] py-3 text-xs tracking-[2px]"
         >
-          Add Artist
+          + Add Artist
         </Link>
       </div>
 
       {artists.length > 0 ? (
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <div className="mt-8 border border-ink bg-card">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-ink text-paper">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
                   Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
                   Artworks
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
                   Bio
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  Actions
+                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-[1.8px]">
+                  <span className="sr-only">Actions</span>
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody>
               {artists.map((artist) => (
-                <tr key={artist.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                <tr key={artist.id} className="hover:bg-row-hover">
+                  <td className="px-5 py-3 border-b border-hairline text-sm text-ink">
                     {formatArtistName(artist.first_name, artist.last_name)}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-5 py-3 border-b border-hairline text-[13px] text-muted">
                     {artist.artwork_count || 0}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-5 py-3 border-b border-hairline text-[13px] text-muted">
                     {artist.bio ? artist.bio.substring(0, 60) + "..." : "—"}
                   </td>
-                  <td className="px-6 py-4 text-sm">
+                  <td className="px-5 py-3 border-b border-hairline">
                     <Link
                       href={`/admin/artists/${artist.id}`}
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                      className="text-xs uppercase tracking-[1.5px] text-green hover:underline"
                     >
                       Edit
                     </Link>
@@ -99,9 +104,12 @@ export default async function AdminArtistsPage() {
           </table>
         </div>
       ) : (
-        <div className="text-center py-12 bg-white rounded-lg">
-          <p className="text-gray-600 mb-4">No artists yet.</p>
-          <Link href="/admin/artists/new" className="text-blue-600">
+        <div className="mt-8 border border-ink bg-card py-12 text-center">
+          <p className="mb-4 text-sm text-muted">No artists yet.</p>
+          <Link
+            href="/admin/artists/new"
+            className="text-xs uppercase tracking-[1.5px] text-green hover:underline"
+          >
             Create the first artist
           </Link>
         </div>
