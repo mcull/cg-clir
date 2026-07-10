@@ -3,10 +3,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Artist, Artwork } from "@/lib/types";
 import { formatArtistName, parseTags } from "@/lib/utils";
 import ImageManager from "@/components/admin/ImageManager";
+import SectionHeader from "@/components/admin/SectionHeader";
 
 export default function EditArtworkPage() {
   const router = useRouter();
@@ -221,314 +223,359 @@ export default function EditArtworkPage() {
     return <div className="text-center py-12">Artwork not found</div>;
   }
 
+  const selectedArtist = artists.find((artist) => artist.id === formData.artist_id);
+  const artistDisplayName = selectedArtist
+    ? formatArtistName(selectedArtist.first_name, selectedArtist.last_name)
+    : artwork.artist
+    ? formatArtistName(artwork.artist.first_name, artwork.artist.last_name)
+    : "Unassigned";
+
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        Edit Artwork
+      <Link
+        href="/admin/artworks"
+        className="text-xs uppercase tracking-[2px] text-muted hover:text-ink"
+      >
+        ← ARTWORKS
+      </Link>
+
+      <h1 className="mt-3 text-[44px] leading-none tracking-[-0.5px]">
+        {formData.title || "Untitled"}
       </h1>
+      <p className="mt-3 text-[13px] text-muted">
+        <span className="font-mono">{formData.sku || "No SKU"}</span>
+        {" · "}
+        {artistDisplayName}
+        {" · "}
+        {formData.on_website ? "live on the site" : "not published"}
+      </p>
 
-      <form onSubmit={handleSubmit} className="max-w-2xl bg-white rounded-lg shadow p-8">
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-red-800">
-            {error}
-          </div>
-        )}
-
-        {savedAt && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded text-green-800">
-            Saved.
-          </div>
-        )}
-
-        {/* Images */}
-        <ImageManager artworkId={artworkId} />
-
-        {/* Title */}
-        <div className="mb-6">
-          <label htmlFor="title" className="block text-sm font-bold text-gray-700 mb-2">
-            Title *
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* SKU */}
-        <div className="mb-6">
-          <label htmlFor="sku" className="block text-sm font-bold text-gray-700 mb-2">
-            SKU
-          </label>
-          <input
-            type="text"
-            id="sku"
-            name="sku"
-            value={formData.sku}
-            onChange={handleChange}
-            placeholder="e.g., JCF 2"
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <p className="text-xs text-gray-600 mt-1">
-            The gallery&rsquo;s catalog code for this piece. Used to match bulk
-            image uploads to the right artwork, so it should be unique per piece.
-          </p>
-        </div>
-
-        {/* Artist */}
-        <div className="mb-6">
-          <label htmlFor="artist_id" className="block text-sm font-bold text-gray-700 mb-2">
-            Artist
-          </label>
-          <select
-            id="artist_id"
-            name="artist_id"
-            value={formData.artist_id}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select an artist</option>
-            {artists.map((artist) => (
-              <option key={artist.id} value={artist.id}>
-                {formatArtistName(artist.first_name, artist.last_name)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Date Created */}
-        <div className="mb-6">
-          <label htmlFor="date_created" className="block text-sm font-bold text-gray-700 mb-2">
-            Date Created
-          </label>
-          <input
-            type="text"
-            id="date_created"
-            name="date_created"
-            value={formData.date_created}
-            onChange={handleChange}
-            placeholder="e.g., 2023 or 2023-05-15"
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Medium */}
-        <div className="mb-6">
-          <label htmlFor="medium" className="block text-sm font-bold text-gray-700 mb-2">
-            Medium
-          </label>
-          <input
-            type="text"
-            id="medium"
-            name="medium"
-            value={formData.medium}
-            onChange={handleChange}
-            placeholder="e.g., Oil on canvas"
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Dimensions */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div>
-            <label htmlFor="height" className="block text-sm font-bold text-gray-700 mb-2">
-              Height (in)
-            </label>
-            <input
-              type="number"
-              id="height"
-              name="height"
-              value={formData.height}
-              onChange={handleChange}
-              step="0.01"
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="width" className="block text-sm font-bold text-gray-700 mb-2">
-              Width (in)
-            </label>
-            <input
-              type="number"
-              id="width"
-              name="width"
-              value={formData.width}
-              onChange={handleChange}
-              step="0.01"
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="depth" className="block text-sm font-bold text-gray-700 mb-2">
-              Depth (in)
-            </label>
-            <input
-              type="number"
-              id="depth"
-              name="depth"
-              value={formData.depth}
-              onChange={handleChange}
-              step="0.01"
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div className="mb-6">
-          <label htmlFor="tags" className="block text-sm font-bold text-gray-700 mb-2">
-            Tags
-          </label>
-          <input
-            type="text"
-            id="tags"
-            name="tags"
-            value={formData.tags}
-            onChange={handleChange}
-            placeholder="Comma-separated tags"
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Long alt text - detail page */}
-        <div className="mb-6">
-          <label htmlFor="alt_text_long" className="block text-sm font-bold text-gray-700 mb-2">
-            Long alt text (detail page)
-          </label>
-          <textarea
-            id="alt_text_long"
-            name="alt_text_long"
-            value={formData.alt_text_long}
-            onChange={handleChange}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Audio description */}
-        <div className="mb-6 p-4 border border-gray-200 rounded bg-gray-50">
-          <label className="block text-sm font-bold text-gray-700 mb-2">
-            Audio description
-          </label>
-          <p className="text-xs text-gray-600 mb-3">
-            Audio is the read-aloud version of the long alt text. The two
-            stay in sync via the Transcribe and Generate buttons below.
-          </p>
-
-          {artwork.audio_url ? (
-            <div className="mb-3">
-              <audio controls preload="metadata" className="w-full" src={artwork.audio_url} />
-              <p className="text-xs text-gray-600 mt-1">
-                Source:{" "}
-                <span className="font-mono">
-                  {artwork.audio_origin || "(no origin recorded)"}
-                </span>
-              </p>
+      <form
+        onSubmit={handleSubmit}
+        className="mt-8 grid grid-cols-[1fr_320px] gap-3.5 items-start"
+      >
+        <div className="border border-ink bg-card p-8">
+          {error && (
+            <div className="mb-6 border border-[#b3261e] bg-card text-[#b3261e] px-4 py-3">
+              {error}
             </div>
-          ) : (
-            <p className="text-sm text-gray-500 italic mb-3">No audio uploaded.</p>
           )}
 
-          <div className="space-y-3">
+          {savedAt && (
+            <div className="mb-6 border border-green bg-card text-green px-4 py-3">
+              Saved.
+            </div>
+          )}
+
+          <SectionHeader title="THE PIECE" rule="hairline" className="mb-5 mt-8 first:mt-0" />
+
+          {/* Title */}
+          <div className="mb-5">
+            <label htmlFor="title" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
+              Title
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+              className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
+            />
+          </div>
+
+          {/* SKU + Artist */}
+          <div className="mb-5 grid grid-cols-2 gap-5">
             <div>
-              <label htmlFor="audio_file" className="block text-xs font-semibold text-gray-700 mb-1">
-                Upload MP3 (replaces existing audio, marks as human-recorded)
+              <label htmlFor="sku" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
+                SKU
               </label>
               <input
-                id="audio_file"
-                type="file"
-                accept="audio/*"
-                disabled={audioBusy !== null}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) handleAudioUpload(f);
-                  e.target.value = ""; // allow re-uploading the same filename
-                }}
-                className="block text-sm"
+                type="text"
+                id="sku"
+                name="sku"
+                value={formData.sku}
+                onChange={handleChange}
+                placeholder="e.g., JCF 2"
+                className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full font-mono"
+              />
+              <p className="mt-1 text-[11px] text-faint">
+                The catalog code. Keep it unique — bulk image uploads match on it.
+              </p>
+            </div>
+
+            <div>
+              <label htmlFor="artist_id" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
+                Artist
+              </label>
+              <select
+                id="artist_id"
+                name="artist_id"
+                value={formData.artist_id}
+                onChange={handleChange}
+                className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
+              >
+                <option value="">Select an artist</option>
+                {artists.map((artist) => (
+                  <option key={artist.id} value={artist.id}>
+                    {formatArtistName(artist.first_name, artist.last_name)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Date Created + Medium */}
+          <div className="mb-5 grid grid-cols-2 gap-5">
+            <div>
+              <label htmlFor="date_created" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
+                Date created
+              </label>
+              <input
+                type="text"
+                id="date_created"
+                name="date_created"
+                value={formData.date_created}
+                onChange={handleChange}
+                placeholder="e.g., 2023 or 2023-05-15"
+                className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
               />
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                disabled={audioBusy !== null || !artwork.audio_url}
-                onClick={handleTranscribe}
-                className="button-secondary text-sm disabled:opacity-50"
-                title={!artwork.audio_url ? "Upload audio first" : "Transcribe audio → long alt text"}
-              >
-                {audioBusy === "transcribe" ? "Transcribing…" : "Transcribe audio → text"}
-              </button>
-              <button
-                type="button"
-                disabled={audioBusy !== null || !formData.alt_text_long}
-                onClick={handleGenerateTts}
-                className="button-secondary text-sm disabled:opacity-50"
-                title={!formData.alt_text_long ? "Long alt text is empty" : "Generate audio from long alt text via ElevenLabs"}
-              >
-                {audioBusy === "tts" ? "Generating…" : "Generate audio from text (ElevenLabs)"}
-              </button>
+            <div>
+              <label htmlFor="medium" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
+                Medium
+              </label>
+              <input
+                type="text"
+                id="medium"
+                name="medium"
+                value={formData.medium}
+                onChange={handleChange}
+                placeholder="e.g., Oil on canvas"
+                className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
+              />
             </div>
+          </div>
 
-            {audioBusy === "upload" && (
-              <p className="text-sm text-gray-600">Uploading…</p>
+          {/* Dimensions */}
+          <div className="mb-5 grid grid-cols-3 gap-5">
+            <div>
+              <label htmlFor="height" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
+                Height (in)
+              </label>
+              <input
+                type="number"
+                id="height"
+                name="height"
+                value={formData.height}
+                onChange={handleChange}
+                step="0.01"
+                className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
+              />
+            </div>
+            <div>
+              <label htmlFor="width" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
+                Width (in)
+              </label>
+              <input
+                type="number"
+                id="width"
+                name="width"
+                value={formData.width}
+                onChange={handleChange}
+                step="0.01"
+                className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
+              />
+            </div>
+            <div>
+              <label htmlFor="depth" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
+                Depth (in)
+              </label>
+              <input
+                type="number"
+                id="depth"
+                name="depth"
+                value={formData.depth}
+                onChange={handleChange}
+                step="0.01"
+                className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
+              />
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div className="mb-5">
+            <label htmlFor="tags" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
+              Tags
+            </label>
+            <input
+              type="text"
+              id="tags"
+              name="tags"
+              value={formData.tags}
+              onChange={handleChange}
+              placeholder="Comma-separated tags"
+              className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
+            />
+          </div>
+
+          <SectionHeader title="HOW IT READS ALOUD" rule="hairline" className="mb-5 mt-8 first:mt-0" />
+
+          {/* Short alt text - grid page */}
+          <div className="mb-5">
+            <label htmlFor="alt_text" className="block text-[11px] tracking-[1.5px] text-muted mb-1.5">
+              <span className="uppercase">Short alt text</span>{" "}
+              <span className="text-faint">— grid page</span>
+            </label>
+            <textarea
+              id="alt_text"
+              name="alt_text"
+              value={formData.alt_text}
+              onChange={handleChange}
+              rows={3}
+              className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
+            />
+          </div>
+
+          {/* Long alt text - detail page */}
+          <div className="mb-5">
+            <label htmlFor="alt_text_long" className="block text-[11px] tracking-[1.5px] text-muted mb-1.5">
+              <span className="uppercase">Long alt text</span>{" "}
+              <span className="text-faint">— detail page</span>
+            </label>
+            <textarea
+              id="alt_text_long"
+              name="alt_text_long"
+              value={formData.alt_text_long}
+              onChange={handleChange}
+              rows={4}
+              className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
+            />
+          </div>
+
+          {/* Audio description */}
+          <div className="mb-5 border border-dashed border-line bg-[#FBFAF7] p-5">
+            <label className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
+              Audio description
+            </label>
+            <p className="text-xs text-faint mb-3">
+              The read-aloud version of the long alt text. Transcribe and Generate keep the two in sync.
+            </p>
+
+            {artwork.audio_url ? (
+              <div className="mb-3">
+                <audio controls preload="metadata" className="w-full" src={artwork.audio_url} />
+                <p className="mt-1 text-[11px] text-faint">
+                  Source:{" "}
+                  <span className="font-mono">
+                    {artwork.audio_origin || "(no origin recorded)"}
+                  </span>
+                </p>
+              </div>
+            ) : (
+              <p className="italic text-muted mb-3">No audio yet.</p>
             )}
-            {audioMessage && (
-              <p className="text-sm text-gray-700">{audioMessage}</p>
-            )}
+
+            <div className="space-y-3">
+              <div>
+                <label
+                  htmlFor="audio_file"
+                  className={`admin-btn admin-btn-secondary px-4 py-2 text-[11px] tracking-[1.5px] ${
+                    audioBusy !== null
+                      ? "pointer-events-none cursor-not-allowed text-faint border-line"
+                      : "cursor-pointer"
+                  }`}
+                >
+                  UPLOAD MP3
+                </label>
+                <input
+                  id="audio_file"
+                  type="file"
+                  accept="audio/*"
+                  disabled={audioBusy !== null}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleAudioUpload(f);
+                    e.target.value = ""; // allow re-uploading the same filename
+                  }}
+                  className="hidden"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={audioBusy !== null || !artwork.audio_url}
+                  onClick={handleTranscribe}
+                  className="admin-btn admin-btn-secondary px-4 py-2 text-[11px] tracking-[1.5px]"
+                  title={!artwork.audio_url ? "Upload audio first" : "Transcribe audio → long alt text"}
+                >
+                  {audioBusy === "transcribe" ? "TRANSCRIBING…" : "TRANSCRIBE → TEXT"}
+                </button>
+                <button
+                  type="button"
+                  disabled={audioBusy !== null || !formData.alt_text_long}
+                  onClick={handleGenerateTts}
+                  className="admin-btn admin-btn-secondary px-4 py-2 text-[11px] tracking-[1.5px]"
+                  title={!formData.alt_text_long ? "Long alt text is empty" : "Generate audio from long alt text via ElevenLabs"}
+                >
+                  {audioBusy === "tts" ? "GENERATING…" : "GENERATE FROM TEXT"}
+                </button>
+              </div>
+
+              {audioBusy === "upload" && (
+                <p className="text-sm text-muted">Uploading…</p>
+              )}
+              {audioMessage && (
+                <p className="text-sm text-muted">{audioMessage}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Publish */}
+          <div className="mb-5">
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                name="on_website"
+                checked={formData.on_website}
+                onChange={handleChange}
+                className="h-4 w-4 accent-green"
+              />
+              <span className="text-sm text-ink">
+                Published on the website
+              </span>
+            </label>
+          </div>
+
+          {/* Actions */}
+          <div className="mt-8 flex items-center gap-6">
+            <button
+              type="submit"
+              disabled={saving}
+              className="admin-btn admin-btn-primary px-[26px] py-3.5 text-[13px] tracking-[2px]"
+            >
+              {saving ? "SAVING…" : "SAVE CHANGES"}
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/admin/artworks")}
+              className="text-muted hover:text-ink text-xs uppercase tracking-[1.5px]"
+            >
+              CANCEL
+            </button>
           </div>
         </div>
 
-        {/* Short alt text - grid page */}
-        <div className="mb-6">
-          <label htmlFor="alt_text" className="block text-sm font-bold text-gray-700 mb-2">
-            Short alt text (grid page)
-          </label>
-          <textarea
-            id="alt_text"
-            name="alt_text"
-            value={formData.alt_text}
-            onChange={handleChange}
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Publish */}
-        <div className="mb-6">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              name="on_website"
-              checked={formData.on_website}
-              onChange={handleChange}
-              className="w-4 h-4 border border-gray-300 rounded"
-            />
-            <span className="ml-3 text-sm text-gray-700">
-              Publish on website
-            </span>
-          </label>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-4">
-          <button
-            type="submit"
-            disabled={saving}
-            className="button-primary disabled:opacity-50"
-          >
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push("/admin/artworks")}
-            className="button-secondary"
-          >
-            Cancel
-          </button>
+        {/* Images */}
+        <div className="border border-ink bg-card p-6">
+          <SectionHeader title="IMAGES" rule="hairline" />
+          <p className="mt-4 mb-4 text-[11px] text-faint">
+            Drag to reorder. The first image is what visitors meet.
+          </p>
+          <ImageManager artworkId={artworkId} />
         </div>
       </form>
     </div>
