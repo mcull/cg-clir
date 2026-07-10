@@ -154,35 +154,33 @@ export default function EditArtistPage() {
   };
 
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>;
+    return <div className="py-12 text-center text-muted">Loading...</div>;
   }
 
   if (!artist) {
-    return <div className="text-center py-12">Artist not found</div>;
+    return <div className="py-12 text-center text-muted">Artist not found</div>;
   }
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        Edit Artist
-      </h1>
+      <h1 className="text-[44px] leading-none tracking-[-0.5px]">Edit Artist</h1>
 
-      <form onSubmit={handleSubmit} className="max-w-2xl bg-white rounded-lg shadow p-8">
+      <form onSubmit={handleSubmit} className="mt-8 max-w-2xl border border-ink bg-card p-8">
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-red-800">
+          <div className="mb-6 border border-[#b3261e] bg-card text-[#b3261e] px-4 py-3">
             {error}
           </div>
         )}
 
         {savedAt && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded text-green-800">
+          <div className="mb-6 border border-green bg-card text-green px-4 py-3">
             Saved.
           </div>
         )}
 
         {/* First Name */}
-        <div className="mb-6">
-          <label htmlFor="first_name" className="block text-sm font-bold text-gray-700 mb-2">
+        <div className="mb-5">
+          <label htmlFor="first_name" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
             First Name *
           </label>
           <input
@@ -192,13 +190,13 @@ export default function EditArtistPage() {
             value={formData.first_name}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
           />
         </div>
 
         {/* Last Name */}
-        <div className="mb-6">
-          <label htmlFor="last_name" className="block text-sm font-bold text-gray-700 mb-2">
+        <div className="mb-5">
+          <label htmlFor="last_name" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
             Last Name *
           </label>
           <input
@@ -208,13 +206,13 @@ export default function EditArtistPage() {
             value={formData.last_name}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
           />
         </div>
 
         {/* Bio */}
-        <div className="mb-6">
-          <label htmlFor="bio" className="block text-sm font-bold text-gray-700 mb-2">
+        <div className="mb-5">
+          <label htmlFor="bio" className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
             Biography
           </label>
           <textarea
@@ -223,22 +221,22 @@ export default function EditArtistPage() {
             value={formData.bio}
             onChange={handleChange}
             rows={6}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
           />
         </div>
 
         {/* External URL (creativegrowth.org artist page) */}
-        <div className="mb-6">
-          <label className="block text-sm font-bold text-gray-700 mb-2">
+        <div className="mb-5">
+          <label className="block text-[11px] uppercase tracking-[1.5px] text-muted mb-1.5">
             Public artist page (creativegrowth.org)
           </label>
-          <p className="text-xs text-gray-600 mb-3">
+          <p className="text-xs text-muted mb-3">
             When set, the artist link on the artwork detail page opens this
             URL in a new tab instead of the internal archive page.
           </p>
 
           <div className="space-y-2">
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-sm text-ink">
               <input
                 type="radio"
                 name="urlMode"
@@ -247,11 +245,12 @@ export default function EditArtistPage() {
                   setUrlMode("none");
                   setFormData((p) => ({ ...p, external_url: "" }));
                 }}
+                className="accent-green"
               />
               No public page
             </label>
 
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-sm text-ink">
               <input
                 type="radio"
                 name="urlMode"
@@ -264,6 +263,7 @@ export default function EditArtistPage() {
                     setFormData((p) => ({ ...p, external_url: "" }));
                   }
                 }}
+                className="accent-green"
               />
               Pick from creativegrowth.org sitemap
             </label>
@@ -281,7 +281,7 @@ export default function EditArtistPage() {
                       external_url: slug ? `${CG_ARTIST_BASE}${slug}` : "",
                     }));
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
                 >
                   <option value="">— select an artist slug —</option>
                   {CG_SLUGS.map((slug) => (
@@ -289,11 +289,11 @@ export default function EditArtistPage() {
                   ))}
                 </select>
                 {suggestedSlug && (
-                  <p className="text-xs text-gray-700 mt-2">
+                  <p className="text-xs text-muted mt-2">
                     Did you mean{" "}
                     <button
                       type="button"
-                      className="link-primary underline"
+                      className="text-green underline"
                       onClick={() =>
                         setFormData((p) => ({
                           ...p,
@@ -309,7 +309,7 @@ export default function EditArtistPage() {
               </div>
             )}
 
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-sm text-ink">
               <input
                 type="radio"
                 name="urlMode"
@@ -318,6 +318,7 @@ export default function EditArtistPage() {
                   setUrlMode("custom");
                   setFormData((p) => ({ ...p, external_url: customUrl }));
                 }}
+                className="accent-green"
               />
               Custom URL
             </label>
@@ -332,7 +333,7 @@ export default function EditArtistPage() {
                     setFormData((p) => ({ ...p, external_url: e.target.value }));
                   }}
                   placeholder="https://..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="admin-field border border-line bg-card px-3.5 py-2.5 text-sm w-full"
                 />
               </div>
             )}
@@ -340,18 +341,18 @@ export default function EditArtistPage() {
         </div>
 
         {/* Actions */}
-        <div className="flex gap-4">
+        <div className="mt-8 flex items-center gap-6">
           <button
             type="submit"
             disabled={saving}
-            className="button-primary disabled:opacity-50"
+            className="admin-btn admin-btn-primary px-[26px] py-3.5 text-[13px] tracking-[2px]"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
           <button
             type="button"
             onClick={() => router.push("/admin/artists")}
-            className="button-secondary"
+            className="text-muted hover:text-ink text-xs uppercase tracking-[1.5px]"
           >
             Cancel
           </button>

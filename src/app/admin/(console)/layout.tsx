@@ -1,9 +1,9 @@
 import { ReactNode } from "react";
-import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { isDevAuthBypass } from "@/lib/admin-auth";
 import { isAllowedAdmin } from "@/lib/admin-allowlist";
 import { redirect } from "next/navigation";
+import AdminNav from "@/components/admin/AdminNav";
 
 /**
  * Server-side gate (defense-in-depth alongside middleware). Verifies the
@@ -37,30 +37,28 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   await requireAdminPage();
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="admin-shell flex min-h-screen bg-paper">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-900 text-white relative">
-        <div className="p-6 border-b border-gray-700">
-          <h1 className="text-xl font-bold">Admin Console</h1>
-          <p className="text-sm text-gray-400 mt-2">
-            Creative Growth Gallery
-          </p>
+      <aside className="sticky top-0 flex h-screen w-[248px] shrink-0 flex-col bg-ink text-paper">
+        <div className="border-b border-sidebar-line px-7 pb-6 pt-8">
+          <div className="text-[17px] uppercase leading-[1.35] tracking-[2.5px]">
+            Creative
+            <br />
+            Growth
+          </div>
+          <div className="mt-2.5 text-[11px] uppercase tracking-[2px] text-green-light">
+            Admin Console
+          </div>
         </div>
 
-        <nav className="p-6 space-y-4">
-          <NavLink href="/admin" label="Dashboard" />
-          <NavLink href="/admin/artworks" label="Artworks" />
-          <NavLink href="/admin/artists" label="Artists" />
-          <NavLink href="/admin/subscribers" label="Subscribers" />
-          <NavLink href="/admin/import" label="Import/Export" />
-        </nav>
+        <AdminNav />
 
-        <div className="absolute bottom-6 left-6 right-6 pt-6 border-t border-gray-700">
+        <div className="mt-auto flex flex-col gap-3 border-t border-sidebar-line px-7 pb-7 pt-6">
           <a
             href="/collection"
-            className="block text-sm text-gray-400 hover:text-white transition-colors"
+            className="text-xs tracking-[1px] text-[#CFC9BC] transition-colors hover:text-paper"
           >
-            ← View Gallery
+            ← View gallery
           </a>
           {/* Logout must be a form-bound server action — onClick handlers
            * don't work in a Server Component, so the old button was inert.
@@ -75,9 +73,9 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
           >
             <button
               type="submit"
-              className="mt-3 block text-sm text-gray-400 hover:text-white transition-colors"
+              className="text-xs tracking-[1px] text-[#CFC9BC] transition-colors hover:text-paper"
             >
-              Logout
+              Log out
             </button>
           </form>
         </div>
@@ -85,22 +83,15 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* Main Content */}
       <main className="flex-1">
-        <div className="bg-blue-600 text-white p-3 text-center text-sm">
-          You are in admin mode
+        <div className="flex items-center gap-2 bg-green px-10 py-2 text-xs tracking-[1.2px] text-paper">
+          <span
+            aria-hidden="true"
+            className="h-[7px] w-[7px] rounded-full bg-white"
+          />
+          You&rsquo;re in admin mode — visitors can&rsquo;t see you fussing.
         </div>
-        <div className="p-8">{children}</div>
+        <div className="mx-auto max-w-[1180px] px-12 pb-16 pt-12">{children}</div>
       </main>
     </div>
-  );
-}
-
-function NavLink({ href, label }: { href: string; label: string }) {
-  return (
-    <Link
-      href={href}
-      className="block px-4 py-2 rounded hover:bg-gray-800 transition-colors text-gray-300 hover:text-white"
-    >
-      {label}
-    </Link>
   );
 }

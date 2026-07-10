@@ -3,6 +3,8 @@ import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { hogql } from "@/lib/posthog-query";
 import { formatArtistName } from "@/lib/utils";
+import StatCard from "@/components/admin/StatCard";
+import SectionHeader from "@/components/admin/SectionHeader";
 
 // Re-evaluate analytics every 5 minutes so the dashboard stays cheap to
 // load and PostHog isn't queried on every refresh.
@@ -181,42 +183,54 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+      <h1 className="text-[44px] leading-none tracking-[-0.5px]">Dashboard</h1>
+      <p className="mt-3 text-sm text-muted">The collection, counted.</p>
 
       {/* Catalog snapshot */}
-      <h2 className="text-sm font-bold text-gray-600 uppercase tracking-wider mb-3">Catalog</h2>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-        <StatCard title="Active artworks" value={stats.artworks} color="blue" />
-        <StatCard title="Active ephemera" value={stats.ephemera} color="purple" />
-        <StatCard title="Artists" value={stats.artists} color="green" />
-        <StatCard title="Human descriptions" value={stats.humanDescriptions} color="green" />
-        <StatCard title="With audio" value={stats.audioPieces} color="orange" />
+      <div className="mt-12 space-y-3.5">
+        <SectionHeader title="CATALOG" />
+        <div className="grid grid-cols-5 gap-3.5">
+          <StatCard
+            label="Active artworks"
+            value={stats.artworks}
+            swatch="oklch(0.62 0.13 145)"
+          />
+          <StatCard
+            label="Active ephemera"
+            value={stats.ephemera}
+            swatch="oklch(0.62 0.13 300)"
+          />
+          <StatCard label="Artists" value={stats.artists} swatch="oklch(0.62 0.13 250)" />
+          <StatCard
+            label="Human descriptions"
+            value={stats.humanDescriptions}
+            swatch="oklch(0.62 0.13 85)"
+          />
+          <StatCard
+            label="With audio"
+            value={stats.audioPieces}
+            swatch="oklch(0.62 0.13 25)"
+          />
+        </div>
       </div>
 
       {/* Activity */}
-      <h2 className="text-sm font-bold text-gray-600 uppercase tracking-wider mb-3">
-        Visitor activity (last 30 days)
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          title="Page views"
-          value={visitors.pageViews}
-          color="blue"
-          fallback={phMissing ? "PostHog not configured" : undefined}
-        />
-        <StatCard
-          title="Unique visitors"
-          value={visitors.uniqueVisitors}
-          color="green"
-          fallback={phMissing ? "PostHog not configured" : undefined}
-        />
-        <StatCard title="Downloads (30d)" value={downloads.last30} color="orange" />
-        <StatCard title="Downloads (7d)" value={downloads.last7} color="orange" />
+      <div className="mt-12 space-y-3.5">
+        <SectionHeader title="VISITOR ACTIVITY" qualifier="LAST 30 DAYS" />
+        <div className="grid grid-cols-4 gap-3.5">
+          <StatCard label="Page views" value={phMissing ? "—" : (visitors.pageViews as number)} />
+          <StatCard
+            label="Unique visitors"
+            value={phMissing ? "—" : (visitors.uniqueVisitors as number)}
+          />
+          <StatCard label="Downloads · 30d" value={downloads.last30} />
+          <StatCard label="Downloads · 7d" value={downloads.last7} />
+        </div>
       </div>
 
       {/* Top tables */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <Card title="Most-viewed artworks (last 30d)">
+      <div className="mt-12 grid grid-cols-2 gap-3.5">
+        <RankedCard title="Most-viewed">
           {topViewed === null ? (
             <EmptyNote>Waiting on PostHog data.</EmptyNote>
           ) : topViewed.length === 0 ? (
@@ -238,11 +252,13 @@ export default async function AdminDashboard() {
               valueLabel="views"
             />
           )}
-        </Card>
+        </RankedCard>
 
-        <Card title="Most-downloaded artworks (last 30d)">
+        <RankedCard title="Most-downloaded">
           {downloads.topArtworks.length === 0 ? (
-            <EmptyNote>No downloads in the last 30 days.</EmptyNote>
+            <p className="px-6 py-5 text-sm text-muted">
+              No downloads in the last 30 days. The art is playing hard to get.
+            </p>
           ) : (
             <RankedList
               items={downloads.topArtworks.map(({ artwork, count }) => ({
@@ -260,77 +276,50 @@ export default async function AdminDashboard() {
               valueLabel="downloads"
             />
           )}
-        </Card>
+        </RankedCard>
       </div>
 
       {/* Geography */}
-      <Card title="Geography (last 30d)">
-        {visitors.geography === null ? (
-          <EmptyNote>Waiting on PostHog data.</EmptyNote>
-        ) : visitors.geography.length === 0 ? (
-          <EmptyNote>No geo-located pageviews yet.</EmptyNote>
-        ) : (
-          <RankedList
-            items={visitors.geography.map((row) => ({
-              key: row.country,
-              primary: row.country,
-              value: row.visitors,
-            }))}
-            valueLabel="visitors"
-          />
-        )}
-      </Card>
+      <div className="mt-12">
+        <RankedCard title="Geography">
+          {visitors.geography === null ? (
+            <EmptyNote>Waiting on PostHog data.</EmptyNote>
+          ) : visitors.geography.length === 0 ? (
+            <EmptyNote>No geo-located pageviews yet.</EmptyNote>
+          ) : (
+            <RankedList
+              items={visitors.geography.map((row) => ({
+                key: row.country,
+                primary: row.country,
+                value: row.visitors,
+              }))}
+              valueLabel="visitors"
+            />
+          )}
+        </RankedCard>
+      </div>
 
-      <p className="text-xs text-gray-500 mt-6">
-        Visitor stats refresh every 5 minutes. Downloads track instantly.
+      <p className="mt-10 text-xs text-faint">
+        Visitor stats refresh every 5 minutes. Downloads brag instantly.
       </p>
     </div>
   );
 }
 
-function StatCard({
-  title,
-  value,
-  color,
-  fallback,
-}: {
-  title: string;
-  value: number | null;
-  color: "blue" | "green" | "purple" | "orange";
-  fallback?: string;
-}) {
-  const colorClasses = {
-    blue: "bg-blue-50 text-blue-900 border-blue-200",
-    green: "bg-green-50 text-green-900 border-green-200",
-    purple: "bg-purple-50 text-purple-900 border-purple-200",
-    orange: "bg-orange-50 text-orange-900 border-orange-200",
-  };
-
+function RankedCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className={`${colorClasses[color]} p-6 rounded-lg border`}>
-      <p className="text-sm font-medium opacity-75">{title}</p>
-      {value === null ? (
-        <p className="text-sm mt-2 opacity-60 italic">{fallback || "—"}</p>
-      ) : (
-        <p className="text-3xl font-bold mt-2">{value.toLocaleString()}</p>
-      )}
-    </div>
-  );
-}
-
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="p-6 border-b border-gray-200">
-        <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+    <div className="border border-ink bg-card">
+      <div className="flex items-center justify-between px-6 py-5 border-b border-ink">
+        <h3 className="text-base">{title}</h3>
+        <span className="text-[11px] uppercase tracking-[1px] text-muted">30D</span>
       </div>
-      <div className="p-6">{children}</div>
+      <div className="px-6">{children}</div>
     </div>
   );
 }
 
 function EmptyNote({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-gray-500 italic">{children}</p>;
+  return <p className="py-5 text-sm text-muted">{children}</p>;
 }
 
 interface RankedItem {
@@ -343,28 +332,29 @@ interface RankedItem {
 
 function RankedList({ items, valueLabel }: { items: RankedItem[]; valueLabel: string }) {
   return (
-    <ol className="space-y-2">
+    <ol>
       {items.map((item, i) => (
-        <li key={item.key} className="flex items-center gap-3 text-sm">
-          <span className="w-6 text-right text-gray-400 font-mono">{i + 1}.</span>
-          <div className="flex-1 min-w-0">
+        <li
+          key={item.key}
+          className="flex items-center gap-4 py-3.5 border-b border-hairline last:border-0"
+        >
+          <span className="min-w-[26px] text-[34px] text-[#D9D3C5]">{i + 1}</span>
+          <div className="min-w-0 flex-1">
             {item.href ? (
               <Link
                 href={item.href}
-                className="text-gray-900 hover:text-blue-600 truncate block"
+                className="block truncate text-sm text-ink hover:text-green hover:underline"
               >
                 {item.primary}
               </Link>
             ) : (
-              <span className="text-gray-900">{item.primary}</span>
+              <span className="block truncate text-sm text-ink">{item.primary}</span>
             )}
-            {item.secondary && (
-              <span className="text-xs text-gray-500">{item.secondary}</span>
-            )}
+            {item.secondary && <span className="text-xs text-muted">{item.secondary}</span>}
           </div>
-          <span className="text-gray-600 font-medium tabular-nums">
+          <span className="ml-auto text-sm tabular-nums text-ink">
             {item.value.toLocaleString()}{" "}
-            <span className="text-xs font-normal text-gray-400">{valueLabel}</span>
+            <span className="text-[11px] text-faint">{valueLabel}</span>
           </span>
         </li>
       ))}
