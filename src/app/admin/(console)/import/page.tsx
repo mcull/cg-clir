@@ -67,6 +67,8 @@ export default function ImportPage() {
         "Categories",
         "Tags",
         "On Website",
+        "Alt Text",
+        "Alt Text (Long)",
       ];
 
       const rows = (data || []).map((artwork: any): string[] => [
@@ -85,6 +87,8 @@ export default function ImportPage() {
         artwork.categories?.map((c: any) => c.category.name).join("; ") || "",
         artwork.tags?.join("; ") || "",
         artwork.on_website ? "Yes" : "No",
+        artwork.alt_text || "",
+        artwork.alt_text_long || "",
       ]);
 
       const csv = [
@@ -92,7 +96,9 @@ export default function ImportPage() {
         ...rows.map((row) =>
           row
             .map((cell) =>
-              typeof cell === "string" && cell.includes(",")
+              // Quote any cell containing a comma, double quote, or newline.
+              // Long alt text descriptions frequently contain all three.
+              typeof cell === "string" && /[",\r\n]/.test(cell)
                 ? `"${cell.replace(/"/g, '""')}"`
                 : cell
             )
