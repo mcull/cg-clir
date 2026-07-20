@@ -46,7 +46,7 @@ export default function EditArtworkPage() {
   // actions persist immediately (no Save Changes round-trip needed). We
   // mirror the latest values onto the artwork object so the player and
   // status text re-render.
-  const [audioBusy, setAudioBusy] = useState<null | "upload" | "transcribe" | "tts">(null);
+  const [audioBusy, setAudioBusy] = useState<null | "upload" | "transcribe" | "tts" | "delete">(null);
   const [audioMessage, setAudioMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -190,6 +190,27 @@ export default function EditArtworkPage() {
       setAudioMessage("Transcript saved to long alt text.");
     } catch (err) {
       setAudioMessage(err instanceof Error ? err.message : "Transcription failed");
+    } finally {
+      setAudioBusy(null);
+    }
+  }
+
+  async function handleAudioDelete() {
+    if (!window.confirm("Delete this audio description? This cannot be undone.")) return;
+    setAudioBusy("delete");
+    setAudioMessage(null);
+    try {
+      const resp = await fetch("/api/admin/audio", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artworkId }),
+      });
+      const json = await resp.json();
+      if (!resp.ok) throw new Error(json.error || `Delete failed: ${resp.status}`);
+      setArtwork((a) => (a ? { ...a, audio_url: null, audio_origin: null } : a));
+      setAudioMessage("Audio deleted.");
+    } catch (err) {
+      setAudioMessage(err instanceof Error ? err.message : "Delete failed");
     } finally {
       setAudioBusy(null);
     }
@@ -523,6 +544,17 @@ export default function EditArtworkPage() {
                 >
                   {audioBusy === "tts" ? "GENERATING…" : "GENERATE FROM TEXT"}
                 </button>
+                {artwork.audio_url && (
+                  <button
+                    type="button"
+                    disabled={audioBusy !== null}
+                    onClick={handleAudioDelete}
+                    className="admin-btn admin-btn-secondary px-4 py-2 text-[11px] tracking-[1.5px] text-red-700 border-red-300 hover:bg-red-50"
+                    title="Delete this audio description"
+                  >
+                    {audioBusy === "delete" ? "DELETING…" : "DELETE AUDIO"}
+                  </button>
+                )}
               </div>
 
               {audioBusy === "upload" && (
